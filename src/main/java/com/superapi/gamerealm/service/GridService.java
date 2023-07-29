@@ -22,6 +22,15 @@ public class GridService {
         this.gridRepository = gridRepository;
     }
     public Grid createAndInitializeGrid() {
+
+
+        Grid existingGrid = gridRepository.findFirstByOrderByIdAsc();
+
+        if (existingGrid != null) {
+            // If a grid exists, return it instead of creating a new one
+            return existingGrid;
+        }
+
         Grid grid = new Grid(5, 5); // Create a 5x5 grid
 
         // Add 5 barbarian villages to the grid at random positions
@@ -54,11 +63,12 @@ public class GridService {
                 yCoordinate = generateRandomCoordinate(height);
                 spotKey = xCoordinate + "," + yCoordinate;
             }
-
             BarbarianVillage barbarianVillage = new BarbarianVillage();
             barbarianVillage.setXCoordinate(xCoordinate);
             barbarianVillage.setYCoordinate(yCoordinate);
+            barbarianVillage.setGrid(grid); // Set the grid to which the village belongs
             grid.getBarbarianVillages().add(barbarianVillage);
+
 
             // Mark the spot as occupied
             occupiedSpots.add(spotKey);
@@ -89,6 +99,7 @@ public class GridService {
             ConquerableSpot conquerableSpot = new ConquerableSpot();
             conquerableSpot.setxCoordinate(xCoordinate);
             conquerableSpot.setyCoordinate(yCoordinate);
+            conquerableSpot.setGrid(grid); // Set the grid to which the conquerable spot belongs
             grid.getConquerableSpots().add(conquerableSpot);
 
             // Mark the spot as occupied

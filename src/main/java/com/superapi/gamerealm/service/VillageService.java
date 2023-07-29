@@ -19,7 +19,7 @@ import java.util.Map;
 public class VillageService {
     private final VillageRepository villageRepository;
     private final ModelMapper modelMapper;
-    private GridService gridService;
+    private final GridService gridService;
 
     @Autowired
     public VillageService(VillageRepository villageRepository, GridService gridService, ModelMapper modelMapper) {
