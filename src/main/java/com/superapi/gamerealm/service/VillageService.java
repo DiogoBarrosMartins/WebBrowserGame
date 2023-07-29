@@ -1,8 +1,10 @@
 package com.superapi.gamerealm.service;
 
+import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.VillageRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,26 +13,19 @@ import java.util.HashMap;
 import java.util.Map;
 @Service
 public class VillageService {
-
     private final VillageRepository villageRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public VillageService(VillageRepository villageRepository) {
+    public VillageService(VillageRepository villageRepository, ModelMapper modelMapper) {
         this.villageRepository = villageRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public Village createVillage(Account account) {
-        // Logic for creating a new village
-        // ...
-
-        Village village = new Village();
-        village.setAccount(account);
-        initializeDefaultResources(village);
-        initializeDefaultBuildings(village);
-
-        // Save the new village to the database using the VillageRepository
-        // It's a good practice to return the saved instance for potential further use.
-        return villageRepository.save(village);
+    public VillageDTO createVillage(VillageDTO villageDTO) {
+        Village village = modelMapper.map(villageDTO, Village.class);
+        Village createdVillage = villageRepository.save(village);
+        return modelMapper.map(createdVillage, VillageDTO.class);
     }
 
     private void initializeDefaultResources(Village village) {

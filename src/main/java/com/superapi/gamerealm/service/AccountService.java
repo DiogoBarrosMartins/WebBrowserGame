@@ -1,49 +1,49 @@
 package com.superapi.gamerealm.service;
 
-import com.superapi.gamerealm.dto.AccountRequest;
+import com.superapi.gamerealm.dto.AccountDTO;
 import com.superapi.gamerealm.model.Account;
-import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.AccountRepository;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
-
     private final AccountRepository accountRepository;
-    private final VillageService villageService;
+    private final ModelMapper modelMapper;
 
-    public AccountService(AccountRepository accountRepository, VillageService villageService) {
+    @Autowired
+    public AccountService(AccountRepository accountRepository, ModelMapper modelMapper) {
         this.accountRepository = accountRepository;
-        this.villageService = villageService;
+        this.modelMapper = modelMapper;
     }
 
-    public Account createAccount(AccountRequest accountRequest) {
-        // Create a new account and save it to the database using the AccountRepository
-        Account newAccount = new Account();
-        // Set account details from the request (username, password, email, tribe, etc.)
-        newAccount.setUsername(accountRequest.getUsername());
-        newAccount.setPassword(accountRequest.getPassword());
-        newAccount.setEmail(accountRequest.getEmail());
-        newAccount.setTribe(accountRequest.getTribe());
+    public AccountDTO createAccount(AccountDTO accountDTO) {
+        Account account = modelMapper.map(accountDTO, Account.class);
+        Account createdAccount = accountRepository.save(account);
+        return modelMapper.map(createdAccount, AccountDTO.class);
+    }
 
-        // Save the new account to the database
-        Account savedAccount = accountRepository.save(newAccount);
-
-        // Create a new village and associate it with the account using the VillageService
-        Village newVillage = villageService.createVillage(savedAccount);
-        savedAccount.setVillage(newVillage);
-
-        // Return the newly created account
-        return savedAccount;
+    public Optional<AccountDTO> getAccountByUsername(String username) {
+        Optional<Account> optionalAccount = accountRepository.findByUsername(username);
+        return optionalAccount.map(account -> modelMapper.map(account, AccountDTO.class));
     }
 
 
-    public Optional<Account> getAccountByUsername(String username) {
-   return accountRepository.findByUsername(username);
+    public List<AccountDTO> getAllAccounts() {
+        List<Account> accounts = accountRepository.findAll();
+        return accounts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    // Other methods related to account business logic
+    private AccountDTO convertToDTO(Account account) {
+        return modelMapper.map(account, AccountDTO.class);
+    }
+
+    // Other account-related methods
 }

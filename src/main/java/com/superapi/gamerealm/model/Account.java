@@ -2,6 +2,8 @@ package com.superapi.gamerealm.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 public class Account {
     @Id
@@ -73,5 +75,21 @@ public class Account {
     public Village getVillage() {
         return village;
     }
-// getters and setters
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Account)) return false;
+        Account account = (Account) o;
+        return Objects.equals(id, account.id) &&
+                Objects.equals(email, account.email) &&
+                Objects.equals(password, account.password) &&
+                Objects.equals(tribe, account.tribe) &&
+                Objects.equals(username, account.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, password, tribe, username);
+    }
 }

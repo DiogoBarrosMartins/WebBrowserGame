@@ -42,7 +42,7 @@ public class Village {
 
 
     public Village() {
-
+    this.name ="default name";
     }
 
     private void initializeDefaultResources() {
