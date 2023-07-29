@@ -2,6 +2,8 @@ package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.model.Account;
+import com.superapi.gamerealm.model.ConquerableSpot;
+import com.superapi.gamerealm.model.Grid;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.VillageRepository;
 import org.modelmapper.ModelMapper;
@@ -10,16 +12,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 @Service
 public class VillageService {
     private final VillageRepository villageRepository;
     private final ModelMapper modelMapper;
+    private GridService gridService;
 
     @Autowired
-    public VillageService(VillageRepository villageRepository, ModelMapper modelMapper) {
+    public VillageService(VillageRepository villageRepository, GridService gridService, ModelMapper modelMapper) {
         this.villageRepository = villageRepository;
+        this.gridService = gridService;
         this.modelMapper = modelMapper;
+
     }
 
     public VillageDTO createVillage(VillageDTO villageDTO) {
@@ -47,7 +54,6 @@ public class VillageService {
         buildings.put("goldMines", 0);
         village.setBuildings(buildings);
     }
-
 
 
     // public for tests!
@@ -96,5 +102,45 @@ public class VillageService {
 
     public void purgePlayerData() {
     }
-    // Other methods related to village business logic
+
+    public List<Village> findAllVillagesByAccountId(Long accountId) {
+        return villageRepository.findAllByAccountId(accountId);
+    }
+
+    public void turnVillageIntoConquerableSpots(Village village) {
+        if (village != null) {
+            // Get the village's coordinates
+            int xCoordinate = village.getXCoordinate();
+            int yCoordinate = village.getYCoordinate();
+
+            // Remove the village from the player's account
+            villageRepository.delete(village);
+
+            // Call the GridService to add a conquerable spot
+            gridService.addConquerableSpot(xCoordinate, yCoordinate);
+        }
+    }
+    public void addVillageFromConquerableSpot(Grid grid, Account account) {
+        List<ConquerableSpot> conquerableSpots = grid.getConquerableSpots();
+
+        if (!conquerableSpots.isEmpty()) {
+            // Pick a random conquerable spot from the list
+            ConquerableSpot conquerableSpot = conquerableSpots.get((int) (Math.random() * conquerableSpots.size()));
+
+            // Create a new Village from the conquerable spot coordinates
+            Village village = new Village();
+            village.setXCoordinate(conquerableSpot.getXCoordinate());
+            village.setYCoordinate(conquerableSpot.getYCoordinate());
+
+            // Associate the village with the account
+            village.setAccount(account);
+
+            // Add the village to the grid and remove the conquerable spot
+            grid.getVillages().add(village);
+            grid.getConquerableSpots().remove(conquerableSpot);
+
+            // Save the updated grid to the database
+            gridService.saveGrid(grid);
+        }
+    }    // Other methods related to village business logic
 }

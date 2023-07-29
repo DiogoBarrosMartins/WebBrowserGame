@@ -1,34 +1,30 @@
 package com.superapi.gamerealm.model;
 
 import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Entity
 public class Grid {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // The width and height of the grid
-    @Column(nullable = false)
     private int width;
-
-    @Column(nullable = false)
     private int height;
 
-    // List of villages on the grid
+
     @OneToMany(mappedBy = "grid", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Village> villages = new ArrayList<>();
 
-    // List of conquerable spots on the grid
     @OneToMany(mappedBy = "grid", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConquerableSpot> conquerableSpots = new ArrayList<>();
 
-    // List of barbarian villages on the grid
     @OneToMany(mappedBy = "grid", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BarbarianVillage> barbarianVillages = new ArrayList<>();
+
 
     public Grid(int width, int height) {
         this.width = width;
@@ -38,9 +34,7 @@ public class Grid {
     }
 
     public Grid() {
-
     }
-
 
     public Long getId() {
         return id;
@@ -88,5 +82,9 @@ public class Grid {
 
     public void setBarbarianVillages(List<BarbarianVillage> barbarianVillages) {
         this.barbarianVillages = barbarianVillages;
+    }
+
+    public List<Village> getPlayerVillages() {
+        return villages;
     }
 }

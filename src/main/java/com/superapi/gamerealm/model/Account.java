@@ -2,6 +2,8 @@ package com.superapi.gamerealm.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -9,9 +11,9 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
-    private Village village;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    private List<Village> villages = new ArrayList<>();
 
     private String username;
     private String password;
@@ -36,9 +38,6 @@ public class Account {
         return id;
     }
 
-    public void setVillage(Village newVillage) {
-   this.village = newVillage;
-    }
 
     public String getUsername() {
         return username;
@@ -72,8 +71,12 @@ public class Account {
         this.tribe = tribe;
     }
 
-    public Village getVillage() {
-        return village;
+    public List<Village> getVillages() {
+        return villages;
+    }
+
+    public void setVillages(List<Village> villages) {
+        this.villages = villages;
     }
 
     @Override

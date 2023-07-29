@@ -22,5 +22,6 @@ public class GameRealmApplication {
 	public void init() {
 		// Call the initializeGameServer() method when the application starts
 		gameServerInitializer.initializeGameServer();
+		System.out.println("GAME FOUND, RESUMING :D");
 	}
 }

@@ -12,15 +12,14 @@ public class GameServerInitializer {
     private final GameServerService gameServerService;
     private final VillageService villageService;
 
-    public GameServerInitializer(GameServerService gameServerService,VillageService villageService ) {
+    public GameServerInitializer(GameServerService gameServerService, VillageService villageService) {
         this.gameServerService = gameServerService;
         this.villageService = villageService;
     }
 
     @Transactional
     public void initializeGameServer() {
-
-gameServerService.createGameServerIfNotExists();
+        gameServerService.createGameServerIfNotExists();
 
     }
 

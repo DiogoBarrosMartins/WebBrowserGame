@@ -1,5 +1,7 @@
 package com.superapi.gamerealm.model;
+
 import jakarta.persistence.*;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,9 +20,6 @@ public class Village {
     @Column(nullable = false)
     private int xCoordinate;
 
-    @ManyToOne
-    @JoinColumn(name = "grid_id")
-    private Grid grid;
     @Column(nullable = false)
     private int yCoordinate;
 
@@ -36,18 +35,18 @@ public class Village {
     @Column(name = "level")
     private Map<String, Integer> buildings = new HashMap<>();
 
-
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
+    @ManyToOne
+    @JoinColumn(name = "grid_id")
+    private Grid grid;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;
 
-
-
     public Village() {
-    this.name ="default name";
+        this.name = "default name";
     }
 
     private void initializeDefaultResources() {
@@ -79,27 +78,38 @@ public class Village {
         return buildings;
     }
 
+
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getXCoordinate() {
+        return xCoordinate;
+    }
+
+    public int getYCoordinate() {
+        return yCoordinate;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
     public void setAccount(Account account) {
         this.account = account;
     }
 
-    public Account getAccount() {
-        return account; }
-
-    public long getId() {
-        return id;}
-
-    public String getName() {
-        return name; }
-
-    public int getXCoordinate() {return xCoordinate;
+    public Grid getGrid() {
+        return grid;
     }
 
-    public int getYCoordinate() {return yCoordinate;
+    public void setGrid(Grid grid) {
+        this.grid = grid;
     }
-
-
-
 
     public void setId(long l) {
         this.id = l;
@@ -150,10 +160,13 @@ public class Village {
     }
 
     public void setXCoordinate(int i) {
-        this.xCoordinate = i; }
+        this.xCoordinate = i;
+    }
 
     public void setYCoordinate(int i) {
-        this.yCoordinate =i; }
+        this.yCoordinate = i;
+    }
+
 
 
 }

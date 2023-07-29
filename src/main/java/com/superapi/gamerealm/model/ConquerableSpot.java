@@ -29,7 +29,7 @@ public class ConquerableSpot {
         this.id = id;
     }
 
-    public int getxCoordinate() {
+    public int getXCoordinate() {
         return xCoordinate;
     }
 
@@ -37,11 +37,21 @@ public class ConquerableSpot {
         this.xCoordinate = xCoordinate;
     }
 
-    public int getyCoordinate() {
+    public int getYCoordinate() {
         return yCoordinate;
     }
 
     public void setyCoordinate(int yCoordinate) {
         this.yCoordinate = yCoordinate;
     }
+
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
+    }
+
+
 }

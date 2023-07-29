@@ -5,6 +5,7 @@ import com.superapi.gamerealm.model.Grid;
 import com.superapi.gamerealm.repository.GameServerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 @Service
 public class GameServerServiceImpl implements GameServerService {
 
@@ -33,9 +34,11 @@ public class GameServerServiceImpl implements GameServerService {
 
             // Purge player accounts (Delete all player accounts)
             accountService.purgePlayerAccounts();
+            gridService.purgeEntireCity();
+            Grid grid = gridService.createAndInitializeGrid();
 
-            // Initialize the grid with a 10x10 size and 5 barbarian villages
-            Grid grid = gridService.createAndInitializeGrid(10, 10, 5);
+            // Associate the grid with the game server
+            gameServer.setGrid(grid);
 
             // Save the game server entity in the database
             gameServer = gameServerRepository.save(gameServer);
