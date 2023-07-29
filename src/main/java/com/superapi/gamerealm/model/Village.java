@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "village_type")
 public class Village {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,6 +18,9 @@ public class Village {
     @Column(nullable = false)
     private int xCoordinate;
 
+    @ManyToOne
+    @JoinColumn(name = "grid_id")
+    private Grid grid;
     @Column(nullable = false)
     private int yCoordinate;
 

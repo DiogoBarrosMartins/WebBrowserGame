@@ -93,5 +93,8 @@ public class VillageService {
         village.setResources(currentResources);
         village.setLastUpdated(now);
     }
+
+    public void purgePlayerData() {
+    }
     // Other methods related to village business logic
 }

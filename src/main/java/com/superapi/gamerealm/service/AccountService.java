@@ -45,5 +45,9 @@ public class AccountService {
         return modelMapper.map(account, AccountDTO.class);
     }
 
+    public void purgePlayerAccounts() {
+        accountRepository.deleteAll();
+    }
+
     // Other account-related methods
 }
