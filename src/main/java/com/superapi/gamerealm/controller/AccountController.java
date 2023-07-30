@@ -44,6 +44,14 @@ public class AccountController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/id/{accountId}")
+    public ResponseEntity<AccountDTO> getAccountByAccountId(@PathVariable Long accountId) {
+        return accountService.getAccountByAccountId(accountId)
+                .map(accountDTO -> new ResponseEntity<>(accountDTO, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+
 }
 
 

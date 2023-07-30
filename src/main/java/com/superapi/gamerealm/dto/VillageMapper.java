@@ -1,22 +1,29 @@
 package com.superapi.gamerealm.dto;
 
+import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.model.Village;
 import org.springframework.stereotype.Component;
-
 @Component
 public class VillageMapper {
-
-    public VillageDTO mapToResponseDTO(Village village) {
-        VillageDTO dto = new VillageDTO();
-        dto.setxCoordinate(village.getXCoordinate());
-        dto.setyCoordinate(village.getYCoordinate());
-        dto.setAccountId(village.getAccount().getId());
-        dto.setId(village.getId());
-        dto.setName(village.getName());
-        return dto;
+    public static VillageDTO toDTO(Village village) {
+        VillageDTO villageDTO = new VillageDTO();
+        villageDTO.setId(village.getId());
+        villageDTO.setX(village.getCoordinates().getX());
+        villageDTO.setY(village.getCoordinates().getY());
+        villageDTO.setName(village.getName());
+        villageDTO.setAccountId(village.getAccount().getId());
+        villageDTO.setLastUpdated(village.getLastUpdated());
+        return villageDTO;
     }
 
-    // You can add more mapping methods if needed for other use cases
-
+    public static Village toEntity(VillageDTO villageDTO) {
+        Village village = new Village();
+        village.setId(villageDTO.getId());
+        village.setCoordinates(new Coordinates(villageDTO.getX(), villageDTO.getY()));
+        village.setName(villageDTO.getName());
+        // Note: accountId should be set through the Account entity using a service or repository.
+        // village.setAccount(/* Account entity */);
+        village.setLastUpdated(villageDTO.getLastUpdated());
+        return village;
+    }
 }
-

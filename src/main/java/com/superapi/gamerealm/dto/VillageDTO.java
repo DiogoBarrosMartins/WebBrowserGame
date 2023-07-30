@@ -1,38 +1,25 @@
 package com.superapi.gamerealm.dto;
 
+import java.util.Date;
+
 public class VillageDTO {
-        private Integer xCoordinate;
-        private Integer yCoordinate;
-        private Long accountId;
         private Long id;
+        private int x;
+        private int y;
         private String name;
+        private Long accountId;
+        private Date lastUpdated;
 
-        public void setCoordinates(int xCoordinate, int yCoordinate) {
-                this.xCoordinate = xCoordinate;
-                this.yCoordinate = yCoordinate;
-        }
-        public Integer getxCoordinate() {
-                return xCoordinate;
+        public VillageDTO() {
         }
 
-        public void setxCoordinate(Integer xCoordinate) {
-                this.xCoordinate = xCoordinate;
-        }
-
-        public Integer getyCoordinate() {
-                return yCoordinate;
-        }
-
-        public void setyCoordinate(Integer yCoordinate) {
-                this.yCoordinate = yCoordinate;
-        }
-
-        public Long getAccountId() {
-                return accountId;
-        }
-
-        public void setAccountId(Long accountId) {
+        public VillageDTO(Long id, int x, int y, String name, Long accountId, Date lastUpdated) {
+                this.id = id;
+                this.x = x;
+                this.y = y;
+                this.name = name;
                 this.accountId = accountId;
+                this.lastUpdated = lastUpdated;
         }
 
         public Long getId() {
@@ -43,6 +30,22 @@ public class VillageDTO {
                 this.id = id;
         }
 
+        public int getX() {
+                return x;
+        }
+
+        public void setX(int x) {
+                this.x = x;
+        }
+
+        public int getY() {
+                return y;
+        }
+
+        public void setY(int y) {
+                this.y = y;
+        }
+
         public String getName() {
                 return name;
         }
@@ -50,6 +53,20 @@ public class VillageDTO {
         public void setName(String name) {
                 this.name = name;
         }
+
+        public Long getAccountId() {
+                return accountId;
+        }
+
+        public void setAccountId(Long accountId) {
+                this.accountId = accountId;
+        }
+
+        public Date getLastUpdated() {
+                return lastUpdated;
+        }
+
+        public void setLastUpdated(Date lastUpdated) {
+                this.lastUpdated = lastUpdated;
+        }
 }
-
-

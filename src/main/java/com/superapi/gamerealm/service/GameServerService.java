@@ -4,9 +4,10 @@ import com.superapi.gamerealm.model.GameServer;
 
 public interface GameServerService {
 
-    GameServer createGameServerIfNotExists();
+    void serve();
 
-    boolean isGameServerInitialized();
+    GameServer startGameIfNoGameExists();
+    boolean isGame();
 }
 
 

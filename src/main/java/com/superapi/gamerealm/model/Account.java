@@ -12,8 +12,11 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    // Other account attributes and relationships (if any)
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Village> villages = new ArrayList<>();
+
 
     private String username;
     private String password;

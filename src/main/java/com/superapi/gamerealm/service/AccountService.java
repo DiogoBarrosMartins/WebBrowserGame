@@ -35,13 +35,13 @@ public class AccountService {
 
         // Initialize the grid and add a random village from a conquerable spot
         Grid grid = gridService.getGrid();
-        villageService.addVillageFromConquerableSpot(grid, createdAccount);
 
         // Save the updated grid to the database
         gridService.saveGrid(grid);
 
         return modelMapper.map(createdAccount, AccountDTO.class);
     }
+
     public Optional<AccountDTO> getAccountByUsername(String username) {
         Optional<Account> optionalAccount = accountRepository.findByUsername(username);
         return optionalAccount.map(account -> modelMapper.map(account, AccountDTO.class));
@@ -60,7 +60,7 @@ public class AccountService {
     }
 
     public List<Village> findAllVillagesByAccountId(Long accountId) {
-        return villageService.findAllVillagesByAccountId(accountId);
+        return null;
     }
 
     public void purgePlayerAccounts() {
@@ -69,9 +69,12 @@ public class AccountService {
 
     public void deleteAccount(Long accountId) {
         for (Village village : findAllVillagesByAccountId(accountId)) {
-            villageService.turnVillageIntoConquerableSpots(village);
         }
-
         accountRepository.deleteById(accountId);
+    }
+
+    public Optional<AccountDTO> getAccountByAccountId(Long accountId) {
+        Optional<Account> optionalAccount = accountRepository.findById(accountId);
+        return optionalAccount.map(account -> modelMapper.map(account, AccountDTO.class));
     }
 }

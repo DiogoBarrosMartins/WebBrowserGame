@@ -24,7 +24,13 @@ public class GameServerServiceImpl implements GameServerService {
     }
 
     @Override
-    public GameServer createGameServerIfNotExists() {
+    public void serve() {
+       if(isGame()){
+       }
+    }
+
+    @Override
+    public GameServer startGameIfNoGameExists() {
         GameServer gameServer = gameServerRepository.findFirstByOrderByIdAsc();
 
         if (gameServer == null) {
@@ -48,7 +54,7 @@ public class GameServerServiceImpl implements GameServerService {
     }
 
     @Override
-    public boolean isGameServerInitialized() {
+    public boolean isGame() {
         GameServer gameServer = gameServerRepository.findFirstByOrderByIdAsc();
         return gameServer != null && gameServer.isInitialized();
     }
