@@ -2,7 +2,6 @@ package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.dto.AccountDTO;
 import com.superapi.gamerealm.model.Account;
-import com.superapi.gamerealm.model.Grid;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.AccountRepository;
 import org.modelmapper.ModelMapper;
@@ -32,6 +31,7 @@ public class AccountService {
     public AccountDTO createAccount(AccountDTO accountDTO) {
         Account account = modelMapper.map(accountDTO, Account.class);
         Account createdAccount = accountRepository.save(account);
+        villageService.createVillageForAccount(account);
         return modelMapper.map(createdAccount, AccountDTO.class);
     }
 

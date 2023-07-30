@@ -1,5 +1,6 @@
 package com.superapi.gamerealm.service;
 
+import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Grid;
@@ -28,7 +29,7 @@ public class VillageService {
 
     public Village createVillageForAccount(Account account) {
         Grid grid = gridService.getGrid(); // You can use the method from before to get the grid
-
+        System.out.println("WE TRIED TO CREATE A VILLAGE XDDDD");
         // Find an available spot on the grid around the center (0,0)
         int x = 0;
         int y = 0;
@@ -49,14 +50,22 @@ public class VillageService {
                 break;
             }
         }
-
-        Village newVillage = new Village( x, y);
+        Village newVillage = new Village(x, y);
         newVillage.setAccount(account);
-        newVillage.setGrid(grid);
+
+        // Update the Grid entity with the new village coordinates
+        int finalX = x;
+        int finalY = y;
+        Coordinates villageCoordinates = grid.getVillageCoordinates().stream()
+                .filter(coordinates -> coordinates.getX() == finalX && coordinates.getY() == finalY)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Invalid coordinates for village."));
+        villageCoordinates.setHasVillage(true);
 
         villageRepository.save(newVillage);
 
         return newVillage;
+
     }
 
     private boolean isSpotAvailable(Grid grid, int x, int y) {
@@ -73,9 +82,9 @@ public class VillageService {
         return modelMapper.map(createdVillage, VillageDTO.class);
     }
 
-
-
-
+    public Village getVillageByCoordinates(int x, int y) {
+        return villageRepository.findByCoordinatesXAndCoordinatesY(x, y);
+    }
 
     /**
     private void initializeDefaultResources(Village village) {

@@ -17,13 +17,16 @@ public class Grid {
 
     private int width;
     private int height;
-    @OneToMany(mappedBy = "grid", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Village> villages = new ArrayList<>();
-
+    @ElementCollection
+    private List<Coordinates> villageCoordinates = new ArrayList<>();
 
     public Grid(int width, int height){
         this.width = width;
         this.height = height;
+    }
+
+    public Grid() {
+
     }
 
     public Long getId() {
@@ -50,12 +53,12 @@ public class Grid {
         this.height = height;
     }
 
-    public List<Village> getVillages() {
-        return villages;
+    public List<Coordinates> getVillageCoordinates() {
+        return villageCoordinates;
     }
 
-    public void setVillages(List<Village> villages) {
-        this.villages = villages;
+    public void setVillageCoordinates(List<Coordinates> villageCoordinates) {
+        this.villageCoordinates = villageCoordinates;
     }
 }
 

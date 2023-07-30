@@ -5,20 +5,22 @@ import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.model.Grid;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.GridRepository;
+import com.superapi.gamerealm.repository.VillageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 
 @Service
 public class GridService {
 
+
     private final GridRepository gridRepository;
+    private final VillageRepository villageRepository;
 
     @Autowired
-    public GridService(GridRepository gridRepository) {
+    public GridService(GridRepository gridRepository, VillageRepository villageRepository) {
         this.gridRepository = gridRepository;
+        this.villageRepository = villageRepository;
     }
 
 
@@ -31,36 +33,50 @@ public class GridService {
         // Place a village at each coordinate
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Village village = new Village(x,y);
-                village.setGrid(grid);
-                grid.getVillages().add(village);
+                Coordinates coordinates = new Coordinates(x, y);
+                grid.getVillageCoordinates().add(coordinates);
             }
         }
 
-        // Save the grid with all villages
+        // Save the grid with all village coordinates
         return gridRepository.save(grid);
     }
 
-
-
+    // Will only get the first GRID, we dont need it any other way. for now.
     public Grid getGrid() {
-        // You can add any additional logic here if needed before fetching the grid from the repository
-        // For simplicity, we'll directly fetch the grid from the repository
         System.out.println("grid was called " + gridRepository.findById(1L).orElse(null));
         return gridRepository.findById(1L).orElse(null);
     }
 
+    public void addVillageToGrid(Grid grid, int x, int y) {
+        // Find the coordinates in the grid matching the specified (x, y) values
+        Coordinates villageCoordinates = grid.getVillageCoordinates().stream()
+                .filter(coordinates -> coordinates.getX() == x && coordinates.getY() == y)
+                .findFirst()
+                .orElse(null);
+
+        // If the coordinates exist and don't already have a village, add the village
+        if (villageCoordinates != null && !villageCoordinates.hasVillage()) {
+            villageCoordinates.setHasVillage(true);
+            gridRepository.save(grid);
+        }
+    }
 
     public Village getVillageAt(int x, int y) {
         Grid grid = getGrid();
         if (grid != null) {
-            return grid.getVillages().stream()
-                    .filter(village -> village.getCoordinates().getX() == x && village.getCoordinates().getY() == y)
+            Coordinates coordinates = grid.getVillageCoordinates().stream()
+                    .filter(coord -> coord.getX() == x && coord.getY() == y)
                     .findFirst()
                     .orElse(null);
+
+            if (coordinates != null && coordinates.hasVillage()) {
+                return villageRepository.findByCoordinatesXAndCoordinatesY(x,y);
+            }
         }
         return null;
     }
+
 
     // Constructors, getters, setters, etc.
     public Coordinates findAvailableSpotAroundCenter() {
@@ -89,7 +105,7 @@ public class GridService {
 
     public boolean isSpotAvailable(int x, int y) {
         // Check if the spot at coordinates (x, y) is available (i.e., no village is already there)
-        return getGrid().getVillages().stream().noneMatch(village -> village.getCoordinates().getX() == x && village.getCoordinates().getY() == y);
+        return getGrid().getVillageCoordinates().stream().noneMatch(Coordinates::hasVillage);
     }
 
     public void saveGrid(Grid grid) {

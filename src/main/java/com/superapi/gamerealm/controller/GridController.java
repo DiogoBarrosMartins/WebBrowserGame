@@ -20,7 +20,7 @@ public class GridController {
         this.gridService = gridService;
     }
 
-    @GetMapping("/generate")
+    @PostMapping("/generate")
     public ResponseEntity<Grid> generateGridWithVillages() {
         Grid grid = gridService.initializeGrid();
         return ResponseEntity.ok(grid);
