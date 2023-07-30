@@ -9,10 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class VillageService {
@@ -28,16 +25,53 @@ public class VillageService {
 
     }
 
-    public VillageDTO createVillage(VillageDTO villageDTO) {
-        Village village = modelMapper.map(villageDTO, Village.class);
-        Village createdVillage = villageRepository.save(village);
-        return modelMapper.map(createdVillage, VillageDTO.class);
+
+    public Village createVillageForAccount(Account account) {
+        Grid grid = gridService.getGrid(); // You can use the method from before to get the grid
+
+        // Find an available spot on the grid around the center (0,0)
+        int x = 0;
+        int y = 0;
+
+        for (int distance = 1; distance <= 5; distance++) {
+            // Check the four cardinal directions (up, down, left, right) around the center
+            if (isSpotAvailable(grid, x + distance, y)) {
+                x += distance;
+                break;
+            } else if (isSpotAvailable(grid, x - distance, y)) {
+                x -= distance;
+                break;
+            } else if (isSpotAvailable(grid, x, y + distance)) {
+                y += distance;
+                break;
+            } else if (isSpotAvailable(grid, x, y - distance)) {
+                y -= distance;
+                break;
+            }
+        }
+
+        Village newVillage = new Village( x, y);
+        newVillage.setAccount(account);
+        newVillage.setGrid(grid);
+
+        villageRepository.save(newVillage);
+
+        return newVillage;
+    }
+
+    private boolean isSpotAvailable(Grid grid, int x, int y) {
+        // Check if the spot at coordinates (x, y) is available (i.e., no village is already there)
+        return gridService.getVillageAt(x, y) == null;
     }
 
 
 
 
-
+    public VillageDTO createVillage(VillageDTO villageDTO) {
+        Village village = modelMapper.map(villageDTO, Village.class);
+        Village createdVillage = villageRepository.save(village);
+        return modelMapper.map(createdVillage, VillageDTO.class);
+    }
 
 
 

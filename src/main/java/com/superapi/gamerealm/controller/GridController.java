@@ -20,18 +20,16 @@ public class GridController {
         this.gridService = gridService;
     }
 
-
+    @GetMapping("/generate")
+    public ResponseEntity<Grid> generateGridWithVillages() {
+        Grid grid = gridService.initializeGrid();
+        return ResponseEntity.ok(grid);
+    }
 
     @GetMapping
     public ResponseEntity<Grid> getGrid() {
-   return null;
-    }
-
-
-
-    @GetMapping("/villages")
-    public ResponseEntity<List<Village>> getPlayerVillages() {
-    return null;
+        Grid grid = gridService.getGrid();
+        return ResponseEntity.ok(grid);
     }
 
 }

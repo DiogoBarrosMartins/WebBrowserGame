@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GameServerRepository extends JpaRepository<GameServer, Long> {
-    GameServer findFirstByOrderByIdAsc();
 }

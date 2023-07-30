@@ -6,8 +6,10 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
+@EnableJpaRepositories
 public class GameRealmApplication {
 	private final GameServerInitializer gameServerInitializer;
 
@@ -20,8 +22,5 @@ public class GameRealmApplication {
 	}
 	@PostConstruct
 	public void init() {
-		// Call the initializeGameServer() method when the application starts
-		gameServerInitializer.initializeGameServer();
-		System.out.println("GAME FOUND, RESUMING :D");
 	}
 }

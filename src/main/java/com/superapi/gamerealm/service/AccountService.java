@@ -32,13 +32,6 @@ public class AccountService {
     public AccountDTO createAccount(AccountDTO accountDTO) {
         Account account = modelMapper.map(accountDTO, Account.class);
         Account createdAccount = accountRepository.save(account);
-
-        // Initialize the grid and add a random village from a conquerable spot
-        Grid grid = gridService.getGrid();
-
-        // Save the updated grid to the database
-        gridService.saveGrid(grid);
-
         return modelMapper.map(createdAccount, AccountDTO.class);
     }
 

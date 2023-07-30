@@ -31,31 +31,11 @@ public class GameServerServiceImpl implements GameServerService {
 
     @Override
     public GameServer startGameIfNoGameExists() {
-        GameServer gameServer = gameServerRepository.findFirstByOrderByIdAsc();
-
-        if (gameServer == null) {
-            // If no game server exists, create a new one and initialize the grid
-            gameServer = new GameServer();
-            gameServer.setInitialized(false); // Set to true once the grid is initialized
-
-            // Purge player accounts (Delete all player accounts)
-            accountService.purgePlayerAccounts();
-            gridService.purgeEntireCity();
-            Grid grid = gridService.createAndInitializeGrid();
-
-            // Associate the grid with the game server
-            gameServer.setGrid(grid);
-
-            // Save the game server entity in the database
-            gameServer = gameServerRepository.save(gameServer);
-        }
-
-        return gameServer;
+    return null;
     }
 
     @Override
     public boolean isGame() {
-        GameServer gameServer = gameServerRepository.findFirstByOrderByIdAsc();
-        return gameServer != null && gameServer.isInitialized();
+    return true;
     }
 }

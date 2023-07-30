@@ -4,6 +4,7 @@ import com.superapi.gamerealm.component.Coordinates;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Entity
 public class Village {
@@ -17,7 +18,8 @@ public class Village {
     private Coordinates coordinates;
     private String name;
 
-
+    @ManyToOne
+    private Grid grid;
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
@@ -29,9 +31,9 @@ public class Village {
         this.name = "default name";
     }
 
-    public Village(String name, int x, int y) {
-        this.name = name;
+    public Village(  int x, int y) {
         this.coordinates = new Coordinates(x, y);
+        this.lastUpdated = new Date();
     }
 
     public Date getLastUpdateTime() {
@@ -82,5 +84,9 @@ public class Village {
 
     public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public void setGrid(Grid grid) {
+  this.grid =grid;
     }
 }
