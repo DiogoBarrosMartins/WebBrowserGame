@@ -15,6 +15,7 @@ public class Coordinates {
     @JsonProperty("hasVillage")
     @Column(nullable = false)
     private boolean hasVillage;
+
     public Coordinates() {
     }
 
@@ -48,4 +49,11 @@ public class Coordinates {
     public void setY(int y) {
         this.y = y;
     }
+
+    public boolean isHasVillage() {
+        return hasVillage;
+    }
+
+
 }
+

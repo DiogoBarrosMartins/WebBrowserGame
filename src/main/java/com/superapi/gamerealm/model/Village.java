@@ -28,11 +28,14 @@ public class Village {
     private Date lastUpdated;
 
     public Village() {
-        this.name = "default name";
+        System.out.println("VILLAGE NO ARGS CONSTRUCTOR ");
     }
 
-    public Village(  int x, int y) {
-        this.coordinates = new Coordinates(x, y);
+    public Village(Coordinates coordinates) {
+
+        System.out.println("VILLAGE COORDINATE ARGS CONSTRUCTOR "+ coordinates.getX() + " " + coordinates.getY());
+        this.coordinates = coordinates;
+        this.name = "default name";
         this.lastUpdated = new Date();
     }
 

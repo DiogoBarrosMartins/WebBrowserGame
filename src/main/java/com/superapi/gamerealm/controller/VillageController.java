@@ -5,10 +5,10 @@ import com.superapi.gamerealm.service.VillageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/villages")
 public class VillageController {
@@ -24,6 +24,16 @@ public class VillageController {
         VillageDTO createdVillage = villageService.createVillage(villageDTO);
         return new ResponseEntity<>(createdVillage, HttpStatus.CREATED);
     }
+    // Endpoint to get all villages
+    @GetMapping
+    public List<VillageDTO> getAllVillages() {
+        return villageService.getAllVillages();
+    }
 
+    // Endpoint to get village by account username
+    @GetMapping("/byAccountUsername/{username}")
+    public VillageDTO getVillageByAccountUsername(@PathVariable String username) {
+        return villageService.getVillageByAccountUsername(username);
+    }
     // Other village-related endpoints
 }

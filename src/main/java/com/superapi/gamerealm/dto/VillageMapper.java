@@ -5,6 +5,7 @@ import com.superapi.gamerealm.model.Village;
 import org.springframework.stereotype.Component;
 @Component
 public class VillageMapper {
+
     public static VillageDTO toDTO(Village village) {
         VillageDTO villageDTO = new VillageDTO();
         villageDTO.setId(village.getId());
@@ -16,10 +17,16 @@ public class VillageMapper {
         return villageDTO;
     }
 
+
     public static Village toEntity(VillageDTO villageDTO) {
         Village village = new Village();
         village.setId(villageDTO.getId());
-        village.setCoordinates(new Coordinates(villageDTO.getX(), villageDTO.getY()));
+
+        // Instead of creating a new Coordinates object, use the existing one from the Village entity
+        Coordinates coordinates = village.getCoordinates();
+        coordinates.setX(villageDTO.getX());
+        coordinates.setY(villageDTO.getY());
+
         village.setName(villageDTO.getName());
         // Note: accountId should be set through the Account entity using a service or repository.
         // village.setAccount(/* Account entity */);

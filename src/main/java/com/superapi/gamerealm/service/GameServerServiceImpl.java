@@ -1,7 +1,6 @@
 package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.model.GameServer;
-import com.superapi.gamerealm.model.Grid;
 import com.superapi.gamerealm.repository.GameServerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,17 +24,17 @@ public class GameServerServiceImpl implements GameServerService {
 
     @Override
     public void serve() {
-       if(isGame()){
-       }
+        if (isGame()) {
+        }
     }
 
     @Override
     public GameServer startGameIfNoGameExists() {
-    return null;
+        return null;
     }
 
     @Override
     public boolean isGame() {
-    return true;
+        return true;
     }
 }
