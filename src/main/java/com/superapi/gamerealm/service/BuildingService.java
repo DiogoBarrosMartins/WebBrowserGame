@@ -1,33 +1,51 @@
 package com.superapi.gamerealm.service;
 
-import com.superapi.gamerealm.model.Village;
+import com.superapi.gamerealm.dto.BuildingMapper;
+import com.superapi.gamerealm.dto.NonResourceBuildingDTO;
+import com.superapi.gamerealm.dto.ResourceBuildingDTO;
 import com.superapi.gamerealm.model.buildings.Building;
+import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.repository.BuildingRepository;
-import com.superapi.gamerealm.repository.VillageRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BuildingService {
     private final BuildingRepository buildingRepository;
-    private final VillageRepository villageRepository;
 
-    public BuildingService(BuildingRepository buildingRepository, VillageRepository villageRepository) {
+    public BuildingService(BuildingRepository buildingRepository) {
         this.buildingRepository = buildingRepository;
-        this.villageRepository = villageRepository;
     }
 
-    public Building createBuilding(Long villageId, Building building) {
-        Village village = villageRepository.findById(villageId)
-                .orElseThrow(() -> new IllegalArgumentException("Village not found with ID: " + villageId));
-        building.setVillage(village);
-        return buildingRepository.save(building);
+    public List<ResourceBuildingDTO> getAllResourceBuildingsInVillage(Long villageId) {
+        List<Building> buildings = buildingRepository.findByVillageId(villageId);
+        for (Building building : buildings) {
+            building.calculateProductionRate();
+        }
+        return buildings.stream()
+                .filter(building -> building.getType() == BuildingType.FARM
+                        || building.getType() == BuildingType.QUARRY
+                        || building.getType() == BuildingType.MINE
+                        || building.getType() == BuildingType.FOREST)
+
+                .map(BuildingMapper::toResourceBuildingDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<Building> getAllBuildingsInVillage(Long villageId) {
-        return buildingRepository.findByVillageId(villageId);
+    public List<NonResourceBuildingDTO> getAllNonResourceBuildingsInVillage(Long villageId) {
+        List<Building> buildings = buildingRepository.findByVillageId(villageId);
+        return buildings.stream()
+                .filter(building -> building.getType() != BuildingType.FARM
+                        && building.getType() != BuildingType.QUARRY
+                        && building.getType() != BuildingType.MINE
+                        && building.getType() != BuildingType.FOREST)
+                .map(BuildingMapper::toNonResourceBuildingDTO)
+                .collect(Collectors.toList());
     }
+
 
     public Building upgradeBuilding(Long buildingId) {
         Building building = buildingRepository.findById(buildingId)
@@ -36,11 +54,18 @@ public class BuildingService {
         // Check if the building's level is less than the maximum level (e.g., 3) before upgrading
         if (building.getLevel() < building.getMaxLevel()) {
             building.setLevel(building.getLevel() + 1);
+            if (building.isResourceBuilding()) {
+                updateResourceBuildingProductionRate(building);
+            }
             return buildingRepository.save(building);
         } else {
             throw new IllegalStateException("Building is already at the maximum level.");
         }
     }
 
-    // Add more methods as needed (e.g., upgradeBuilding, deleteBuilding, etc.)
+    private void updateResourceBuildingProductionRate(Building building) {
+        // Calculate the production rate based on the new level and update the building
+        BigDecimal productionRate = building.calculateProductionRate();
+        building.setProductionRate(productionRate);
+    }
 }

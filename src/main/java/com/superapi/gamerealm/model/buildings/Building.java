@@ -30,6 +30,7 @@ public class Building {
         this.village = village;
         this.type = type;
         this.buildingLevel = 0;
+        this.productionRate = BigDecimal.valueOf(4);
     }
 
     public Building() {
@@ -48,9 +49,6 @@ public class Building {
         return type;
     }
 
-    public void setType(BuildingType type) {
-        this.type = type;
-    }
 
     public BigDecimal getProductionRate() {
         return productionRate;
@@ -78,10 +76,41 @@ public class Building {
         return buildingLevel;
     }
 
+    public void setType(BuildingType type) {
+        this.type = type;
+    }
+
+    public int getBuildingLevel() {
+        return buildingLevel;
+    }
+
+    public void setBuildingLevel(int buildingLevel) {
+        this.buildingLevel = buildingLevel;
+    }
 
     public int getMaxLevel() {
         return maxLevel;
     }
 
+    public BigDecimal calculateProductionRate() {
 
+        //  base production rate for level 0 <- constructor
+        BigDecimal baseProductionRate = productionRate;
+
+        // Define a rate of increase per level
+        BigDecimal increasePerLevel = new BigDecimal("5");
+
+        // Calculate the production rate based on the level
+        // Return the calculated production rate
+        return baseProductionRate.add(increasePerLevel.multiply(new BigDecimal(getLevel())));
+    }
+    public boolean isResourceBuilding() {
+        return type != BuildingType.PUB &&
+                type != BuildingType.BARRACKS &&
+                type != BuildingType.GRAIN_SILO &&
+                type != BuildingType.STABLE &&
+                type != BuildingType.RESEARCH_CENTER &&
+                type != BuildingType.STORAGE &&
+                type != BuildingType.SIEGE_WORKSHOP;
+    }
 }

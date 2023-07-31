@@ -4,13 +4,10 @@ import com.superapi.gamerealm.model.buildings.BuildingType;
 
 import java.math.BigDecimal;
 
-public class BuildingDTO {
+public class NonResourceBuildingDTO  {
     private Long id;
     private BuildingType type;
-    private BigDecimal productionRate;
-    private String name;
     private int buildingLevel;
-    private int maxLevel;
 
 
     public Long getId() {
@@ -29,21 +26,9 @@ public class BuildingDTO {
         this.type = type;
     }
 
-    public BigDecimal getProductionRate() {
-        return productionRate;
-    }
 
-    public void setProductionRate(BigDecimal productionRate) {
-        this.productionRate = productionRate;
-    }
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public int getBuildingLevel() {
         return buildingLevel;
@@ -53,11 +38,4 @@ public class BuildingDTO {
         this.buildingLevel = buildingLevel;
     }
 
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    public void setMaxLevel(int maxLevel) {
-        this.maxLevel = maxLevel;
-    }
 }
