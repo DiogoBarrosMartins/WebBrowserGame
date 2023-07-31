@@ -1,5 +1,6 @@
 package com.superapi.gamerealm.dto;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class VillageDTO {
@@ -9,6 +10,43 @@ public class VillageDTO {
         private String name;
         private Long accountId;
         private Date lastUpdated;
+        // Resource fields
+        private BigDecimal wood;
+        private BigDecimal wheat;
+        private BigDecimal stone;
+        private BigDecimal gold;
+
+        public BigDecimal getWheat() {
+                return wheat;
+        }
+
+        public void setWheat(BigDecimal wheat) {
+                this.wheat = wheat;
+        }
+
+        public BigDecimal getGold() {
+                return gold;
+        }
+
+        public void setGold(BigDecimal gold) {
+                this.gold = gold;
+        }
+
+        public BigDecimal getWood() {
+                return wood;
+        }
+
+        public void setWood(BigDecimal wood) {
+                this.wood = wood;
+        }
+
+        public BigDecimal getStone() {
+                return stone;
+        }
+
+        public void setStone(BigDecimal stone) {
+                this.stone = stone;
+        }
 
         public VillageDTO() {
         }

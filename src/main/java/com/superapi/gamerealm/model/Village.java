@@ -1,6 +1,7 @@
 package com.superapi.gamerealm.model;
 
 import com.superapi.gamerealm.component.Coordinates;
+import com.superapi.gamerealm.model.resources.Resources;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -26,13 +27,18 @@ public class Village {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;
 
+    @OneToOne(cascade = CascadeType.ALL) // Cascade all operations (persist, update, delete) to the associated resource
+    @JoinColumn(name = "resources_id") // Specify the foreign key column
+    private Resources resources;
+
 
     public Village() {
         System.out.println("VILLAGE NO ARGS CONSTRUCTOR ");
+
     }
 
-    public Village(Coordinates coordinates) {
 
+    public Village(Coordinates coordinates) {
         System.out.println("VILLAGE COORDINATE ARGS CONSTRUCTOR "+ coordinates.getX() + " " + coordinates.getY());
         this.coordinates = coordinates;
         this.name = "default name";
@@ -91,5 +97,17 @@ public class Village {
 
     public void setGrid(Grid grid) {
   this.grid =grid;
+    }
+
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public Resources getResources() {
+        return resources;
+    }
+
+    public void setResources(Resources resources) {
+        this.resources = resources;
     }
 }

@@ -6,11 +6,13 @@ import com.superapi.gamerealm.dto.VillageMapper;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Grid;
 import com.superapi.gamerealm.model.Village;
+import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.repository.VillageRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,8 +31,8 @@ public class VillageService {
 
     }
 
-    public boolean isSpotAvailable(int x, int y) {
-        Coordinates coordinates = getCoordinatesAt(x, y);
+    public boolean isSpotAvailable(Grid grid, int x, int y) {
+        Coordinates coordinates = getCoordinatesAt(grid, x, y);
         return coordinates != null && !coordinates.hasVillage();
     }
 
@@ -39,7 +41,7 @@ public class VillageService {
 
         for (int x = 0; x < grid.getWidth(); x++) {
             for (int y = 0; y < grid.getHeight(); y++) {
-                Coordinates coordinates = getCoordinatesAt(x, y);
+                Coordinates coordinates = getCoordinatesAt(grid, x, y);
                 if (coordinates != null && !coordinates.hasVillage()) {
                     availableSpots.add(coordinates);
                 }
@@ -66,11 +68,9 @@ public class VillageService {
         // Create the new Village entity with the selected coordinates
         Village newVillage = new Village(spot);
         newVillage.setAccount(account);
+        initializeDefaultResources(newVillage);
         villageRepository.save(newVillage);
 
-        // Print the coordinates of the newly created village for debugging
-        System.out.println(newVillage.getCoordinates().getX());
-        System.out.println(newVillage.getCoordinates().getY());
 
         // Remove the selected spot from the list to avoid duplicates
         availableSpots.remove(randomIndex);
@@ -78,10 +78,21 @@ public class VillageService {
         return newVillage;
     }
 
+    private void initializeDefaultResources(Village village) {
+        // Create a new Resources instance
+        Resources resources = new Resources();
 
+        // Set default resource amounts
+        resources.setWheat(BigDecimal.valueOf(1000L));
+        resources.setWood(BigDecimal.valueOf(1000L));
+        resources.setStone(BigDecimal.valueOf(500L));
+        resources.setGold(BigDecimal.valueOf(500L));
 
-    private Coordinates getCoordinatesAt(int x, int y) {
-        Grid grid = gridService.getGrid();
+        // Assign the resources to the village
+        village.setResources(resources);
+    }
+
+    private Coordinates getCoordinatesAt(Grid grid, int x, int y) {
         return grid.getVillageCoordinates().stream()
                 .filter(coordinates -> coordinates.getX() == x && coordinates.getY() == y)
                 .findFirst()
@@ -119,77 +130,10 @@ public class VillageService {
         return modelMapper.map(village, VillageDTO.class);
     }
 
+
+
+
     /**
-     public Village createVillageForAccount(Account account) {
-     Grid grid = gridService.getGrid();
-
-     // Find the center coordinates of the grid
-     int centerX = grid.getWidth() / 2;
-     int centerY = grid.getHeight() / 2;
-
-     // Start searching for available spots around the center
-     int x = centerX;
-     int y = centerY;
-
-     // Define the search radius around the center (adjust as needed)
-     int searchRadius = 2;
-
-     for (int distance = 1; distance <= searchRadius; distance++) {
-     // Check the four cardinal directions (up, down, left, right) around the center
-     if (isSpotAvailable(x + distance, y)) {
-     x += distance;
-     break;
-     }
-     if (isSpotAvailable(x - distance, y)) {
-     x -= distance;
-     break;
-     }
-     if (isSpotAvailable(x, y + distance)) {
-     y += distance;
-     break;
-     }
-     if (isSpotAvailable(x, y - distance)) {
-     y -= distance;
-     break;
-     }
-     }
-
-     // Check if an available spot was found
-     if (!isSpotAvailable(x, y)) {
-     throw new RuntimeException("No available spot for village.");
-     }
-
-     // Update the grid to indicate that a village has been created at the selected coordinate
-     Coordinates villageCoordinates = getCoordinatesAt(x, y);
-     if (villageCoordinates != null) {
-     villageCoordinates.setHasVillage(true);
-     } else {
-     throw new RuntimeException("Invalid coordinates for village.");
-     }
-
-     // Create the new Village entity with the selected coordinates
-     Village newVillage = new Village(villageCoordinates);
-     newVillage.setAccount(account);
-     villageRepository.save(newVillage);
-
-     // Print the coordinates of the newly created village for debugging
-     System.out.println(newVillage.getCoordinates().getX());
-     System.out.println(newVillage.getCoordinates().getY());
-
-     return newVillage;
-     }
-     **/
-    /**
-     private void initializeDefaultResources(Village village) {
-     // Set default resource amounts
-     Map<String, Long> resources = new HashMap<>();
-     resources.put("wheat", 1000L);
-     resources.put("wood", 1000L);
-     resources.put("stone", 500L);
-     resources.put("gold", 500L);
-     village.setResources(resources);
-     }
-
 
 
 
