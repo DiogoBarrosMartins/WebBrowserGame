@@ -1,10 +1,13 @@
 package com.superapi.gamerealm.model;
 
 import com.superapi.gamerealm.component.Coordinates;
+import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.resources.Resources;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Village {
@@ -30,6 +33,9 @@ public class Village {
     @OneToOne(cascade = CascadeType.ALL) // Cascade all operations (persist, update, delete) to the associated resource
     @JoinColumn(name = "resources_id") // Specify the foreign key column
     private Resources resources;
+
+    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Building> buildings = new ArrayList<>();
 
 
     public Village() {
@@ -109,5 +115,22 @@ public class Village {
 
     public void setResources(Resources resources) {
         this.resources = resources;
+    }
+    public List<Building> getBuildings() {
+        return buildings;
+    }
+
+    public void addBuilding(Building building) {
+        buildings.add(building);
+        building.setVillage(this);
+    }
+
+    public void removeBuilding(Building building) {
+        buildings.remove(building);
+        building.setVillage(null);
+    }
+
+    public void setBuildings(List<Building> buildings) {
+        this.buildings = buildings;
     }
 }

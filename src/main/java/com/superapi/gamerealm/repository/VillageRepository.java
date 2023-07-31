@@ -15,5 +15,6 @@ public interface VillageRepository extends JpaRepository<Village, Long> {
 
     Village findByCoordinatesXAndCoordinatesY(int x, int y);
     @Query("SELECT v FROM Village v WHERE v.account.username = :username")
-    Optional<Village> findByAccountUsername(String username);
+    List<Village> findByAccountUsername(String username);
+
 }

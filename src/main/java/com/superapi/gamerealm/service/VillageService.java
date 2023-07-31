@@ -6,6 +6,8 @@ import com.superapi.gamerealm.dto.VillageMapper;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Grid;
 import com.superapi.gamerealm.model.Village;
+import com.superapi.gamerealm.model.buildings.Building;
+import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.repository.VillageRepository;
 import org.modelmapper.ModelMapper;
@@ -31,10 +33,6 @@ public class VillageService {
 
     }
 
-    public boolean isSpotAvailable(Grid grid, int x, int y) {
-        Coordinates coordinates = getCoordinatesAt(grid, x, y);
-        return coordinates != null && !coordinates.hasVillage();
-    }
 
     public List<Coordinates> getAllAvailableSpots(Grid grid) {
         List<Coordinates> availableSpots = new ArrayList<>();
@@ -69,6 +67,8 @@ public class VillageService {
         Village newVillage = new Village(spot);
         newVillage.setAccount(account);
         initializeDefaultResources(newVillage);
+        initializeDefaultBuildings(newVillage);
+
         villageRepository.save(newVillage);
 
 
@@ -77,6 +77,21 @@ public class VillageService {
 
         return newVillage;
     }
+
+    private void initializeDefaultBuildings(Village village) {
+        List<Building> buildings = new ArrayList<>();
+
+        for (BuildingType type : BuildingType.values()) {
+            int numberOfBuildings = (type.ordinal() < 4) ? 4 : 1;
+            for (int i = 0; i < numberOfBuildings; i++) {
+                Building building = new Building(type, village);
+                buildings.add(building);
+            }
+        }
+
+        village.setBuildings(buildings);
+    }
+
 
     private void initializeDefaultResources(Village village) {
         // Create a new Resources instance
@@ -120,88 +135,17 @@ public class VillageService {
     }
 
     // Method to get village by account username as DTO
+// Method to get village by account username as DTO
     public VillageDTO getVillageByAccountUsername(String username) {
-        Village village = villageRepository.findByAccountUsername(username)
-                .orElseThrow(() -> new RuntimeException("Village not found for account username: " + username));
-        return convertToVillageDTO(village);
+        List<Village> villages = villageRepository.findByAccountUsername(username);
+
+        if (villages.isEmpty()) {
+            throw new RuntimeException("Village not found for account username: " + username);
+        }
+
+        Village village = villages.get(0);
+        return VillageMapper.toDTO(village);
     }
 
-    private VillageDTO convertToVillageDTO(Village village) {
-        return modelMapper.map(village, VillageDTO.class);
-    }
 
-
-
-
-    /**
-
-
-
-     public long calculateElapsedHours(Date lastUpdateTime, Date now) {
-     long elapsedMilliseconds = now.getTime() - lastUpdateTime.getTime();
-     return elapsedMilliseconds / (1000 * 3600); // Convert elapsedMilliseconds to elapsedHours
-     }
-
-
-     public Map<String, Long> calculateResourcesProduced(Village village, long elapsedHours) {
-     Map<String, Long> resourcesProduced = new HashMap<>();
-     Map<String, Integer> buildingLevels = village.getBuildings();
-
-     // Production rates for each resource building
-     Map<String, Long> productionRates = new HashMap<>();
-     productionRates.put("farms", 1000L);
-     productionRates.put("lumbers", 500L);
-     productionRates.put("rockMines", 300L);
-     productionRates.put("goldMines", 100L);
-
-     // Calculate the resources produced based on building levels and elapsed hours
-     for (String resourceBuilding : productionRates.keySet()) {
-     int buildingLevel = buildingLevels.getOrDefault(resourceBuilding, 0);
-     long productionRate = productionRates.get(resourceBuilding);
-     long producedAmount = buildingLevel * productionRate * elapsedHours;
-     resourcesProduced.put(resourceBuilding, producedAmount);
-     }
-
-     return resourcesProduced;
-     }
-
-
-     public void updateVillageResources(Village village, Map<String, Long> resourcesProduced, Date now) {
-     Map<String, Long> currentResources = village.getResources();
-
-     for (String resource : resourcesProduced.keySet()) {
-     long producedAmount = resourcesProduced.get(resource);
-     long currentAmount = currentResources.getOrDefault(resource, 0L);
-     long updatedAmount = currentAmount + producedAmount;
-     currentResources.put(resource, updatedAmount);
-     }
-
-     village.setResources(currentResources);
-     village.setLastUpdated(now);
-     }
-
-     public void purgePlayerData() {
-     }
-
-     public List<Village> findAllVillagesByAccountId(Long accountId) {
-     return villageRepository.findAllByAccountId(accountId);
-     }
-
-     public void turnVillageIntoConquerableSpots(Village village) {
-     if (village != null) {
-     // Get the village's coordinates
-     int xCoordinate = village.getXCoordinate();
-     int yCoordinate = village.getYCoordinate();
-
-     // Remove the village from the player's account
-     villageRepository.delete(village);
-
-     // Call the GridService to add a conquerable spot
-     }
-     }
-     public void addVillageFromConquerableSpot(Grid grid, Account account) {
-
-     }
-     }    // Other methods related to village business logic
-     **/
 }
