@@ -25,52 +25,66 @@ public class VillageService {
         this.modelMapper = modelMapper;
 
     }
+    public boolean isSpotAvailable(Grid grid, int x, int y) {
+        // Check if the spot at coordinates (x, y) is available (i.e., no village is already there)
+        return grid.getVillageCoordinates().stream()
+                .noneMatch(coordinates -> coordinates.getX() == x && coordinates.getY() == y && coordinates.hasVillage());
+    }
 
+
+
+
+    //here we is
 
     public Village createVillageForAccount(Account account) {
         Grid grid = gridService.getGrid(); // You can use the method from before to get the grid
         System.out.println("WE TRIED TO CREATE A VILLAGE XDDDD");
         // Find an available spot on the grid around the center (0,0)
-        int x = 0;
-        int y = 0;
+        int x = (grid.getHeight()/2);
+        int y = (grid.getWidth()/2);
 
-        for (int distance = 1; distance <= 5; distance++) {
+        Coordinates villageCoordinates = null; // Initialize a variable to hold the village coordinates
+        // this goes out of bounds because we are in a 5 by 5 grid
+        for (int distance = 1; distance <= 2; distance++) {
             // Check the four cardinal directions (up, down, left, right) around the center
             if (isSpotAvailable(grid, x + distance, y)) {
                 x += distance;
+                villageCoordinates = getCoordinatesAt(grid, x, y);
                 break;
             } else if (isSpotAvailable(grid, x - distance, y)) {
                 x -= distance;
+                villageCoordinates = getCoordinatesAt(grid, x, y);
                 break;
             } else if (isSpotAvailable(grid, x, y + distance)) {
                 y += distance;
+                villageCoordinates = getCoordinatesAt(grid, x, y);
                 break;
             } else if (isSpotAvailable(grid, x, y - distance)) {
                 y -= distance;
+                villageCoordinates = getCoordinatesAt(grid, x, y);
                 break;
             }
         }
+
         Village newVillage = new Village(x, y);
         newVillage.setAccount(account);
 
         // Update the Grid entity with the new village coordinates
-        int finalX = x;
-        int finalY = y;
-        Coordinates villageCoordinates = grid.getVillageCoordinates().stream()
-                .filter(coordinates -> coordinates.getX() == finalX && coordinates.getY() == finalY)
+         villageCoordinates = getCoordinatesAt(grid, x, y);
+        if (villageCoordinates != null) {
+            villageCoordinates.setHasVillage(true);
+        } else {
+            throw new RuntimeException("Invalid coordinates for village.");
+        }
+
+        villageRepository.save(newVillage);        return newVillage;
+}
+
+    private Coordinates getCoordinatesAt(Grid grid, int x, int y) {
+        return grid.getVillageCoordinates().stream()
+                .filter(coordinates -> coordinates.getX() == x && coordinates.getY() == y)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Invalid coordinates for village."));
-        villageCoordinates.setHasVillage(true);
-
-        villageRepository.save(newVillage);
-
-        return newVillage;
-
-    }
-
-    private boolean isSpotAvailable(Grid grid, int x, int y) {
-        // Check if the spot at coordinates (x, y) is available (i.e., no village is already there)
-        return gridService.getVillageAt(x, y) == null;
+                .orElse(null);
     }
 
 
