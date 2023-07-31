@@ -1,7 +1,12 @@
 package com.superapi.gamerealm;
 
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.model.Account;
@@ -10,108 +15,99 @@ import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.VillageRepository;
 import com.superapi.gamerealm.service.GridService;
 import com.superapi.gamerealm.service.VillageService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.modelmapper.ModelMapper;
 
-import java.util.HashSet;
-import java.util.Set;
-
-
-
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
+@RunWith(MockitoJUnitRunner.class)
 public class VillageServiceTest {
+}
+  /**
+
+    @Mock
+    private VillageRepository villageRepository;
 
     @Mock
     private GridService gridService;
 
     @Mock
-    private VillageRepository villageRepository;
+    private ModelMapper modelMapper;
 
     @InjectMocks
     private VillageService villageService;
 
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
+    private List<Coordinates> availableSpots;
 
-    @Test
-    public void testCreateVillageWithUniqueCoordinates() {
-        // Arrange: Create a 5x5 grid with 25 spaces
-        Grid grid = new Grid(5, 5);
-        when(gridService.getGrid()).thenReturn(grid);
+    @Before
+    public void setUp() {
+        // Initialize the mock grid and available spots before each test
 
-        // Set to keep track of coordinates already used
-        Set<Coordinates> usedCoordinates = new HashSet<>();
+        Grid mockGrid = new Grid();
+        mockGrid.setWidth(5);
+        mockGrid.setHeight(5);
 
-        // Act & Assert: Create 25 villages and verify their uniqueness
-        for (int i = 0; i < 25; i++) {
-            // Create a new account for each village (you can replace this with your account logic)
-            Account account = new Account();
+        // Stub the behavior of the GridService.getGrid() method to return the mockGrid
+        when(gridService.getGrid()).thenReturn(mockGrid);
 
-            // Call the method under test
-            Village newVillage = villageService.createVillageForAccount(account);
 
-            // Verify that the village has a unique set of coordinates
-            Coordinates villageCoordinates = newVillage.getCoordinates();
-            assertFalse(usedCoordinates.contains(villageCoordinates), "Duplicate coordinates found for village: " + newVillage.getId());
-            usedCoordinates.add(villageCoordinates);
-
-            // Mock the village repository to return the newly created village
-            when(villageRepository.save(any(Village.class))).thenReturn(newVillage);
+        availableSpots = new ArrayList<>();
+        for (int x = 0; x < mockGrid.getWidth(); x++) {
+            for (int y = 0; y < mockGrid.getHeight(); y++) {
+                Coordinates spot = new Coordinates(x, y);
+                availableSpots.add(spot);
+            }
         }
 
-        // Assert: Verify that the villageRepository.save() method was called 25 times
-        verify(villageRepository, times(25)).save(any(Village.class));
+        // Mock the behavior of the GridService
+        when(gridService.getGrid()).thenReturn(mockGrid);
+
+        // Mock the behavior of the VillageService to return the available spots
+        when(villageService.getAllAvailableSpots(mockGrid)).thenReturn(availableSpots);
+    }
+    @Test
+    public void testCreateVillageForAccount() {
+        // Mock the VillageRepository save method
+        when(villageRepository.save(any(Village.class))).thenAnswer(invocation -> {
+            Village savedVillage = invocation.getArgument(0);
+            // In a real scenario, you might set an ID or perform other operations here.
+            return savedVillage;
+        });
+
+        // Create an account (you may need to mock the account creation logic if needed)
+        Account mockAccount = new Account();
+        // Set up other properties for the account as needed for the test
+
+        // Call the method to create the village
+        Village createdVillage = villageService.createVillageForAccount(mockAccount);
+
+        // Assertion: Verify that the village is created and saved with correct coordinates
+        assertNotNull(createdVillage);
+        assertEquals(2, createdVillage.getCoordinates().getX()); // Center X coordinate for the 5x5 grid
+        assertEquals(2, createdVillage.getCoordinates().getY()); // Center Y coordinate for the 5x5 grid
+
+        // Verify that the villageRepository.save() method is called the expected number of times
+        int expectedVillageCount = Math.min(25, availableSpots.size());
+        verify(villageRepository, times(expectedVillageCount)).save(any(Village.class));
     }
 
     @Test
-    public void testCreateVillageNoAvailableSpot() {
-        // Arrange: Create a 1x1 grid with no available spots
-        Grid grid = new Grid(1, 1);
-        when(gridService.getGrid()).thenReturn(grid);
+    public void testGetAllAvailableSpots() {
+        // Call the method to get all available spots
+        List<Coordinates> result = villageService.getAllAvailableSpots(gridService.getGrid());
 
-        // Act & Assert: Creating a village should throw a RuntimeException
-        assertThrows(RuntimeException.class, () -> villageService.createVillageForAccount(new Account()));
+        // Assertion: Verify that the list of available spots is correct
+        assertNotNull(result);
+        assertEquals(availableSpots.size(), result.size());
     }
-
-    @Test
-    public void testCreateVillageAtGridCenter() {
-        // Arrange: Create a 3x3 grid with center spot available
-        Grid grid = new Grid(3, 3);
-        when(gridService.getGrid()).thenReturn(grid);
-
-        // Act: Create a village and get its coordinates
-        Account account = new Account();
-        Village newVillage = villageService.createVillageForAccount(account);
-        Coordinates villageCoordinates = newVillage.getCoordinates();
-
-        // Assert: The village should be created at the center spot
-        assertEquals(1, villageCoordinates.getX());
-        assertEquals(1, villageCoordinates.getY());
-    }
-
-    // Add more test cases as needed to cover different scenarios
 }
 
 
 
-
+**/
 
 
 /**

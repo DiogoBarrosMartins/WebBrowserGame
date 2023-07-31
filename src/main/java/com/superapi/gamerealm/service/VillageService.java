@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,56 +34,37 @@ public class VillageService {
         return coordinates != null && !coordinates.hasVillage();
     }
 
+    public List<Coordinates> getAllAvailableSpots(Grid grid) {
+        List<Coordinates> availableSpots = new ArrayList<>();
+
+        for (int x = 0; x < grid.getWidth(); x++) {
+            for (int y = 0; y < grid.getHeight(); y++) {
+                Coordinates coordinates = getCoordinatesAt(x, y);
+                if (coordinates != null && !coordinates.hasVillage()) {
+                    availableSpots.add(coordinates);
+                }
+            }
+        }
+
+        return availableSpots;
+    }
 
     public Village createVillageForAccount(Account account) {
         Grid grid = gridService.getGrid();
+        List<Coordinates> availableSpots = getAllAvailableSpots(grid);
 
-        // Find the center coordinates of the grid
-        int centerX = grid.getWidth() / 2;
-        int centerY = grid.getHeight() / 2;
-
-        // Start searching for available spots around the center
-        int x = centerX;
-        int y = centerY;
-
-        // Define the search radius around the center (adjust as needed)
-        int searchRadius = 2;
-
-        for (int distance = 1; distance <= searchRadius; distance++) {
-            // Check the four cardinal directions (up, down, left, right) around the center
-            if (isSpotAvailable(x + distance, y)) {
-                x += distance;
-                break;
-            }
-            if (isSpotAvailable(x - distance, y)) {
-                x -= distance;
-                break;
-            }
-            if (isSpotAvailable(x, y + distance)) {
-                y += distance;
-                break;
-            }
-            if (isSpotAvailable(x, y - distance)) {
-                y -= distance;
-                break;
-            }
-        }
-
-        // Check if an available spot was found
-        if (!isSpotAvailable(x, y)) {
+        if (availableSpots.isEmpty()) {
             throw new RuntimeException("No available spot for village.");
         }
 
-        // Update the grid to indicate that a village has been created at the selected coordinate
-        Coordinates villageCoordinates = getCoordinatesAt(x, y);
-        if (villageCoordinates != null) {
-            villageCoordinates.setHasVillage(true);
-        } else {
-            throw new RuntimeException("Invalid coordinates for village.");
-        }
+        // Select a random available spot from the list
+        int randomIndex = (int) (Math.random() * availableSpots.size());
+        Coordinates spot = availableSpots.get(randomIndex);
+
+        spot.setHasVillage(true); // Update the grid to indicate that a village has been created at the selected coordinate
 
         // Create the new Village entity with the selected coordinates
-        Village newVillage = new Village(villageCoordinates);
+        Village newVillage = new Village(spot);
         newVillage.setAccount(account);
         villageRepository.save(newVillage);
 
@@ -90,8 +72,12 @@ public class VillageService {
         System.out.println(newVillage.getCoordinates().getX());
         System.out.println(newVillage.getCoordinates().getY());
 
+        // Remove the selected spot from the list to avoid duplicates
+        availableSpots.remove(randomIndex);
+
         return newVillage;
     }
+
 
 
     private Coordinates getCoordinatesAt(int x, int y) {
@@ -133,6 +119,66 @@ public class VillageService {
         return modelMapper.map(village, VillageDTO.class);
     }
 
+    /**
+     public Village createVillageForAccount(Account account) {
+     Grid grid = gridService.getGrid();
+
+     // Find the center coordinates of the grid
+     int centerX = grid.getWidth() / 2;
+     int centerY = grid.getHeight() / 2;
+
+     // Start searching for available spots around the center
+     int x = centerX;
+     int y = centerY;
+
+     // Define the search radius around the center (adjust as needed)
+     int searchRadius = 2;
+
+     for (int distance = 1; distance <= searchRadius; distance++) {
+     // Check the four cardinal directions (up, down, left, right) around the center
+     if (isSpotAvailable(x + distance, y)) {
+     x += distance;
+     break;
+     }
+     if (isSpotAvailable(x - distance, y)) {
+     x -= distance;
+     break;
+     }
+     if (isSpotAvailable(x, y + distance)) {
+     y += distance;
+     break;
+     }
+     if (isSpotAvailable(x, y - distance)) {
+     y -= distance;
+     break;
+     }
+     }
+
+     // Check if an available spot was found
+     if (!isSpotAvailable(x, y)) {
+     throw new RuntimeException("No available spot for village.");
+     }
+
+     // Update the grid to indicate that a village has been created at the selected coordinate
+     Coordinates villageCoordinates = getCoordinatesAt(x, y);
+     if (villageCoordinates != null) {
+     villageCoordinates.setHasVillage(true);
+     } else {
+     throw new RuntimeException("Invalid coordinates for village.");
+     }
+
+     // Create the new Village entity with the selected coordinates
+     Village newVillage = new Village(villageCoordinates);
+     newVillage.setAccount(account);
+     villageRepository.save(newVillage);
+
+     // Print the coordinates of the newly created village for debugging
+     System.out.println(newVillage.getCoordinates().getX());
+     System.out.println(newVillage.getCoordinates().getY());
+
+     return newVillage;
+     }
+     **/
     /**
      private void initializeDefaultResources(Village village) {
      // Set default resource amounts

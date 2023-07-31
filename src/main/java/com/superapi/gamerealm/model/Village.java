@@ -4,7 +4,6 @@ import com.superapi.gamerealm.component.Coordinates;
 import jakarta.persistence.*;
 
 import java.util.Date;
-import java.util.Optional;
 
 @Entity
 public class Village {
@@ -26,6 +25,7 @@ public class Village {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;
+
 
     public Village() {
         System.out.println("VILLAGE NO ARGS CONSTRUCTOR ");

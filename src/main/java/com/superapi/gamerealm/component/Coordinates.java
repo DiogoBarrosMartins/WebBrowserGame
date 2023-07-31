@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
+import java.util.Objects;
+
 @Embeddable
 public class Coordinates {
     @Column(nullable = false)
@@ -54,6 +56,17 @@ public class Coordinates {
         return hasVillage;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Coordinates)) return false;
+        Coordinates that = (Coordinates) o;
+        return getX() == that.getX() && getY() == that.getY();
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getX(), getY());
+    }
 }
 

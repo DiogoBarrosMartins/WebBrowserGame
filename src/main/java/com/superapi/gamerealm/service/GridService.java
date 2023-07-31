@@ -48,19 +48,7 @@ public class GridService {
         return gridRepository.findById(1L).orElse(null);
     }
 
-    public void addVillageToGrid(Grid grid, int x, int y) {
-        // Find the coordinates in the grid matching the specified (x, y) values
-        Coordinates villageCoordinates = grid.getVillageCoordinates().stream()
-                .filter(coordinates -> coordinates.getX() == x && coordinates.getY() == y)
-                .findFirst()
-                .orElse(null);
 
-        // If the coordinates exist and don't already have a village, add the village
-        if (villageCoordinates != null && !villageCoordinates.hasVillage()) {
-            villageCoordinates.setHasVillage(true);
-            gridRepository.save(grid);
-        }
-    }
 
     public Village getVillageAt(int x, int y) {
         Grid grid = getGrid();
