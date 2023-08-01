@@ -11,7 +11,6 @@ get accounts
 get account by id 
 get account by username
 
-creating an account doesnt trigger creation of the village 
 
 
 VILLAGE 
