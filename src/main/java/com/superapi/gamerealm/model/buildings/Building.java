@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
+import static com.superapi.gamerealm.model.buildings.BuildingType.*;
+
 @Entity
 public class Building {
     @Id
@@ -30,7 +32,7 @@ public class Building {
         this.village = village;
         this.type = type;
         this.buildingLevel = 0;
-        this.productionRate = BigDecimal.valueOf(4);
+        this.productionRate = BigDecimal.valueOf(999994);
     }
 
     public Building() {
@@ -113,4 +115,5 @@ public class Building {
                 type != BuildingType.STORAGE &&
                 type != BuildingType.SIEGE_WORKSHOP;
     }
+
 }

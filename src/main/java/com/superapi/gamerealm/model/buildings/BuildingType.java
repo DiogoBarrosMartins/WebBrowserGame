@@ -22,4 +22,21 @@ public enum BuildingType {
         public String getDisplayName() {
             return displayName;
         }
+        public String getResourceName() {
+                switch (this) {
+                        case FARM:
+                                return "wheat";
+                        case FOREST:
+                                return "wood";
+                        case QUARRY:
+                                return "stone";
+                        case MINE:
+                                return "gold";
+                        default:
+                                throw new IllegalArgumentException("Unsupported building type: " + this);
+                }
+        }
+
+
+
 }

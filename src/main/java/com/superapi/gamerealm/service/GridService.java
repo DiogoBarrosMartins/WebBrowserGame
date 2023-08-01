@@ -15,6 +15,7 @@ public class GridService {
 
 
     private final GridRepository gridRepository;
+    //???????????? this should go get the village Service not the repo, but we have circular dependency kekw
     private final VillageRepository villageRepository;
 
     @Autowired
@@ -49,7 +50,6 @@ public class GridService {
     }
 
 
-
     public Village getVillageAt(int x, int y) {
         Grid grid = getGrid();
         if (grid != null) {
@@ -59,7 +59,7 @@ public class GridService {
                     .orElse(null);
 
             if (coordinates != null && coordinates.hasVillage()) {
-                return villageRepository.findByCoordinatesXAndCoordinatesY(x,y);
+                return villageRepository.findByCoordinatesXAndCoordinatesY(x, y);
             }
         }
         return null;
@@ -105,9 +105,7 @@ public class GridService {
         gridRepository.deleteAll();
     }
 
-    public void addConquerableSpot() {
 
-    }
 
 }
 

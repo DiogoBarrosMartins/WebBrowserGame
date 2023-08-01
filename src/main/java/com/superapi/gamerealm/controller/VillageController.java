@@ -35,5 +35,15 @@ public class VillageController {
     public VillageDTO getVillageByAccountUsername(@PathVariable String username) {
         return villageService.getVillageByAccountUsername(username);
     }
-    // Other village-related endpoints
+
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<VillageDTO> getVillageById(@PathVariable Long id) {
+        VillageDTO villageDTO = villageService.getVillageById(id);
+        if (villageDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(villageDTO);
+    }
 }
