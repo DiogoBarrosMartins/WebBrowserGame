@@ -2,13 +2,16 @@ package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.buildings.Building;
+import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.resources.Resources;
+import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.repository.BuildingRepository;
 import com.superapi.gamerealm.repository.ResourcesRepository;
 import com.superapi.gamerealm.repository.VillageRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,51 +28,80 @@ public class ResourceService {
         this.villageRepository = villageRepository;
     }
 
-    public Map<String, BigDecimal> calculateProductionPerHour(Village village) {
-        Map<String, BigDecimal> productionPerHour = new HashMap<>();
+// FUBAR
+        public void updateResourcesAndLastUpdated(Village village) {
+            Resources resources = village.getResources();
+            Date lastUpdated = village.getLastUpdated();
+            Date currentTime = new Date();
+            long secondsElapsed = calculateElapsedSeconds(lastUpdated, currentTime);
 
-        for (Building building : village.getBuildings()) {
-            if (building.isResourceBuilding()) {
+            Map<TypeOfResource, BigDecimal> productionPerSecond = calculateProductionPerSecond(village);
 
-                BigDecimal productionRatePerHour = building.calculateProductionRate();
-                productionPerHour.put(building.getType().name(), productionRatePerHour);
+            for (BuildingType buildingType : BuildingType.values()) {
+
+                System.out.println("Processing building type: " + buildingType);
+                TypeOfResource resourceType = buildingType.getResourceName();
+                BigDecimal produced = productionPerSecond.getOrDefault(buildingType, BigDecimal.ZERO).multiply(BigDecimal.valueOf(secondsElapsed));
+                resources.setAmount(resourceType, resources.getAmount(resourceType).add(produced).setScale(0, RoundingMode.DOWN));
             }
-        }
 
-        return productionPerHour;
-    }
-
-     public void updateResourcesAndLastUpdated(Village village) {
-        Resources resources = village.getResources();
-        Date lastUpdated = village.getLastUpdated();
-        Date currentTime = new Date();
-        long hoursElapsed = calculateElapsedHours(lastUpdated, currentTime);
-
-        Map<String, BigDecimal> productionPerHour = calculateProductionPerHour(village);
-
-        BigDecimal wheatProduced = productionPerHour.getOrDefault("FARM", BigDecimal.ZERO).multiply(BigDecimal.valueOf(hoursElapsed));
-        resources.setWheat(resources.getWheat().add(wheatProduced));
-
-        // Update other resources (e.g., gold, wood, stone) similarly based on their respective production rates
-        // For demonstration purposes, I'll assume the keys in productionPerHour are "GOLD", "WOOD", and "STONE"
-
-        BigDecimal goldProduced = productionPerHour.getOrDefault("GOLD", BigDecimal.ZERO).multiply(BigDecimal.valueOf(hoursElapsed));
-        resources.setGold(resources.getGold().add(goldProduced));
-
-        BigDecimal woodProduced = productionPerHour.getOrDefault("WOOD", BigDecimal.ZERO).multiply(BigDecimal.valueOf(hoursElapsed));
-        resources.setWood(resources.getWood().add(woodProduced));
-
-        BigDecimal stoneProduced = productionPerHour.getOrDefault("STONE", BigDecimal.ZERO).multiply(BigDecimal.valueOf(hoursElapsed));
-        resources.setStone(resources.getStone().add(stoneProduced));
-
+        // Save the updated resources
         resourcesRepository.save(resources);
 
         village.setLastUpdated(currentTime);
+        village.setResources(resources);
+
+        // Save the updated village with the updated resources
         villageRepository.save(village);
     }
-
-    private long calculateElapsedHours(Date lastUpdateTime, Date currentTime) {
+    private long calculateElapsedSeconds(Date lastUpdateTime, Date currentTime) {
         long timeElapsedInMillis = currentTime.getTime() - lastUpdateTime.getTime();
-        return timeElapsedInMillis / (1000 * 60 * 60); // Convert milliseconds to hours
+        return timeElapsedInMillis / 1000; // Convert milliseconds to seconds
     }
+
+    public Map<TypeOfResource, BigDecimal> calculateProductionPerSecond(Village village) {
+        Map<TypeOfResource, BigDecimal> productionPerSecond = new HashMap<>();
+
+        for (Building building : village.getBuildings()) {
+            if (building.isResourceBuilding()) {
+                BigDecimal productionRatePerHour = building.calculateProductionRate();
+                BigDecimal productionRatePerSecond = productionRatePerHour.divide(BigDecimal.valueOf(3600), 2, RoundingMode.DOWN);
+                TypeOfResource resourceType = building.getType().getResourceName();
+                productionPerSecond.put(resourceType, productionRatePerSecond);
+            }
+        }
+
+        return productionPerSecond;
+    }
+
+    public boolean hasEnoughResources(Long villageId, int[] resourcesNeeded) {
+        Village village = getVillageById(villageId);
+        Resources resources = village.getResources();
+
+        return resources.getAmount(TypeOfResource.WHEAT).compareTo(BigDecimal.valueOf(resourcesNeeded[0])) >= 0 &&
+                resources.getAmount(TypeOfResource.GOLD).compareTo(BigDecimal.valueOf(resourcesNeeded[1])) >= 0 &&
+                resources.getAmount(TypeOfResource.WOOD).compareTo(BigDecimal.valueOf(resourcesNeeded[2])) >= 0 &&
+                resources.getAmount(TypeOfResource.STONE).compareTo(BigDecimal.valueOf(resourcesNeeded[3])) >= 0;
+    }
+
+    public Resources getResourceInventory(Long villageId) {
+        Village village = getVillageById(villageId);
+        return village.getResources();
+    }
+
+    public void deductResources(Building building , int[] resourcesNeeded) {
+Resources resources = building.getVillage().getResources();
+        resources.setAmount(TypeOfResource.WHEAT, resources.getAmount(TypeOfResource.WHEAT).subtract(BigDecimal.valueOf(resourcesNeeded[building.getLevel()+1])));
+        resources.setAmount(TypeOfResource.GOLD, resources.getAmount(TypeOfResource.GOLD).subtract(BigDecimal.valueOf(resourcesNeeded[building.getLevel()+1])));
+        resources.setAmount(TypeOfResource.STONE, resources.getAmount(TypeOfResource.STONE).subtract(BigDecimal.valueOf(resourcesNeeded[building.getLevel()+1])));
+        resources.setAmount(TypeOfResource.WOOD, resources.getAmount(TypeOfResource.WOOD).subtract(BigDecimal.valueOf(resourcesNeeded[building.getLevel()+1])));
+        resourcesRepository.save(resources);
+    }
+
+    private Village getVillageById(Long villageId) {
+        return villageRepository.findById(villageId).orElseThrow(RuntimeException::new);
+    }
+
+
+
 }

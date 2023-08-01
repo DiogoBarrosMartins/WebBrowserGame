@@ -50,8 +50,13 @@ a Storage ( that  will cap how much of the other resources besides wheat i can h
 a Research Center (to unlock more troops, this will be an hell to implement so it will go last),
 a Stable (to build troops of type horse) 
 and a Siege Workshop (to build troops of type siege).
-All building must be constructed.  
+All building must be constructed.
 
-
+ok now let's establish some requirements to upgrade buildings ! we should use a good resources curve, so it's engaging to keep evolving your buildings! 
+If the buildings would always evolve at the same pace, by the time you would have evolved two or three times it would lose the sense of fun and achievement! 
+So we need a good curve. The max level is 10, and they start at level 0. Let's start with our Forests! 
+To evolve our forests from level 0 to level 1 we should need like 100 wood, 200 stone, 100 wheat and 50 gold.
+And instead of producing 4 wood each hour, they should produce 10 at level 1. You see, thats more than double. It should also take time! 
+Every building should take time to evolve. Let's say that it takes 5 minutes for a forest building to evolve from level 0 to level 1. 
 
 

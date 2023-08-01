@@ -5,19 +5,26 @@ import com.superapi.gamerealm.dto.NonResourceBuildingDTO;
 import com.superapi.gamerealm.dto.ResourceBuildingDTO;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.buildings.BuildingType;
+import com.superapi.gamerealm.model.resources.TypeOfResource;
+import com.superapi.gamerealm.model.resources.Upgrade;
 import com.superapi.gamerealm.repository.BuildingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class BuildingService {
     private final BuildingRepository buildingRepository;
+    private final ResourceService resourceService;
 
-    public BuildingService(BuildingRepository buildingRepository) {
+    @Autowired
+    public BuildingService(BuildingRepository buildingRepository, ResourceService resourceService) {
         this.buildingRepository = buildingRepository;
+        this.resourceService = resourceService;
     }
 
     public List<ResourceBuildingDTO> getAllResourceBuildingsInVillage(Long villageId) {
@@ -46,26 +53,62 @@ public class BuildingService {
                 .collect(Collectors.toList());
     }
 
-
     public Building upgradeBuilding(Long buildingId) {
         Building building = buildingRepository.findById(buildingId)
                 .orElseThrow(() -> new IllegalArgumentException("Building not found with ID: " + buildingId));
 
-        // Check if the building's level is less than the maximum level (e.g., 3) before upgrading
-        if (building.getLevel() < building.getMaxLevel()) {
+        // Check if the building's level is less than the maximum level (e.g., 10) before upgrading
+        if (building.getLevel() >= building.getMaxLevel()) {
+            throw new IllegalStateException("Building is already at the maximum level.");
+        }
+
+
+        // Check if the player has enough resources to upgrade the building
+        int[] resourcesNeeded = Upgrade.getResourceBuildingResourcesNeeded(building.getType().toString(), building.getLevel());
+        if (resourceService.hasEnoughResources(building.getVillage().getId(), resourcesNeeded)) {
+            // Deduct the required resources from the player's inventory
+            resourceService.deductResources(building, resourcesNeeded);
+            // Set the startedAt field to the current date and time
+            building.setStartedAt(new Date());
+            // Increase the building's level
             building.setLevel(building.getLevel() + 1);
-            if (building.isResourceBuilding()) {
-                updateResourceBuildingProductionRate(building);
-            }
+            // Set the time to upgrade to the appropriate value
+            calculateUpgradeTime(building.getType(), building.getLevel() + 1);
             return buildingRepository.save(building);
+        } else {
+            throw new IllegalStateException("Player doesn't have enough resources to upgrade this building.");
+        }
+    }
+
+    private Date calculateUpgradeTime(BuildingType buildingType, int nextLevel) {
+        int[] upgradeTimes = Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES;
+        if (nextLevel <= upgradeTimes.length) {
+            // Get the upgrade time in minutes for the next level
+            int upgradeTimeMinutes = upgradeTimes[nextLevel - 1];
+            // Calculate the time when the upgrade will be completed
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.MINUTE, upgradeTimeMinutes);
+            return calendar.getTime();
         } else {
             throw new IllegalStateException("Building is already at the maximum level.");
         }
     }
 
-    private void updateResourceBuildingProductionRate(Building building) {
-        // Calculate the production rate based on the new level and update the building
-        BigDecimal productionRate = building.calculateProductionRate();
-        building.setProductionRate(productionRate);
+    private TypeOfResource getTypeOfResourceFromBuilding(BuildingType buildingType) {
+        switch (buildingType) {
+            case FOREST:
+                return TypeOfResource.WOOD;
+            case MINE:
+                return TypeOfResource.STONE;
+            case QUARRY:
+                return TypeOfResource.GOLD;
+            case FARM:
+                return TypeOfResource.WHEAT;
+            default:
+                throw new IllegalStateException("Unexpected value: " + buildingType);
+        }
     }
+
+
 }

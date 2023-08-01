@@ -1,5 +1,7 @@
 package com.superapi.gamerealm.model.buildings;
 
+import com.superapi.gamerealm.model.resources.TypeOfResource;
+
 public enum BuildingType {
         FARM("Farm"),
         QUARRY("Quarry"),
@@ -22,16 +24,16 @@ public enum BuildingType {
         public String getDisplayName() {
             return displayName;
         }
-        public String getResourceName() {
+        public TypeOfResource getResourceName() {
                 switch (this) {
                         case FARM:
-                                return "wheat";
+                                return TypeOfResource.WHEAT;
                         case FOREST:
-                                return "wood";
+                                return  TypeOfResource.WOOD;
                         case QUARRY:
-                                return "stone";
+                                return  TypeOfResource.STONE;
                         case MINE:
-                                return "gold";
+                                return TypeOfResource.GOLD;
                         default:
                                 throw new IllegalArgumentException("Unsupported building type: " + this);
                 }

@@ -9,26 +9,21 @@ public class Resources {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BigDecimal wheat;
+    private TypeOfResource type;
 
     @Column(nullable = false)
-    private BigDecimal gold;
-
-    @Column(nullable = false)
-    private BigDecimal wood;
-
-    @Column(nullable = false)
-    private BigDecimal stone;
+    private BigDecimal amount;
 
     public Resources() {
-        this.wood = BigDecimal.ZERO;
-        this.wheat = BigDecimal.ZERO;
-        this.stone = BigDecimal.ZERO;
-        this.gold = BigDecimal.ZERO;
+        this.amount = BigDecimal.ZERO;
     }
-    public BigDecimal getWheat() {
-        return  wheat;
+
+    public Resources(TypeOfResource type, BigDecimal amount) {
+        this.type = type;
+        this.amount = amount;
     }
 
     public Long getId() {
@@ -39,33 +34,22 @@ public class Resources {
         this.id = id;
     }
 
-    public void setWheat(BigDecimal wheat) {
-        this.wheat = wheat;
+
+    public BigDecimal getAmount(TypeOfResource type) {
+        return this.type.equals(type) ? amount : BigDecimal.ZERO;
     }
 
-    public BigDecimal getGold() {
-        return gold;
-    }
 
-    public void setGold(BigDecimal gold) {
-        this.gold = gold;
+    public void setAmount(TypeOfResource type, BigDecimal amount) {
+        if (this.type.equals(type)) {
+            this.amount = amount;
+        }
     }
-
-    public BigDecimal getWood() {
-        return wood;
-    }
-
-    public void setWood(BigDecimal wood) {
-        this.wood = wood;
-    }
-
-    public BigDecimal getStone() {
-        return stone;
-    }
-
-    public void setStone(BigDecimal stone) {
-        this.stone = stone;
-    }
-// Constructors, getters, and setters
 }
+
+
+
+
+
+
 

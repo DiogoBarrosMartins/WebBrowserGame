@@ -9,6 +9,7 @@ import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.resources.Resources;
+import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.repository.ResourcesRepository;
 import com.superapi.gamerealm.repository.VillageRepository;
 import org.modelmapper.ModelMapper;
@@ -16,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -97,16 +99,10 @@ public class VillageService {
 
 
     private void initializeDefaultResources(Village village) {
-        // Create a new Resources instance
-        Resources resources = new Resources();
-
-        // Set default resource amounts
-        resources.setWheat(BigDecimal.valueOf(1000L));
-        resources.setWood(BigDecimal.valueOf(1000L));
-        resources.setStone(BigDecimal.valueOf(500L));
-        resources.setGold(BigDecimal.valueOf(500L));
-
-        // Assign the resources to the village
+        Resources resources = new Resources(TypeOfResource.WHEAT, BigDecimal.valueOf(1000L));
+        resources.setAmount(TypeOfResource.WOOD, BigDecimal.valueOf(1000L));
+        resources.setAmount(TypeOfResource.STONE, BigDecimal.valueOf(500L));
+        resources.setAmount(TypeOfResource.GOLD, BigDecimal.valueOf(500L));
         village.setResources(resources);
     }
 
@@ -124,10 +120,6 @@ public class VillageService {
         return modelMapper.map(createdVillage, VillageDTO.class);
     }
 
-    public Village getVillageByCoordinates(int x, int y) {
-        return villageRepository.findByCoordinatesXAndCoordinatesY(x, y);
-    }
-
 
     // Method to get all villages as DTOs
     public List<VillageDTO> getAllVillages() {
@@ -137,7 +129,70 @@ public class VillageService {
                 .collect(Collectors.toList());
     }
 
-    // Method to get village by account username as DTO
+
+
+    /**
+     *
+     *
+     VILLAGE NO ARGS CONSTRUCTOR
+     2023-08-01T23:25:19.850+01:00 ERROR 17244 --- [nio-8080-exec-4] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.IllegalArgumentException: Unsupported building type: PUB] with root cause
+
+     java.lang.IllegalArgumentException: Unsupported building type: PUB
+     at com.superapi.gamerealm.model.buildings.BuildingType.getResourceName(BuildingType.java:38) ~[classes/:na]
+     at com.superapi.gamerealm.service.ResourceService.updateResourcesAndLastUpdated(ResourceService.java:41) ~[classes/:na]
+     at com.superapi.gamerealm.service.VillageService.getVillageByAccountUsername(VillageService.java:142) ~[classes/:na]
+     at com.superapi.gamerealm.controller.VillageController.getVillageByAccountUsername(VillageController.java:36) ~[classes/:na]
+     at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+     at java.base/java.lang.reflect.Method.invoke(Method.java:578) ~[na:na]
+     at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:253) ~[spring-web-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181) ~[spring-web-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:918) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:830) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1086) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564) ~[tomcat-embed-core-10.1.11.jar:6.0]
+     at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.1.0-M3.jar:6.1.0-M3]
+     at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.11.jar:6.0]
+     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.0-M3.jar:6.1.0-M3]
+     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.0-M3.jar:6.1.0-M3]
+     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.1.0-M3.jar:6.1.0-M3]
+     at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.1.0-M3.jar:6.1.0-M3]
+     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:166) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:894) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1740) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) ~[tomcat-embed-core-10.1.11.jar:10.1.11]
+     at java.base/java.lang.Thread.run(Thread.java:1623) ~[na:na]
+**/
+
+
     public VillageDTO getVillageByAccountUsername(String username) {
         List<Village> villages = villageRepository.findByAccountUsername(username);
 
@@ -149,158 +204,25 @@ public class VillageService {
         // Calculate resources produced during the elapsed hours
         resourceService.updateResourcesAndLastUpdated(village);
 
-        // Save the updated village to the database
-        villageRepository.save(village);
-
-
         return VillageMapper.toDTO(village);
     }
-
+// {
+//    "id": 1,
+//    "x": 2,
+//    "y": 0,
+//    "name": "default name",
+//    "accountId": 1,
+//    "lastUpdated": "2023-08-01T22:22:46.947+00:00",
+//    "wood": 0,
+//    "wheat": 1000.00,
+//    "stone": 0,
+//    "gold": 0
+//}
     public VillageDTO getVillageById(Long villageId) {
         Village village = villageRepository.findById(villageId)
                 .orElseThrow(() -> new RuntimeException("Village not found with ID: " + villageId));
-
-        // Calculate elapsed hours since the last update
-        Date now = new Date();
-        long elapsedHours = calculateElapsedHours(village.getLastUpdated(), now);
-
-        // Calculate resources produced during the elapsed hours
-        Map<String, Long> resourcesProduced = calculateResourcesProduced(village, elapsedHours);
-
-        // Update the village's resources and lastUpdated time
-        updateVillageResources(village, resourcesProduced, now);
-
-        // Convert the updated village to DTO
-        VillageDTO villageDTO = VillageMapper.toDTO(village);
-        return villageDTO;
+        return VillageMapper.toDTO(village);
     }
 
 
-
-
-
-
-
-
-
-
-
-    // this is resource 
-
-
-
-    private long calculateElapsedHours(Date lastUpdated, Date now) {
-        // Calculate the elapsed time in milliseconds
-        long elapsedTimeInMillis = now.getTime() - lastUpdated.getTime();
-
-        // Convert elapsed time from milliseconds to hours
-        return elapsedTimeInMillis / (1000 * 60 * 60);
-    }
-
-    private Map<String, Long> calculateResourcesProduced(Village village, long elapsedHours) {
-        Map<String, Long> resourcesProduced = new HashMap<>();
-
-        // Iterate through the village's buildings to calculate resources produced by each building
-        for (Building building : village.getBuildings()) {
-            BigDecimal productionRate;
-            if (building.getType() == BuildingType.PUB ||
-                    building.getType() == BuildingType.BARRACKS ||
-                    building.getType() == BuildingType.GRAIN_SILO ||
-                    building.getType() == BuildingType.STABLE ||
-                    building.getType() == BuildingType.RESEARCH_CENTER ||
-                    building.getType() == BuildingType.STORAGE ||
-                    building.getType() == BuildingType.SIEGE_WORKSHOP) {
-                // For non-resource buildings, no need to calculate the production rate
-             continue;
-            } else {
-                // For resource production buildings, calculate the production rate based on the level
-                productionRate = building.getProductionRate().multiply(BigDecimal.valueOf(building.getLevel()));
-            }
-
-            String resourceType = getResourceTypeFromBuildingType(building.getType());
-
-            // Calculate the total resources produced by the building during elapsed hours
-            long totalProduced = productionRate.multiply(BigDecimal.valueOf(elapsedHours)).longValue();
-            resourcesProduced.put(resourceType, totalProduced);
-        }
-
-        return resourcesProduced;
-    }
-
-    private void updateVillageResources(Village village, Map<String, Long> resourcesProduced, Date lastUpdated) {
-        Resources resources = village.getResources();
-
-        // Update wheat
-        Long wheatProduced = resourcesProduced.getOrDefault("wheat", 0L);
-        BigDecimal currentWheat = resources.getWheat();
-        BigDecimal newWheat = currentWheat.add(BigDecimal.valueOf(wheatProduced));
-        resources.setWheat(newWheat);
-
-        // Update gold
-        Long goldProduced = resourcesProduced.getOrDefault("gold", 0L);
-        BigDecimal currentGold = resources.getGold();
-        BigDecimal newGold = currentGold.add(BigDecimal.valueOf(goldProduced));
-        resources.setGold(newGold);
-
-        // Update wood
-        Long woodProduced = resourcesProduced.getOrDefault("wood", 0L);
-        BigDecimal currentWood = resources.getWood();
-        BigDecimal newWood = currentWood.add(BigDecimal.valueOf(woodProduced));
-        resources.setWood(newWood);
-
-        // Update stone
-        Long stoneProduced = resourcesProduced.getOrDefault("stone", 0L);
-        BigDecimal currentStone = resources.getStone();
-        BigDecimal newStone = currentStone.add(BigDecimal.valueOf(stoneProduced));
-        resources.setStone(newStone);
-
-        // Update the lastUpdated time
-        village.setLastUpdated(lastUpdated);
-
-        // Save the updated resources
-        resourcesRepository.save(resources);
-    }
-
-    public void updateVillageResources(Village village) {
-        Date now = new Date();
-        long elapsedSeconds = calculateElapsedSeconds(village.getLastUpdated(), now);
-        Map<String, Long> resourcesProduced = calculateResourcesProduced(village, elapsedSeconds);
-        updateResources(village.getResources(), resourcesProduced);
-        village.setLastUpdated(now);
-        villageRepository.save(village);
-    }
-
-    private long calculateElapsedSeconds(Date lastUpdated, Date now) {
-        long timeDifferenceInMillis = now.getTime() - lastUpdated.getTime();
-        return timeDifferenceInMillis / 1000; // Convert milliseconds to seconds
-    }
-
-    private Map<String, Long> calculateResourcesProduced(Village village, long elapsedSeconds) {
-        Map<String, Long> resourcesProduced = new HashMap<>();
-        for (Building building : village.getBuildings()) {
-            if (building.getType().isResourceBuilding()) {
-                long productionRatePerSecond = building.calculateProductionRate().divide(BigDecimal.valueOf(3600), RoundingMode.HALF_UP).longValue();
-                long producedResources = productionRatePerSecond * elapsedSeconds;
-                String resourceName = building.getType().getResourceName();
-                resourcesProduced.put(resourceName, resourcesProduced.getOrDefault(resourceName, 0L) + producedResources);
-            }
-        }
-        return resourcesProduced;
-    }
-
-    // Utility method to map building type to resource type
-    private String getResourceTypeFromBuildingType(BuildingType buildingType) {
-        switch (buildingType) {
-            case FARM:
-                return "wheat";
-            case FOREST:
-                return "wood";
-            case QUARRY:
-                return "stone";
-            case MINE:
-                return "gold";
-            default:
-                throw new IllegalArgumentException("Invalid building type: " + buildingType);
-        }
-    }
 }

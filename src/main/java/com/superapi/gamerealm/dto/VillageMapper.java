@@ -2,11 +2,10 @@ package com.superapi.gamerealm.dto;
 
 import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.model.Village;
+import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.resources.Resources;
 import org.springframework.stereotype.Component;
-@Component
 public class VillageMapper {
-
     public static VillageDTO toDTO(Village village) {
         VillageDTO villageDTO = new VillageDTO();
         villageDTO.setId(village.getId());
@@ -15,19 +14,19 @@ public class VillageMapper {
         villageDTO.setName(village.getName());
         villageDTO.setAccountId(village.getAccount().getId());
         villageDTO.setLastUpdated(village.getLastUpdated());
+
         // Map resource fields
-        villageDTO.setWheat(village.getResources().getWheat());
-        villageDTO.setGold(village.getResources().getGold());
-        villageDTO.setWood(village.getResources().getWood());
-        villageDTO.setStone(village.getResources().getStone());
-
-
-
-
+        mapResourcesToDTO(village.getResources(), villageDTO);
 
         return villageDTO;
     }
 
+    private static void mapResourcesToDTO(Resources resources, VillageDTO villageDTO) {
+        villageDTO.setWheat(resources.getAmount(TypeOfResource.WHEAT));
+        villageDTO.setGold(resources.getAmount(TypeOfResource.GOLD));
+        villageDTO.setWood(resources.getAmount(TypeOfResource.WOOD));
+        villageDTO.setStone(resources.getAmount(TypeOfResource.STONE));
+    }
 
     public static Village toEntity(VillageDTO villageDTO) {
         Village village = new Village();
@@ -40,13 +39,15 @@ public class VillageMapper {
 
         village.setName(villageDTO.getName());
 
-
-
-        Resources resources = new Resources();
-        resources.setWheat(villageDTO.getWheat());
-        resources.setGold(villageDTO.getGold());
-        resources.setWood(villageDTO.getWood());
-        resources.setStone(villageDTO.getStone());
+        // Set the existing Resources object if it exists, or create a new one if it doesn't
+        Resources resources = village.getResources();
+        if (resources == null) {
+            resources = new Resources();
+        }
+        resources.setAmount(TypeOfResource.WHEAT, villageDTO.getWheat());
+        resources.setAmount(TypeOfResource.GOLD, villageDTO.getGold());
+        resources.setAmount(TypeOfResource.WOOD, villageDTO.getWood());
+        resources.setAmount(TypeOfResource.STONE, villageDTO.getStone());
 
         village.setResources(resources);
 
@@ -55,4 +56,6 @@ public class VillageMapper {
         village.setLastUpdated(villageDTO.getLastUpdated());
         return village;
     }
+
 }
+
