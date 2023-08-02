@@ -1,64 +1,70 @@
-# WebBrowserGame
-Backend
-I AM CREATING THE SINGLE GREATEST WEB BROWSER GAME IN THE HISTORY OF THE INTERWEBS TRY TO STOP ME NERDS. 
+# WebBrowserGame Backend
 
+Welcome to the Single Greatest Web Browser Game in the history of the interwebs! Try to stop me nerds!
 
+## Postman Endpoints
 
+### Game Map Generation
 
+- Generate the game map (5 by 5 grid):
+   - Endpoint: `POST http://localhost:8080/grid/generate`
 
+### Account Management
 
-HOW TO SEE SOME ... ENDPOINTS 
+- Create an account with the following JSON object as the request body:
+   - Endpoint: `POST http://localhost:8080/accounts`
+   - Request Body:
+     ```json
+     {
+         "username": "example_user",
+         "email": "example@example.com",
+         "password": "yourpassword",
+         "tribe": "orc"
+     }
+     ```
 
+- Retrieve all accounts:
+   - Endpoint: `GET http://localhost:8080/accounts/`
 
-POSTMAN : 
+- Get an account by username:
+   - Endpoint: `GET http://localhost:8080/accounts/example_user`
 
+- Get an account by user ID:
+   - Endpoint: `GET http://localhost:8080/accounts/id/1`
 
-We create a game map. This will happen only once, and be implemented on our GameServerService. 5 by 5 grid. 
-1) http://localhost:8080/grid/generate  `POST` 
+### Village Management
 
-You can now see the grid, the gamemap. It will allow us to see where we can colonize
-   http://localhost:8080/grid  `GET`
+- Retrieve all villages:
+   - Endpoint: `GET http://localhost:8080/villages`
 
+- Get a list of villages by account username:
+   - Endpoint: `GET http://localhost:8080/villages/byAccountUsername/example_user`
 
-We can now create an account using this json object as a body on this endpoint :)
-2) http://localhost:8080/accounts  `POST` 
-{
-"username": "example_user",
-"email": "example@example.com",
-"password": "yourpassword",
-"tribe":"orc"
-} 
+### Building Management
 
-We can also see all accounts
-http://localhost:8080/accounts/  `GET`
-Get an account by username
-http://localhost:8080/accounts/example_user  `GET`
-Get an account by user ID
-http://localhost:8080/accounts/id/1  `GET`
+- Retrieve all resource-producing buildings by village ID:
+   - Endpoint: `GET http://localhost:8080/buildings/{villageID}/resource`
 
+- Retrieve all non-resource producing buildings by village ID:
+   - Endpoint: `GET http://localhost:8080/buildings/{villageID}/non-resource`
 
-The cool part is that, as it should be, an account creation created a village for that player!
-We can see all Villages
-The best part, we can also see the resources of that village! Spying is 100% legal for now. 
-3) http://localhost:8080/villages  `GET` 
+- Upgrade buildings (stats change, but the timer is yet to be refined):
+   - Endpoint: `POST http://localhost:8080/{villageID}/buildings/{buildingID}/upgrade`
 
-We can get a list of villages by account username (neat)
-http://localhost:8080/villages/byAccountUsername/example_use  `GET`r
+### Messages, Troops, and Attacks
 
+Messages, Troops, and Attacks are implemented and being tested.
 
-4) We can also see buildings !!
+## Status and Collaboration
 
-All resource producing buildings by village ID !
-http://localhost:8080/buildings/{villageID}/resourc  `GET`e
+This application is almost ready to go to the front-end phase! Feel free to contact me if you want to collaborate. 😄
 
-As well as non resource producing buildings. There are a bit lacking for now. 
-http://localhost:8080/buildings/{villageID}/non-resourc  `GET`e
+Looking forward to building the ultimate WebBrowserGame together! 🚀
 
-We can upgrade buildings, the stats change but the timer is yet to be refined. 
-5) http://localhost:8080/{villageID}/buildings/{buildingID}/upgrad  `POST` e
+## License 
 
-Messages, Troops and Attacks are implemented and being tested.
+This project is released under the MIT License.
 
-This application is almost ready to go to the front end phase !
+## Acknowledgments
 
-Feel free to contact me if you want to collaborate :D
+Thanks! 
