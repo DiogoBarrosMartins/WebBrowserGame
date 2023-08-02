@@ -3,6 +3,7 @@ package com.superapi.gamerealm.model;
 import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.resources.Resources;
+import com.superapi.gamerealm.model.troop.Troop;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -30,13 +31,14 @@ public class Village {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;
 
-    @OneToOne(cascade = CascadeType.ALL) // Cascade all operations (persist, update, delete) to the associated resource
-    @JoinColumn(name = "resources_id") // Specify the foreign key column
-    private Resources resources;
+    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Resources> resources = new ArrayList<>();
 
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Building> buildings = new ArrayList<>();
-
+    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Troop> troops = new ArrayList<>();
+    private boolean underAttack;
 
     public Village() {
         System.out.println("VILLAGE NO ARGS CONSTRUCTOR ");
@@ -45,7 +47,7 @@ public class Village {
 
 
     public Village(Coordinates coordinates) {
-        System.out.println("VILLAGE COORDINATE ARGS CONSTRUCTOR "+ coordinates.getX() + " " + coordinates.getY());
+        System.out.println("VILLAGE COORDINATE ARGS CONSTRUCTOR " + coordinates.getX() + " " + coordinates.getY());
         this.coordinates = coordinates;
         this.name = "default name";
         this.lastUpdated = new Date();
@@ -102,20 +104,21 @@ public class Village {
     }
 
     public void setGrid(Grid grid) {
-  this.grid =grid;
+        this.grid = grid;
     }
 
     public Grid getGrid() {
         return grid;
     }
 
-    public Resources getResources() {
+    public List<Resources> getResources() {
         return resources;
     }
 
-    public void setResources(Resources resources) {
+    public void setResources(List<Resources> resources) {
         this.resources = resources;
     }
+
     public List<Building> getBuildings() {
         return buildings;
     }
@@ -125,6 +128,22 @@ public class Village {
         building.setVillage(this);
     }
 
+    public List<Troop> getTroops() {
+        return troops;
+    }
+
+    public void setTroops(List<Troop> troops) {
+        this.troops = troops;
+    }
+
+    public boolean isUnderAttack() {
+        return underAttack;
+    }
+
+    public void setUnderAttack(boolean underAttack) {
+        this.underAttack = underAttack;
+    }
+
     public void removeBuilding(Building building) {
         buildings.remove(building);
         building.setVillage(null);
@@ -132,5 +151,9 @@ public class Village {
 
     public void setBuildings(List<Building> buildings) {
         this.buildings = buildings;
+    }
+
+    public void setIsUnderAttack(boolean b) {
+        this.underAttack = b;
     }
 }

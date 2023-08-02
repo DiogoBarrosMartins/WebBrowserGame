@@ -1,7 +1,9 @@
 package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.dto.AccountDTO;
+import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.model.Account;
+import com.superapi.gamerealm.model.Message;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.AccountRepository;
 import org.modelmapper.ModelMapper;
@@ -11,22 +13,21 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
-    private final GridService gridService;
     private final VillageService villageService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, GridService gridService,
+    public AccountService(AccountRepository accountRepository,
                           VillageService villageService, ModelMapper modelMapper) {
         this.accountRepository = accountRepository;
-        this.gridService = gridService;
         this.villageService = villageService;
         this.modelMapper = modelMapper;
     }
+
+
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
         Account account = modelMapper.map(accountDTO, Account.class);
@@ -40,7 +41,6 @@ public class AccountService {
         return optionalAccount.map(account -> modelMapper.map(account, AccountDTO.class));
     }
 
-
     public List<AccountDTO> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
         return accounts.stream()
@@ -48,12 +48,8 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    private AccountDTO convertToDTO(Account account) {
-        return modelMapper.map(account, AccountDTO.class);
-    }
-
-    public List<Village> findAllVillagesByAccountId(Long accountId) {
-        return null;
+    public List<VillageDTO> findAllVillagesByAccountId(Long accountId) {
+        return villageService.findAllVillagesByAccountId(accountId);
     }
 
     public void purgePlayerAccounts() {
@@ -61,7 +57,8 @@ public class AccountService {
     }
 
     public void deleteAccount(Long accountId) {
-        for (Village village : findAllVillagesByAccountId(accountId)) {
+        for (VillageDTO village : findAllVillagesByAccountId(accountId)) {
+            villageService.deleteVillage(village.getId());
         }
         accountRepository.deleteById(accountId);
     }
@@ -70,4 +67,30 @@ public class AccountService {
         Optional<Account> optionalAccount = accountRepository.findById(accountId);
         return optionalAccount.map(account -> modelMapper.map(account, AccountDTO.class));
     }
+
+    public void sendMessage(String senderUsername, String recipientUsername, String message) {
+        Optional<Account> optionalSender = accountRepository.findByUsername(senderUsername);
+        Optional<Account> optionalRecipient = accountRepository.findByUsername(recipientUsername);
+
+        if (optionalSender.isPresent() && optionalRecipient.isPresent()) {
+            Account sender = optionalSender.get();
+            Account recipient = optionalRecipient.get();
+
+            Message messageEntity = new Message( sender, recipient, message);
+            sender.getSentMessages().add(messageEntity);
+            recipient.getReceivedMessages().add(messageEntity);
+
+            accountRepository.save(sender);
+            accountRepository.save(recipient);
+        }
+    }
+
+    private AccountDTO convertToDTO(Account account) {
+        return modelMapper.map(account, AccountDTO.class);
+    }
+
+
+
+
 }
+

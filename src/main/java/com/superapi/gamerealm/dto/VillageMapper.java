@@ -4,7 +4,9 @@ import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.resources.Resources;
-import org.springframework.stereotype.Component;
+
+import java.util.List;
+
 public class VillageMapper {
     public static VillageDTO toDTO(Village village) {
         VillageDTO villageDTO = new VillageDTO();
@@ -21,11 +23,25 @@ public class VillageMapper {
         return villageDTO;
     }
 
-    private static void mapResourcesToDTO(Resources resources, VillageDTO villageDTO) {
-        villageDTO.setWheat(resources.getAmount(TypeOfResource.WHEAT));
-        villageDTO.setGold(resources.getAmount(TypeOfResource.GOLD));
-        villageDTO.setWood(resources.getAmount(TypeOfResource.WOOD));
-        villageDTO.setStone(resources.getAmount(TypeOfResource.STONE));
+    private static void mapResourcesToDTO(List<Resources> resources, VillageDTO villageDTO) {
+        for (Resources resource : resources) {
+            switch (resource.getType()) {
+                case WHEAT:
+                    villageDTO.setWheat(resource.getAmount());
+                    break;
+                case GOLD:
+                    villageDTO.setGold(resource.getAmount());
+                    break;
+                case WOOD:
+                    villageDTO.setWood(resource.getAmount());
+                    break;
+                case STONE:
+                    villageDTO.setStone(resource.getAmount());
+                    break;
+                default:
+                    // Do nothing
+            }
+        }
     }
 
     public static Village toEntity(VillageDTO villageDTO) {
@@ -34,28 +50,39 @@ public class VillageMapper {
 
         // Instead of creating a new Coordinates object, use the existing one from the Village entity
         Coordinates coordinates = village.getCoordinates();
+        if (coordinates == null) {
+            coordinates = new Coordinates();
+            village.setCoordinates(coordinates);
+        }
         coordinates.setX(villageDTO.getX());
         coordinates.setY(villageDTO.getY());
 
         village.setName(villageDTO.getName());
 
-        // Set the existing Resources object if it exists, or create a new one if it doesn't
-        Resources resources = village.getResources();
-        if (resources == null) {
-            resources = new Resources();
-        }
-        resources.setAmount(TypeOfResource.WHEAT, villageDTO.getWheat());
-        resources.setAmount(TypeOfResource.GOLD, villageDTO.getGold());
-        resources.setAmount(TypeOfResource.WOOD, villageDTO.getWood());
-        resources.setAmount(TypeOfResource.STONE, villageDTO.getStone());
+        // Create a new Resources object for each resource type and set its amount
+        Resources wheat = new Resources(TypeOfResource.WHEAT, villageDTO.getWheat());
+        Resources gold = new Resources(TypeOfResource.GOLD, villageDTO.getGold());
+        Resources wood = new Resources(TypeOfResource.WOOD, villageDTO.getWood());
+        Resources stone = new Resources(TypeOfResource.STONE, villageDTO.getStone());
 
-        village.setResources(resources);
+        // Associate the Resources objects with the Village
+        wheat.setVillage(village);
+        gold.setVillage(village);
+        wood.setVillage(village);
+        stone.setVillage(village);
+
+        // Add the Resources objects to the Village's list of resources
+        village.getResources().add(wheat);
+        village.getResources().add(gold);
+        village.getResources().add(wood);
+        village.getResources().add(stone);
 
         // Note: accountId should be set through the Account entity using a service or repository.
         // village.setAccount(/* Account entity */);
         village.setLastUpdated(villageDTO.getLastUpdated());
         return village;
     }
+
 
 }
 

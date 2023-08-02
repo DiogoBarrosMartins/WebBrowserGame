@@ -1,6 +1,9 @@
 package com.superapi.gamerealm.controller;
 
 import com.superapi.gamerealm.dto.VillageDTO;
+import com.superapi.gamerealm.dto.VillageMapper;
+import com.superapi.gamerealm.model.Attack;
+import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.service.VillageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +41,20 @@ public class VillageController {
 
 
 
+    @PostMapping("/{villageId}/declare-attack")
+    public ResponseEntity<?> declareAttack(@PathVariable Long villageId, @RequestBody Attack attack) {
+        Village attackerVillage = villageService.getVillage(villageId);
+        attack.setAttackerVillage(attackerVillage);
+        villageService.declareAttack(attack);
+        return ResponseEntity.ok().build();
+    }
+/**
+    @PostMapping("/handle-attack")
+    public ResponseEntity<?> handleAttack(@RequestBody Attack attack) {
+        villageService.handleAttack(attack);
+        return ResponseEntity.ok().build();
+    }
+**/
     @GetMapping("/{id}")
     public ResponseEntity<VillageDTO> getVillageById(@PathVariable Long id) {
         VillageDTO villageDTO = villageService.getVillageById(id);

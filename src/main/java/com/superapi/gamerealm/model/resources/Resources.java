@@ -1,5 +1,6 @@
 package com.superapi.gamerealm.model.resources;
 
+import com.superapi.gamerealm.model.Village;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -16,6 +17,11 @@ public class Resources {
 
     @Column(nullable = false)
     private BigDecimal amount;
+
+    @ManyToOne
+    @JoinColumn(name = "village_id")
+    private Village village;
+
 
     public Resources() {
         this.amount = BigDecimal.ZERO;
@@ -36,16 +42,52 @@ public class Resources {
 
 
     public BigDecimal getAmount(TypeOfResource type) {
-        return this.type.equals(type) ? amount : BigDecimal.ZERO;
+        return this.type == type ? amount : BigDecimal.ZERO;
     }
 
-
     public void setAmount(TypeOfResource type, BigDecimal amount) {
-        if (this.type.equals(type)) {
+        if (this.type == type) {
             this.amount = amount;
         }
     }
+
+    public void setVillage(Village village) {
+   this.village = village;
+    }
+
+    public void setType(TypeOfResource type) {
+        this.type = type;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public TypeOfResource getType() {
+        return type;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public Village getVillage() {
+        return village;
+    }
+
+    public void increaseAmount(BigDecimal amount) {
+        this.amount = this.amount.add(amount);
+    }
+
+    public void decreaseAmount(BigDecimal amount) {
+        if (this.amount.compareTo(amount) >= 0) {
+            this.amount = this.amount.subtract(amount);
+        } else {
+            throw new IllegalArgumentException("Not enough resources");
+        }
+    }
 }
+
 
 
 

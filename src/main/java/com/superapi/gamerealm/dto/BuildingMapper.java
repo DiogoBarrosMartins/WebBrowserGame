@@ -1,23 +1,33 @@
 package com.superapi.gamerealm.dto;
 
 import com.superapi.gamerealm.model.buildings.Building;
+import com.superapi.gamerealm.model.resources.Upgrade;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Component
 public class BuildingMapper {
     public static ResourceBuildingDTO toResourceBuildingDTO(Building building) {
-        ResourceBuildingDTO dto = new ResourceBuildingDTO();
-        dto.setId(building.getId());
-        dto.setType(building.getType());
-        dto.setProductionRate(building.getProductionRate());
-        dto.setBuildingLevel(building.getLevel());
-        return dto;
+        return new ResourceBuildingDTO(
+                building.getId(),
+                building.getType(),
+                building.getLevel(),
+                building.calculateProductionRate(),
+                building.getMaxLevel(),
+                Upgrade.getResourceBuildingResourcesNeeded(building.getType().toString(), building.getLevel())
+        );
     }
+
     public static NonResourceBuildingDTO toNonResourceBuildingDTO(Building building) {
-        NonResourceBuildingDTO dto = new NonResourceBuildingDTO();
-        dto.setId(building.getId());
-        dto.setType(building.getType());
-        dto.setBuildingLevel(building.getLevel());
-        return dto;
+        return new NonResourceBuildingDTO(
+                building.getId(),
+                building.getType(),
+                building.getLevel(),
+                building.getMaxLevel(),
+                Upgrade.getNonResourceBuildingResourcesNeeded(building.getType().toString(), building.getLevel())
+        );
     }
+
+
 }
