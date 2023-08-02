@@ -100,18 +100,7 @@ public class Building {
         return maxLevel;
     }
 
-    public BigDecimal calculateProductionRate() {
 
-        //  base production rate for level 0 <- constructor
-        BigDecimal baseProductionRate = productionRate;
-
-        // Define a rate of increase per level
-        BigDecimal increasePerLevel = new BigDecimal("5");
-
-        // Calculate the production rate based on the level
-        // Return the calculated production rate
-        return baseProductionRate.add(increasePerLevel.multiply(new BigDecimal(getLevel())));
-    }
     public boolean isResourceBuilding() {
         return type != BuildingType.PUB &&
                 type != BuildingType.BARRACKS &&

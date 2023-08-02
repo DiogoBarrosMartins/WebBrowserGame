@@ -20,6 +20,7 @@ import java.math.BigDecimal;
         public ResourceBuildingDTO(Long id, BuildingType type, int level, BigDecimal bigDecimal, int maxLevel, int[] resourceBuildingResourcesNeeded) {
         }
 
+
         public ResourceBuildingDTO(Long id, BuildingType type, int level, BigDecimal productionRate, int maxLevel, int[] resourcesNeeded, long timeLeft) {
             this.id = id;
             this.type = type;
@@ -85,6 +86,5 @@ import java.math.BigDecimal;
         public void setTimeLeft(long timeLeft) {
             this.timeLeft = timeLeft;
         }
-// getters and setters omitted for brevity
     }
 

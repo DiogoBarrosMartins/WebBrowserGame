@@ -25,6 +25,18 @@ public class ResourceService {
         this.resourcesRepository = resourcesRepository;
         this.villageRepository = villageRepository;
     }
+    public BigDecimal calculateProductionRate(Building building) {
+        // Define a base production rate for level 0
+        BigDecimal baseProductionRate = building.getProductionRate();
+
+        // Define a rate of increase per level
+        BigDecimal increasePerLevel = new BigDecimal("5");
+
+        // Calculate the production rate based on the building's level
+        // Return the calculated production rate
+        return baseProductionRate.add(increasePerLevel.multiply(new BigDecimal(building.getLevel())));
+    }
+
 
     public void updateResourcesAndLastUpdated(Village village) {
         List<Resources> resourcesList = village.getResources();
@@ -35,7 +47,7 @@ public class ResourceService {
         for (Building building : village.getBuildings()) {
             if (building.isResourceBuilding()) {
                 TypeOfResource resourceType = building.getType().getResourceName();
-                BigDecimal productionRatePerHour = building.calculateProductionRate();
+                BigDecimal productionRatePerHour = calculateProductionRate(building);
                 BigDecimal productionRatePerSecond = productionRatePerHour.divide(BigDecimal.valueOf(3600), 2, RoundingMode.HALF_UP);
                 BigDecimal produced = productionRatePerSecond.multiply(BigDecimal.valueOf(secondsElapsed));
 

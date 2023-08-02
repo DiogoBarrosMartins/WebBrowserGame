@@ -11,6 +11,7 @@ import com.superapi.gamerealm.repository.BuildingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -29,18 +30,22 @@ public class BuildingService {
 
     public List<ResourceBuildingDTO> getAllResourceBuildingsInVillage(Long villageId) {
         List<Building> buildings = buildingRepository.findByVillageId(villageId);
+
+        // Calculate production rates for all buildings
         for (Building building : buildings) {
-            building.calculateProductionRate();
+            BigDecimal productionRate = resourceService.calculateProductionRate(building);
+            building.setProductionRate(productionRate);
         }
+
         return buildings.stream()
                 .filter(building -> building.getType() == BuildingType.FARM
                         || building.getType() == BuildingType.QUARRY
                         || building.getType() == BuildingType.MINE
                         || building.getType() == BuildingType.FOREST)
-
                 .map(BuildingMapper::toResourceBuildingDTO)
                 .collect(Collectors.toList());
     }
+
 
     public List<NonResourceBuildingDTO> getAllNonResourceBuildingsInVillage(Long villageId) {
         List<Building> buildings = buildingRepository.findByVillageId(villageId);
