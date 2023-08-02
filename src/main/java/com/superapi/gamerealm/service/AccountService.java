@@ -1,6 +1,7 @@
 package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.dto.AccountDTO;
+import com.superapi.gamerealm.dto.AccountMapper;
 import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Message;
@@ -18,22 +19,22 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final VillageService villageService;
     private final ModelMapper modelMapper;
+    private final AccountMapper accountMapper;
 
     @Autowired
     public AccountService(AccountRepository accountRepository,
-                          VillageService villageService, ModelMapper modelMapper) {
+                          VillageService villageService, AccountMapper accountMapper,ModelMapper modelMapper) {
         this.accountRepository = accountRepository;
         this.villageService = villageService;
-        this.modelMapper = modelMapper;
+        this.modelMapper = modelMapper;this.accountMapper = accountMapper;
     }
 
 
-
     public AccountDTO createAccount(AccountDTO accountDTO) {
-        Account account = modelMapper.map(accountDTO, Account.class);
+        Account account = accountMapper.dtoToEntity(accountDTO);
         Account createdAccount = accountRepository.save(account);
         villageService.createVillageForAccount(account);
-        return modelMapper.map(createdAccount, AccountDTO.class);
+        return accountMapper.entityToDto(createdAccount);
     }
 
     public Optional<AccountDTO> getAccountByUsername(String username) {
