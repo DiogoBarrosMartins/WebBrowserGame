@@ -7,23 +7,22 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
-
-public interface ResourcesRepository extends JpaRepository <Resources, Long> {
-
-    @Modifying
-    @Query("UPDATE Resources r SET r.amount = :wheat WHERE r.type = 'WHEAT'")
-    void updateWheat(BigDecimal wheat);
+public interface ResourcesRepository extends JpaRepository<Resources, Long> {
 
     @Modifying
-    @Query("UPDATE Resources r SET r.amount = :wood WHERE r.type = 'WOOD'")
-    void updateWood(BigDecimal wood);
+    @Query("UPDATE Resources r SET r.wheat = :wheat WHERE r.id = :id")
+    void updateWheat(@Param("id") Long id, @Param("wheat") BigDecimal wheat);
 
     @Modifying
-    @Query("UPDATE Resources r SET r.amount = :stone WHERE r.type = 'STONE'")
-    void updateStone(BigDecimal stone);
+    @Query("UPDATE Resources r SET r.wood = :wood WHERE r.id = :id")
+    void updateWood(@Param("id") Long id, @Param("wood") BigDecimal wood);
 
     @Modifying
-    @Query("UPDATE Resources r SET r.amount = :gold WHERE r.type = 'GOLD'")
-    void updateGold(BigDecimal gold);
+    @Query("UPDATE Resources r SET r.stone = :stone WHERE r.id = :id")
+    void updateStone(@Param("id") Long id, @Param("stone") BigDecimal stone);
+
+    @Modifying
+    @Query("UPDATE Resources r SET r.gold = :gold WHERE r.id = :id")
+    void updateGold(@Param("id") Long id, @Param("gold") BigDecimal gold);
 }
 

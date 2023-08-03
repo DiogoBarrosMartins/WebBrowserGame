@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +56,6 @@ public class BuildingService {
                 .map(BuildingMapper::toNonResourceBuildingDTO)
                 .collect(Collectors.toList());
     }
-
     public Building upgradeBuilding(Long buildingId) {
         Building building = buildingRepository.findById(buildingId)
                 .orElseThrow(() -> new IllegalArgumentException("Building not found with ID: " + buildingId));
@@ -67,23 +65,29 @@ public class BuildingService {
             throw new IllegalStateException("Building is already at the maximum level.");
         }
 
-
         // Check if the player has enough resources to upgrade the building
-        int[] resourcesNeeded = Upgrade.getResourceBuildingResourcesNeeded(building.getType().toString(), building.getLevel());
+        Map<TypeOfResource, Double> resourcesNeeded = Upgrade.getResourceNeeded(building.getType(), building.getLevel());
+
         if (resourceService.hasEnoughResources(building.getVillage().getId(), resourcesNeeded)) {
             // Deduct the required resources from the player's inventory
-            resourceService.deductResources(building, resourcesNeeded);
+            resourceService.deductResources(building.getVillage().getId(), resourcesNeeded);
+
             // Set the startedAt field to the current date and time
-            building.setStartedAt(new Date());
+            building.setStartedAt(LocalDateTime.now());
+
             // Increase the building's level
             building.setLevel(building.getLevel() + 1);
+
             // Set the time to upgrade to the appropriate value
             calculateUpgradeTime(building.getType(), building.getLevel() + 1);
+
             return buildingRepository.save(building);
         } else {
             throw new IllegalStateException("Player doesn't have enough resources to upgrade this building.");
         }
     }
+
+
 
     private Date calculateUpgradeTime(BuildingType buildingType, int nextLevel) {
         int[] upgradeTimes = Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES;
@@ -100,20 +104,7 @@ public class BuildingService {
         }
     }
 
-    private TypeOfResource getTypeOfResourceFromBuilding(BuildingType buildingType) {
-        switch (buildingType) {
-            case FOREST:
-                return TypeOfResource.WOOD;
-            case MINE:
-                return TypeOfResource.STONE;
-            case QUARRY:
-                return TypeOfResource.GOLD;
-            case FARM:
-                return TypeOfResource.WHEAT;
-            default:
-                throw new IllegalStateException("Unexpected value: " + buildingType);
-        }
-    }
+
 
 
 }

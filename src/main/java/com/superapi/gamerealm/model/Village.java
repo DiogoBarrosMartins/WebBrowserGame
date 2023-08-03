@@ -6,6 +6,7 @@ import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.model.troop.Troop;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,12 +29,11 @@ public class Village {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdated;
+    @Column
+    private LocalDateTime lastUpdated;
 
-    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Resources> resources = new ArrayList<>();
-
+    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Resources> resources;
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Building> buildings = new ArrayList<>();
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -50,12 +50,10 @@ public class Village {
         System.out.println("VILLAGE COORDINATE ARGS CONSTRUCTOR " + coordinates.getX() + " " + coordinates.getY());
         this.coordinates = coordinates;
         this.name = "default name";
-        this.lastUpdated = new Date();
+        this.lastUpdated = LocalDateTime.now();
     }
 
-    public Date getLastUpdateTime() {
-        return lastUpdated;
-    }
+
 
 
     public long getId() {
@@ -87,13 +85,7 @@ public class Village {
         this.name = name;
     }
 
-    public Date getLastUpdated() {
-        return lastUpdated;
-    }
 
-    public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
 
     public Coordinates getCoordinates() {
         return coordinates;
@@ -111,6 +103,7 @@ public class Village {
         return grid;
     }
 
+
     public List<Resources> getResources() {
         return resources;
     }
@@ -118,7 +111,6 @@ public class Village {
     public void setResources(List<Resources> resources) {
         this.resources = resources;
     }
-
     public List<Building> getBuildings() {
         return buildings;
     }
@@ -155,5 +147,14 @@ public class Village {
 
     public void setIsUnderAttack(boolean b) {
         this.underAttack = b;
+    }
+
+
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 }

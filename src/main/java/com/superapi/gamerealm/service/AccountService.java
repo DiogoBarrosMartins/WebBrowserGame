@@ -5,7 +5,6 @@ import com.superapi.gamerealm.dto.AccountMapper;
 import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Message;
-import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.AccountRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

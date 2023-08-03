@@ -2,17 +2,23 @@ package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.buildings.Building;
+import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.model.resources.TypeOfResource;
+import com.superapi.gamerealm.model.resources.Upgrade;
 import com.superapi.gamerealm.repository.BuildingRepository;
 import com.superapi.gamerealm.repository.ResourcesRepository;
 import com.superapi.gamerealm.repository.VillageRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ResourceService {
@@ -38,89 +44,110 @@ public class ResourceService {
     }
 
 
-    public void updateResourcesAndLastUpdated(Village village) {
-        List<Resources> resourcesList = village.getResources();
-        Date lastUpdated = village.getLastUpdated();
-        Date currentTime = new Date();
-        long secondsElapsed = calculateElapsedSeconds(lastUpdated, currentTime);
 
-        for (Building building : village.getBuildings()) {
-            if (building.isResourceBuilding()) {
-                TypeOfResource resourceType = building.getType().getResourceName();
-                BigDecimal productionRatePerHour = calculateProductionRate(building);
-                BigDecimal productionRatePerSecond = productionRatePerHour.divide(BigDecimal.valueOf(3600), 2, RoundingMode.HALF_UP);
-                BigDecimal produced = productionRatePerSecond.multiply(BigDecimal.valueOf(secondsElapsed));
+    // Assume there's a maximum limit for each resource
+    private static final double MAX_RESOURCE = 5000.0;
 
-                // Find the corresponding Resources object for the resource type
-                Resources resources = resourcesList.stream()
-                        .filter(r -> r.getType() == resourceType)
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("No Resources object found for resource type " + resourceType));
+    public void updateVillageResources(Village village) {
+        synchronized(village) {
+            Resources resources = village.getResources().get(0); // Assuming there's always at least one Resources object in the list
+            List<Building> buildings = village.getBuildings();
 
-                // Update the amount of the corresponding Resources object
-                resources.setAmount(resources.getAmount().add(produced).setScale(0, RoundingMode.DOWN));
-            }
+            // calculate the time elapsed since the last update
+            Duration timeElapsed = Duration.between(village.getLastUpdated(), LocalDateTime.now());
+
+            // calculate total production rates for each type of resource
+            double totalWoodProductionRate = buildings.stream()
+                    .filter(b -> b.getType().equals(BuildingType.FOREST))
+                    .mapToDouble(b -> b.getProductionRate().doubleValue())
+                    .sum();
+
+            double totalWheatProductionRate = buildings.stream()
+                    .filter(b -> b.getType().equals(BuildingType.FARM ))
+                    .mapToDouble(b -> b.getProductionRate().doubleValue())
+                    .sum();
+
+            double totalStoneProductionRate = buildings.stream()
+                    .filter(b -> b.getType().equals(BuildingType.QUARRY))
+                    .mapToDouble(b -> b.getProductionRate().doubleValue())
+                    .sum();
+
+            double totalGoldProductionRate = buildings.stream()
+                    .filter(b -> b.getType().equals(BuildingType.MINE))
+                    .mapToDouble(b -> b.getProductionRate().doubleValue())
+                    .sum();
+
+            // update each resource
+            double newWood = Math.min(resources.getWood() + timeElapsed.toHours() * totalWoodProductionRate, MAX_RESOURCE);
+            resources.setWood(newWood);
+
+            double newWheat = Math.min(resources.getWheat() + timeElapsed.toHours() * totalWheatProductionRate, MAX_RESOURCE);
+            resources.setWheat(newWheat);
+
+            double newStone = Math.min(resources.getStone() + timeElapsed.toHours() * totalStoneProductionRate, MAX_RESOURCE);
+            resources.setStone(newStone);
+
+            double newGold = Math.min(resources.getGold() + timeElapsed.toHours() * totalGoldProductionRate, MAX_RESOURCE);
+            resources.setGold(newGold);
+
+            // update the lastUpdated timestamp
+            village.setLastUpdated(LocalDateTime.now());
+
+            // save the updated village in the database
+            villageRepository.save(village);
         }
-
-        // Save the updated resources
-        resourcesRepository.saveAll(resourcesList);
-
-        village.setLastUpdated(currentTime);
-
-        // Save the updated village with the updated resources
-        villageRepository.save(village);
     }
 
-    private long calculateElapsedSeconds(Date lastUpdateTime, Date currentTime) {
-        long timeElapsedInMillis = currentTime.getTime() - lastUpdateTime.getTime();
-        return timeElapsedInMillis / 1000; // Convert milliseconds to seconds
-    }
-
-    public boolean hasEnoughResources(Long villageId, int[] resourcesNeeded) {
+    public boolean hasEnoughResources(Long villageId, Map<TypeOfResource, Double> resourcesNeeded) {
         Village village = getVillageById(villageId);
-        List<Resources> resourcesList = village.getResources();
+        Resources resources = village.getResources().get(0); // Assuming there's always at least one Resources object in the list
 
-        return resourcesList.stream()
-                .filter(r -> r.getType() == TypeOfResource.WHEAT || r.getType() == TypeOfResource.GOLD ||
-                        r.getType() == TypeOfResource.WOOD || r.getType() == TypeOfResource.STONE)
-                .allMatch(r -> r.getAmount().compareTo(BigDecimal.valueOf(resourcesNeeded[r.getType().ordinal()])) >= 0);
+        return resources.getWood() >= resourcesNeeded.getOrDefault(TypeOfResource.WOOD, 0.0) &&
+                resources.getWheat() >= resourcesNeeded.getOrDefault(TypeOfResource.WHEAT, 0.0) &&
+                resources.getStone() >= resourcesNeeded.getOrDefault(TypeOfResource.STONE, 0.0) &&
+                resources.getGold() >= resourcesNeeded.getOrDefault(TypeOfResource.GOLD, 0.0);
     }
 
-    public void deductResources(Building building, int[] resourcesNeeded) {
-        Village village = building.getVillage();
-        List<Resources> resourcesList = village.getResources();
+    public void deductResources(Long villageId, Map<TypeOfResource, Double> resourcesToDeduct) {
+        Village village = getVillageById(villageId);
+        Resources resources = village.getResources().get(0); // Assuming there's always at least one Resources object in the list
 
-        for (Resources resources : resourcesList) {
-            TypeOfResource resourceType = resources.getType();
-            BigDecimal amountToDeduct = BigDecimal.valueOf(resourcesNeeded[resourceType.ordinal()]);
+        double newWood = resources.getWood() - resourcesToDeduct.getOrDefault(TypeOfResource.WOOD, 0.0);
+        if (newWood >= 0) {
+            resources.setWood(newWood);
+        } else {
+            throw new RuntimeException("Not enough wood to deduct");
+        }
 
-            if (resources.getAmount().compareTo(amountToDeduct) >= 0) {
-                resources.setAmount(resources.getAmount().subtract(amountToDeduct));
-            } else {
-                throw new RuntimeException("Not enough " + resourceType + " to deduct for building " + building.getType());
-            }
+        double newWheat = resources.getWheat() - resourcesToDeduct.getOrDefault(TypeOfResource.WHEAT, 0.0);
+        if (newWheat >= 0) {
+            resources.setWheat(newWheat);
+        } else {
+            throw new RuntimeException("Not enough wheat to deduct");
+        }
+
+        double newStone = resources.getStone() - resourcesToDeduct.getOrDefault(TypeOfResource.STONE, 0.0);
+        if (newStone >= 0) {
+            resources.setStone(newStone);
+        } else {
+            throw new RuntimeException("Not enough stone to deduct");
+        }
+
+        double newGold = resources.getGold() - resourcesToDeduct.getOrDefault(TypeOfResource.GOLD, 0.0);
+        if (newGold >= 0) {
+            resources.setGold(newGold);
+        } else {
+            throw new RuntimeException("Not enough gold to deduct");
         }
 
         // Save the updated resources
-        resourcesRepository.saveAll(resourcesList);
+        resourcesRepository.save(resources);
     }
+
 
     private Village getVillageById(Long villageId) {
         return villageRepository.findById(villageId).orElseThrow(RuntimeException::new);
     }
 
-    public int getTotalResources(Resources defenderResources) {
-        // this is not an int
-        //todo
-        return 420;
-    }
 
-    public Resources createResources(int lootAmount) {
-        //todo xdd
-        return new Resources(TypeOfResource.WHEAT, BigDecimal.valueOf(420));
-    }
-
-    public Resources createResource(Resources gold, int food, int wood, Resources stone) {
-        return new Resources();
-    }
 }

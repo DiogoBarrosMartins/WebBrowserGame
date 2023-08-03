@@ -4,32 +4,42 @@ import com.superapi.gamerealm.model.Village;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-
 @Entity
 public class Resources {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TypeOfResource type;
-
-    @Column(nullable = false)
-    private BigDecimal amount;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "village_id")
     private Village village;
 
+    @Column(nullable = false)
+    private Double wood;
+
+    @Column(nullable = false)
+    private Double wheat;
+
+    @Column(nullable = false)
+    private Double stone;
+
+    @Column(nullable = false)
+    private Double gold;
+
+    // other fields
+
 
     public Resources() {
-        this.amount = BigDecimal.ZERO;
     }
 
-    public Resources(TypeOfResource type, BigDecimal amount) {
-        this.type = type;
-        this.amount = amount;
+    public Resources(Long id, Village village, Double wood, Double wheat, Double stone, Double gold) {
+        this.id = id;
+        this.village = village;
+        this.wood = wood;
+        this.wheat = wheat;
+        this.stone = stone;
+        this.gold = gold;
     }
 
     public Long getId() {
@@ -40,51 +50,44 @@ public class Resources {
         this.id = id;
     }
 
-
-    public BigDecimal getAmount(TypeOfResource type) {
-        return this.type == type ? amount : BigDecimal.ZERO;
-    }
-
-    public void setAmount(TypeOfResource type, BigDecimal amount) {
-        if (this.type == type) {
-            this.amount = amount;
-        }
-    }
-
-    public void setVillage(Village village) {
-   this.village = village;
-    }
-
-    public void setType(TypeOfResource type) {
-        this.type = type;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public TypeOfResource getType() {
-        return type;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
     public Village getVillage() {
         return village;
     }
 
-    public void increaseAmount(BigDecimal amount) {
-        this.amount = this.amount.add(amount);
+    public void setVillage(Village village) {
+        this.village = village;
     }
 
-    public void decreaseAmount(BigDecimal amount) {
-        if (this.amount.compareTo(amount) >= 0) {
-            this.amount = this.amount.subtract(amount);
-        } else {
-            throw new IllegalArgumentException("Not enough resources");
-        }
+    public Double getWood() {
+        return wood;
+    }
+
+    public void setWood(Double wood) {
+        this.wood = wood;
+    }
+
+    public Double getWheat() {
+        return wheat;
+    }
+
+    public void setWheat(Double wheat) {
+        this.wheat = wheat;
+    }
+
+    public Double getStone() {
+        return stone;
+    }
+
+    public void setStone(Double stone) {
+        this.stone = stone;
+    }
+
+    public Double getGold() {
+        return gold;
+    }
+
+    public void setGold(Double gold) {
+        this.gold = gold;
     }
 }
 

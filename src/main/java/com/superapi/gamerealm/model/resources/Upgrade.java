@@ -1,5 +1,10 @@
 package com.superapi.gamerealm.model.resources;
 
+import com.superapi.gamerealm.model.buildings.BuildingType;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class Upgrade {
 
     public static final int[] RESOURCE_BUILDING_PRODUCTION_RATES = {4, 10, 22, 46, 94, 140, 200, 306, 500, 1070};
@@ -122,6 +127,29 @@ public class Upgrade {
     public static int[] getNonResourceBuildingResourcesNeeded(String type, int level) {
             return BARRACKS_RESOURCES_NEEDED[level ];
         }
+
+
+
+        // ... (keep the other constants as they are)
+
+        public static Map<TypeOfResource, Double> getResourceNeeded(BuildingType buildingType, int level) {
+            int[] resourcesNeededArray = switch (buildingType) {
+                case FOREST-> FOREST_RESOURCES_NEEDED[level];
+                case MINE -> MINE_RESOURCES_NEEDED[level];
+                case QUARRY -> QUARRY_RESOURCES_NEEDED[level];
+                case FARM  -> FARM_RESOURCES_NEEDED[level];
+                default -> throw new IllegalArgumentException("Invalid building type: " + buildingType);
+            };
+
+            Map<TypeOfResource, Double> resourcesNeeded = new HashMap<>();
+            resourcesNeeded.put(TypeOfResource.WOOD, (double) resourcesNeededArray[0]);
+            resourcesNeeded.put(TypeOfResource.WHEAT, (double) resourcesNeededArray[1]);
+            resourcesNeeded.put(TypeOfResource.STONE, (double) resourcesNeededArray[2]);
+            resourcesNeeded.put(TypeOfResource.GOLD, (double) resourcesNeededArray[3]);
+
+            return resourcesNeeded;
+        }
     }
+
 
 

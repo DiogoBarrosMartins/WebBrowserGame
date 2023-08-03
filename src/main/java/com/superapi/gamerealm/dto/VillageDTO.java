@@ -1,52 +1,18 @@
 package com.superapi.gamerealm.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
-public class VillageDTO {
+public class VillageDTO{
         private Long id;
         private int x;
         private int y;
         private String name;
         private Long accountId;
         private Date lastUpdated;
-        // Resource fields
-        private BigDecimal wood;
-        private BigDecimal wheat;
-        private BigDecimal stone;
-        private BigDecimal gold;
-
-        public BigDecimal getWheat() {
-                return wheat;
-        }
-
-        public void setWheat(BigDecimal wheat) {
-                this.wheat = wheat;
-        }
-
-        public BigDecimal getGold() {
-                return gold;
-        }
-
-        public void setGold(BigDecimal gold) {
-                this.gold = gold;
-        }
-
-        public BigDecimal getWood() {
-                return wood;
-        }
-
-        public void setWood(BigDecimal wood) {
-                this.wood = wood;
-        }
-
-        public BigDecimal getStone() {
-                return stone;
-        }
-
-        public void setStone(BigDecimal stone) {
-                this.stone = stone;
-        }
+        private List<ResourcesDTO> resourcesDTO;
 
         public VillageDTO() {
         }
@@ -57,6 +23,11 @@ public class VillageDTO {
                 this.y = y;
                 this.name = name;
                 this.accountId = accountId;
+                this.lastUpdated = lastUpdated;
+        }
+
+
+        public void setLastUpdated(Date lastUpdated) {
                 this.lastUpdated = lastUpdated;
         }
 
@@ -104,7 +75,13 @@ public class VillageDTO {
                 return lastUpdated;
         }
 
-        public void setLastUpdated(Date lastUpdated) {
-                this.lastUpdated = lastUpdated;
+        public List<ResourcesDTO> getResourcesDTO() {
+                return resourcesDTO;
         }
+
+        public void setResourcesDTO(List<ResourcesDTO> resourcesDTO) {
+                this.resourcesDTO = resourcesDTO;
+        }
+
+
 }

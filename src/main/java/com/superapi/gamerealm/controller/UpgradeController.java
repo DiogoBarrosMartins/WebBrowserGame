@@ -30,7 +30,7 @@ public class UpgradeController {
     public ResponseEntity<?> upgradeBuilding(@PathVariable Long villageId, @PathVariable Long buildingId) {
         try {
             Building building = buildingService.upgradeBuilding(buildingId);
-            resourceService.updateResourcesAndLastUpdated(building.getVillage());
+            resourceService.updateVillageResources(building.getVillage());
 
             if (building.isResourceBuilding()) {
                 ResourceBuildingDTO buildingDTO = BuildingMapper.toResourceBuildingDTO(building);
