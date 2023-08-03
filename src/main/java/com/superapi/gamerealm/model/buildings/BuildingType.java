@@ -25,9 +25,6 @@ public enum BuildingType {
         return displayName;
     }
 
-
-
-
     public TypeOfResource getResourceName() {
 
         switch (this) {
@@ -43,6 +40,5 @@ public enum BuildingType {
                 throw new IllegalArgumentException("Unsupported building type: " + this);
         }
     }
-
 
 }

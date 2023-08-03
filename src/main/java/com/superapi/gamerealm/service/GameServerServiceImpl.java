@@ -9,16 +9,13 @@ import org.springframework.stereotype.Service;
 public class GameServerServiceImpl implements GameServerService {
 
     private final GameServerRepository gameServerRepository;
-    private final GridService gridService;
     private final AccountService accountService;
 
     @Autowired
     public GameServerServiceImpl(
             GameServerRepository gameServerRepository,
-            GridService gridService,
             AccountService accountService) {
         this.gameServerRepository = gameServerRepository;
-        this.gridService = gridService;
         this.accountService = accountService;
     }
 

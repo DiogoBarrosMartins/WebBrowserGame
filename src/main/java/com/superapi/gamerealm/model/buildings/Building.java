@@ -14,23 +14,26 @@ public class Building {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "village_id") // The column that holds the foreign key to the Village table
+    @JoinColumn(name = "village_id")// The column that holds the foreign key to the Village table
     @JsonIgnore
-    private Village village; // Reference to the owning village
+    private Village village;
+    // Reference to the owning village
 
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime startedAt; // Represents the time when the building upgrade started
+    private LocalDateTime startedAt;
+    // Represents the time when the building upgrade started
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date timeToUpgrade; // Represents the time when the building will finish constructing or upgrading
+    private Date timeToUpgrade;
+    // Represents the time when the building will finish constructing or upgrading
 
     @Enumerated(EnumType.STRING)
     private BuildingType type;
 
-    // Properties specific to each building type
-    // For example, for resource production buildings:
     private BigDecimal productionRate;
     private int buildingLevel;
+
+
     private final int maxLevel = 10;
 
     public Building(BuildingType type, Village village) {
@@ -70,9 +73,11 @@ public class Building {
         return village;
     }
 
+
     public void setVillage(Village village) {
         this.village = village;
     }
+
 
     public void setLevel(int i) {
         this.buildingLevel = i;
@@ -89,7 +94,7 @@ public class Building {
 
     public int getBuildingLevel() {
         return buildingLevel;
-    }
+}
 
     public void setBuildingLevel(int buildingLevel) {
         this.buildingLevel = buildingLevel;
@@ -98,7 +103,6 @@ public class Building {
     public int getMaxLevel() {
         return maxLevel;
     }
-
 
     public boolean isResourceBuilding() {
         return type != BuildingType.PUB &&
@@ -125,4 +129,5 @@ public class Building {
     public void setTimeToUpgrade(Date timeToUpgrade) {
         this.timeToUpgrade = timeToUpgrade;
     }
+
 }

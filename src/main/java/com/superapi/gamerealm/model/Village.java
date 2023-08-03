@@ -3,13 +3,15 @@ package com.superapi.gamerealm.model;
 import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.resources.Resources;
+import com.superapi.gamerealm.model.resources.Upgrade;
 import com.superapi.gamerealm.model.troop.Troop;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 @Entity
 public class Village {
@@ -18,13 +20,14 @@ public class Village {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column
+    private int x;
+    @Column
+    private int y;
 
-    @Embedded
-    private Coordinates coordinates;
     private String name;
 
-    @ManyToOne
-    private Grid grid;
+
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
@@ -38,6 +41,13 @@ public class Village {
     private List<Building> buildings = new ArrayList<>();
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Troop> troops = new ArrayList<>();
+
+
+    Queue<Construction> resourceBuildingUpgradeQueue = new LinkedList<>();
+
+    Queue<Construction> nonResourceBuildingUpgradeQueue = new LinkedList<>();
+
+
     private boolean underAttack;
 
     public Village() {
@@ -46,14 +56,13 @@ public class Village {
     }
 
 
-    public Village(Coordinates coordinates) {
-        System.out.println("VILLAGE COORDINATE ARGS CONSTRUCTOR " + coordinates.getX() + " " + coordinates.getY());
-        this.coordinates = coordinates;
+    public Village(int x, int y) {
+        System.out.println("VILLAGE COORDINATE ARGS CONSTRUCTOR " + x + " " + y);
+        this.x = x;
+        this.y = y;
         this.name = "default name";
         this.lastUpdated = LocalDateTime.now();
     }
-
-
 
 
     public long getId() {
@@ -87,21 +96,6 @@ public class Village {
 
 
 
-    public Coordinates getCoordinates() {
-        return coordinates;
-    }
-
-    public void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public void setGrid(Grid grid) {
-        this.grid = grid;
-    }
-
-    public Grid getGrid() {
-        return grid;
-    }
 
 
     public List<Resources> getResources() {
@@ -111,6 +105,7 @@ public class Village {
     public void setResources(List<Resources> resources) {
         this.resources = resources;
     }
+
     public List<Building> getBuildings() {
         return buildings;
     }

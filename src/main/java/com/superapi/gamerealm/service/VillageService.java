@@ -1,12 +1,9 @@
 package com.superapi.gamerealm.service;
 
-import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.dto.VillageDTO;
-
 import com.superapi.gamerealm.dto.VillageMapper;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Attack;
-import com.superapi.gamerealm.model.Grid;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.buildings.BuildingType;
@@ -16,9 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,15 +22,13 @@ import java.util.stream.Collectors;
 public class VillageService {
     private final VillageRepository villageRepository;
     private final ModelMapper modelMapper;
-    private final GridService gridService;
     private final ResourceService resourceService;
     private final CombatService combatService;
     private final VillageMapper villageMapper;
 
     @Autowired
-    public VillageService(VillageRepository villageRepository, GridService gridService, ModelMapper modelMapper, ResourceService resourceService, CombatService combatService, VillageMapper villageMapper) {
+    public VillageService(VillageRepository villageRepository, ModelMapper modelMapper, ResourceService resourceService, CombatService combatService, VillageMapper villageMapper) {
         this.villageRepository = villageRepository;
-        this.gridService = gridService;
         this.modelMapper = modelMapper;
         this.resourceService = resourceService;
         this.combatService = combatService;
@@ -43,29 +36,24 @@ public class VillageService {
     }
 
     public Village createVillageForAccount(Account account) {
-        Grid grid = gridService.getGrid();
-        List<Coordinates> availableSpots = grid.getVillageCoordinates();
+        // Define the boundaries of your grid
+        int minCoordinate = 0;
+        int maxCoordinate = 100; // adjust this according to the size of your grid
 
-        if (availableSpots.isEmpty()) {
-            throw new RuntimeException("No available spot for village.");
-        }
-
-        // Select a random available spot from the list
-        int randomIndex = (int) (Math.random() * availableSpots.size());
-        Coordinates spot = availableSpots.get(randomIndex);
-
-        spot.setHasVillage(true); // Update the grid to indicate that a village has been created at the selected coordinate
+        // Generate a random spot within the grid
+        int x, y;
+        do {
+            x = minCoordinate + (int) (Math.random() * ((maxCoordinate - minCoordinate) + 1));
+            y = minCoordinate + (int) (Math.random() * ((maxCoordinate - minCoordinate) + 1));
+        } while (villageRepository.findByCoordinatesXAndCoordinatesY(x, y) != null);
 
         // Create the new Village entity with the selected coordinates
-        Village newVillage = new Village(spot);
+        Village newVillage = new Village(x, y);
         newVillage.setAccount(account);
         initializeDefaultResources(newVillage);
         initializeDefaultBuildings(newVillage);
 
         villageRepository.save(newVillage);
-
-        // Remove the selected spot from the list to avoid duplicates
-        availableSpots.remove(randomIndex);
 
         return newVillage;
     }
@@ -99,7 +87,6 @@ public class VillageService {
     }
 
 
-
     public VillageDTO createVillage(VillageDTO villageDTO) {
         Village village = modelMapper.map(villageDTO, Village.class);
         Village createdVillage = villageRepository.save(village);
@@ -113,7 +100,6 @@ public class VillageService {
                 .map(villageMapper::villageToVillageDTO)
                 .collect(Collectors.toList());
     }
-
 
     public VillageDTO getVillageByAccountUsername(String username) {
         List<Village> villages = villageRepository.findByAccountUsername(username);
@@ -129,13 +115,10 @@ public class VillageService {
         return villageMapper.villageToVillageDTO(village);
     }
 
-
     public VillageDTO getVillageById(Long villageId) {
         Village village = villageRepository.findById(villageId)
                 .orElseThrow(() -> new RuntimeException("Village not found with ID: " + villageId));
         resourceService.updateVillageResources(village);
-
-
         return villageMapper.villageToVillageDTO(village);
     }
 
@@ -147,7 +130,7 @@ public class VillageService {
     }
 
     public Village getVillage(Long id) {
-        Village v =  villageRepository.findById(id).orElseThrow(() -> new RuntimeException("Village not found with ID: " + id));
+        Village v = villageRepository.findById(id).orElseThrow(() -> new RuntimeException("Village not found with ID: " + id));
         resourceService.updateVillageResources(v);
         return villageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Village not found"));
@@ -163,13 +146,13 @@ public class VillageService {
         villageRepository.save(village);
     }
 
+
+    // change to ded xd
     public void deleteVillage(Long id) {
         Optional<Village> optionalVillage = villageRepository.findById(id);
 
         if (optionalVillage.isPresent()) {
             Village village = optionalVillage.get();
-            Coordinates coordinates = village.getCoordinates();
-            coordinates.setHasVillage(false); // Update the grid to indicate that the spot is now available
             villageRepository.delete(village);
         } else {
             throw new RuntimeException("No village found with ID: " + id);
@@ -178,3 +161,21 @@ public class VillageService {
 
 
 }
+
+/**
+ * class Building
+ * <p>
+ * <p>
+ * p Construction Cost
+ * build(){
+ * <p>
+ * <p>
+ * <p>
+ * }
+ * <p>
+ * class Quarry extends Building
+ *
+ * @Override p Construction cost = new List<>
+ */
+
+

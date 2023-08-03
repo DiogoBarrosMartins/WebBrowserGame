@@ -73,13 +73,13 @@ public class BuildingService {
             resourceService.deductResources(building.getVillage().getId(), resourcesNeeded);
 
             // Set the startedAt field to the current date and time
+            calculateUpgradeTime(building.getType(), building.getLevel() + 1);
             building.setStartedAt(LocalDateTime.now());
 
             // Increase the building's level
             building.setLevel(building.getLevel() + 1);
-
+            building.setProductionRate(BigDecimal.valueOf(Upgrade.RESOURCE_BUILDING_PRODUCTION_RATES[building.getLevel()]));
             // Set the time to upgrade to the appropriate value
-            calculateUpgradeTime(building.getType(), building.getLevel() + 1);
 
             return buildingRepository.save(building);
         } else {

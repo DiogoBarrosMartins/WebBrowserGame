@@ -3,25 +3,9 @@ package com.superapi.gamerealm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.superapi.gamerealm.component.Coordinates;
-import com.superapi.gamerealm.model.Account;
-import com.superapi.gamerealm.model.Grid;
-import com.superapi.gamerealm.model.Village;
-import com.superapi.gamerealm.repository.VillageRepository;
-import com.superapi.gamerealm.service.GridService;
-import com.superapi.gamerealm.service.VillageService;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.modelmapper.ModelMapper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VillageServiceTest {
