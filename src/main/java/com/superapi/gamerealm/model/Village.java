@@ -43,9 +43,6 @@ public class Village {
     private List<Troop> troops = new ArrayList<>();
 
 
-    Queue<Construction> resourceBuildingUpgradeQueue = new LinkedList<>();
-
-    Queue<Construction> nonResourceBuildingUpgradeQueue = new LinkedList<>();
 
 
     private boolean underAttack;
@@ -95,8 +92,21 @@ public class Village {
     }
 
 
+    public int getX() {
+        return x;
+    }
 
+    public void setX(int x) {
+        this.x = x;
+    }
 
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
 
     public List<Resources> getResources() {
         return resources;

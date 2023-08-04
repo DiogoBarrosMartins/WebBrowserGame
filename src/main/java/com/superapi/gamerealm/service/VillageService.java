@@ -45,7 +45,7 @@ public class VillageService {
         do {
             x = minCoordinate + (int) (Math.random() * ((maxCoordinate - minCoordinate) + 1));
             y = minCoordinate + (int) (Math.random() * ((maxCoordinate - minCoordinate) + 1));
-        } while (villageRepository.findByCoordinatesXAndCoordinatesY(x, y) != null);
+        } while (villageRepository.findByXAndY(x, y) != null);
 
         // Create the new Village entity with the selected coordinates
         Village newVillage = new Village(x, y);
@@ -97,9 +97,11 @@ public class VillageService {
         List<Village> villages = villageRepository.findAll();
 
         return villages.stream()
+                .peek(resourceService::updateVillageResources)
                 .map(villageMapper::villageToVillageDTO)
                 .collect(Collectors.toList());
     }
+
 
     public VillageDTO getVillageByAccountUsername(String username) {
         List<Village> villages = villageRepository.findByAccountUsername(username);

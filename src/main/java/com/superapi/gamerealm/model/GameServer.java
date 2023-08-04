@@ -12,10 +12,6 @@ public class GameServer {
 
     @Column(nullable = false, unique = true)
     private boolean initialized;
-    @OneToOne
-    @JoinColumn(name = "grid_id")
-    private Grid grid;
-    // Add other fields, constructors, and getters/setters (if needed)
 
     public Long getId() {
         return id;
@@ -33,9 +29,6 @@ public class GameServer {
         this.initialized = initialized;
     }
 
-    public void setGrid(Grid grid) {
-        this.grid = grid;
-    }
 
     // Add constructors, getters, setters, and other methods as needed
 }

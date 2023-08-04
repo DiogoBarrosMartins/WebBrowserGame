@@ -13,8 +13,8 @@ public interface VillageRepository extends JpaRepository<Village, Long> {
     @Query("SELECT v FROM Village v WHERE v.account.id = :accountId")
     List<Village> findAllByAccountId(Long accountId);
 
-    Village findByCoordinatesXAndCoordinatesY(int x, int y);
+    Village findByXAndY(int x, int y);
+
     @Query("SELECT v FROM Village v WHERE v.account.username = :username")
     List<Village> findByAccountUsername(String username);
-
 }

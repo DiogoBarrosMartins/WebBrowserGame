@@ -9,8 +9,8 @@ public interface VillageMapper {
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
-    @Mapping(source = "coordinates.x", target = "x")
-    @Mapping(source = "coordinates.y", target = "y")
+    @Mapping(source = "x", target = "x")
+    @Mapping(source = "y", target = "y")
     @Mapping(source = "lastUpdated", target = "lastUpdated")
     @Mapping(source = "account.id", target = "accountId")
     @Mapping(source = "resources", target = "resourcesDTO")
