@@ -2,7 +2,7 @@ package com.superapi.gamerealm.model.buildings;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.superapi.gamerealm.model.Village;
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public class Building {
     // Reference to the owning village
 
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime startedAt;
+    private Date startedAt;
     // Represents the time when the building upgrade started
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -114,11 +114,11 @@ public class Building {
                 type != BuildingType.SIEGE_WORKSHOP;
     }
 
-    public LocalDateTime getStartedAt() {
+    public Date getStartedAt() {
         return startedAt;
     }
 
-    public void setStartedAt(LocalDateTime startedAt) {
+    public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
 

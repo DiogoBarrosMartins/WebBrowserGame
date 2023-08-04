@@ -1,6 +1,6 @@
 package com.superapi.gamerealm.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,6 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    // Other account attributes and relationships (if any)
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Village> villages = new ArrayList<>();
@@ -93,6 +91,14 @@ public class Account {
 
     public void setVillages(List<Village> villages) {
         this.villages = villages;
+    }
+
+    public void setSentMessages(List<Message> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public void setReceivedMessages(List<Message> receivedMessages) {
+        this.receivedMessages = receivedMessages;
     }
 
     @Override

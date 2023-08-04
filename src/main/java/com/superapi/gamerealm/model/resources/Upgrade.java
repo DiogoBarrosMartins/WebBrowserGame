@@ -132,16 +132,27 @@ public class Upgrade {
 
         // ... (keep the other constants as they are)
 
-        public static Map<TypeOfResource, Double> getResourceNeeded(BuildingType buildingType, int level) {
-            int[] resourcesNeededArray = switch (buildingType) {
-                case FOREST-> FOREST_RESOURCES_NEEDED[level];
-                case MINE -> MINE_RESOURCES_NEEDED[level];
-                case QUARRY -> QUARRY_RESOURCES_NEEDED[level];
-                case FARM  -> FARM_RESOURCES_NEEDED[level];
-                default -> throw new IllegalArgumentException("Invalid building type: " + buildingType);
-            };
+    public static Map<TypeOfResource, Double> getResourceNeeded(BuildingType buildingType, int level) {
+        int[] resourcesNeededArray;
+        switch (buildingType) {
+            case FOREST:
+                resourcesNeededArray = FOREST_RESOURCES_NEEDED[level];
+                break;
+            case MINE:
+                resourcesNeededArray = MINE_RESOURCES_NEEDED[level];
+                break;
+            case QUARRY:
+                resourcesNeededArray = QUARRY_RESOURCES_NEEDED[level];
+                break;
+            case FARM:
+                resourcesNeededArray = FARM_RESOURCES_NEEDED[level];
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid building type: " + buildingType);
+        }
+        // rest of the code
 
-            Map<TypeOfResource, Double> resourcesNeeded = new HashMap<>();
+    Map<TypeOfResource, Double> resourcesNeeded = new HashMap<>();
             resourcesNeeded.put(TypeOfResource.WOOD, (double) resourcesNeededArray[0]);
             resourcesNeeded.put(TypeOfResource.WHEAT, (double) resourcesNeededArray[1]);
             resourcesNeeded.put(TypeOfResource.STONE, (double) resourcesNeededArray[2]);

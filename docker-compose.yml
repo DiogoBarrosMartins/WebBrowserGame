@@ -1,22 +1,21 @@
 version: '3.1'
 
 services:
-  db:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: example
-      POSTGRES_USER: example
-      POSTGRES_DB: example
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-  app:
-    build: src/main/java
+  webbrowsergame:
+    build: .
     ports:
       - 8080:8080
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/example
-      SPRING_DATASOURCE_USERNAME: example
-      SPRING_DATASOURCE_PASSWORD: example
     depends_on:
       - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/db3
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=RubyKxd_?l3
+
+  db:
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: RubyKxd_?l3
+      POSTGRES_USER: postgres
+      POSTGRES_DB: db3

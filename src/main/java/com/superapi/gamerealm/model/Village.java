@@ -1,17 +1,13 @@
 package com.superapi.gamerealm.model;
 
-import com.superapi.gamerealm.component.Coordinates;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.resources.Resources;
-import com.superapi.gamerealm.model.resources.Upgrade;
 import com.superapi.gamerealm.model.troop.Troop;
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 @Entity
 public class Village {

@@ -74,7 +74,7 @@ public class BuildingService {
 
             // Set the startedAt field to the current date and time
             calculateUpgradeTime(building.getType(), building.getLevel() + 1);
-            building.setStartedAt(LocalDateTime.now());
+            building.setStartedAt(new Date());
 
             // Increase the building's level
             building.setLevel(building.getLevel() + 1);

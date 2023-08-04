@@ -1,20 +1,29 @@
-# Use the official maven/Java 8 image to create a build artifact.
-# https://hub.docker.com/_/maven
-FROM maven:3.8.4-openjdk-11 as builder
+# Use the official maven/Java 11 image to create a build artifact.
+# This is based on Debian and sets the MAVEN_HOME environment variable
+FROM maven:3.8-openjdk-11 as builder
 
-# Copy local code to the container image.
+# Set the working directory
 WORKDIR /app
+
+# Copy pom.xml and src directory to the docker image
 COPY pom.xml .
 COPY src ./src
 
-# Build a release artifact.
+# Install git
+RUN apt-get update && \
+    apt-get install -y git
+
+# Build a release artifact
 RUN mvn package -DskipTests
 
-# Use OpenJDK for our runtime environment
-FROM openjdk:11-jre-slim
+# Use OpenJDK 11 for our runtime environment
+FROM openjdk:11
 
-# Copy the jar to the production image from the builder stage.
-COPY --from=builder /app/target/webbrowsergame-0.0.1-SNAPSHOT.jar /webbrowsergame.jar
+# Set the working directory
+WORKDIR /app
 
-# Specifies a command that provides default values for an executing container.
-CMD ["java","-jar","/webbrowsergame.jar"]
+# Copy the jar file from builder image to the new docker image
+COPY --from=builder /app/target/gamerealm-0.0.1-SNAPSHOT.jar /app
+
+# Set the startup command
+CMD ["java", "-jar", "/app/gamerealm-0.0.1-SNAPSHOT.jar"]

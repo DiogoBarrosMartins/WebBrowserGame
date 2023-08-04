@@ -5,18 +5,14 @@ import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.model.resources.TypeOfResource;
-import com.superapi.gamerealm.model.resources.Upgrade;
 import com.superapi.gamerealm.repository.BuildingRepository;
 import com.superapi.gamerealm.repository.ResourcesRepository;
 import com.superapi.gamerealm.repository.VillageRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

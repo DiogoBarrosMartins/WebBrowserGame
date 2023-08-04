@@ -1,6 +1,6 @@
 package com.superapi.gamerealm.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "messages")
