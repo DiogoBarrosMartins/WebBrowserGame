@@ -5,19 +5,14 @@ import com.superapi.gamerealm.dto.AccountMapper;
 import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Message;
-import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.repository.AccountRepository;
-import com.superapi.gamerealm.repository.VillageRepository;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
@@ -25,31 +20,21 @@ public class AccountService {
     private final ModelMapper modelMapper;
     private final AccountMapper accountMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
-    private final VillageRepository villageRepository;
-
-
     @Autowired
     public AccountService(AccountRepository accountRepository,
-                          VillageService villageService, VillageRepository v, AccountMapper accountMapper, ModelMapper modelMapper) {
+                          VillageService villageService, AccountMapper accountMapper,ModelMapper modelMapper) {
         this.accountRepository = accountRepository;
         this.villageService = villageService;
-        this.villageRepository = v;
-        this.modelMapper = modelMapper;
-        this.accountMapper = accountMapper;
+        this.modelMapper = modelMapper;this.accountMapper = accountMapper;
     }
+
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
         Account account = accountMapper.dtoToEntity(accountDTO);
-        account = accountRepository.save(account);
-        logger.info("Saved account: {}", account);
-
-        Village village = villageService.createVillageForAccount(account);
-        logger.info("Saved village: {}", village);
-
-        return accountMapper.entityToDto(account);
+        Account createdAccount = accountRepository.save(account);
+        villageService.createVillageForAccount(account);
+        return accountMapper.entityToDto(createdAccount);
     }
-
 
     public Optional<AccountDTO> getAccountByUsername(String username) {
         Optional<Account> optionalAccount = accountRepository.findByUsername(username);
@@ -91,7 +76,7 @@ public class AccountService {
             Account sender = optionalSender.get();
             Account recipient = optionalRecipient.get();
 
-            Message messageEntity = new Message(sender, recipient, message);
+            Message messageEntity = new Message( sender, recipient, message);
             sender.getSentMessages().add(messageEntity);
             recipient.getReceivedMessages().add(messageEntity);
 
@@ -103,6 +88,8 @@ public class AccountService {
     private AccountDTO convertToDTO(Account account) {
         return modelMapper.map(account, AccountDTO.class);
     }
+
+
 
 
 }

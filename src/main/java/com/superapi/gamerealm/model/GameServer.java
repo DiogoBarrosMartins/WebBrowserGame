@@ -1,6 +1,6 @@
 package com.superapi.gamerealm.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 
 @Entity
@@ -12,6 +12,9 @@ public class GameServer {
 
     @Column(nullable = false, unique = true)
     private boolean initialized;
+    @OneToOne
+    @JoinColumn(name = "grid_id")
+    // Add other fields, constructors, and getters/setters (if needed)
 
     public Long getId() {
         return id;

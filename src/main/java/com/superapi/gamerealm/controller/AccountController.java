@@ -1,6 +1,10 @@
 package com.superapi.gamerealm.controller;
+import com.superapi.gamerealm.model.Account;
+import com.superapi.gamerealm.model.Village;
+import com.superapi.gamerealm.model.troop.Troop;
 import com.superapi.gamerealm.service.AccountService;
 import com.superapi.gamerealm.service.CombatService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

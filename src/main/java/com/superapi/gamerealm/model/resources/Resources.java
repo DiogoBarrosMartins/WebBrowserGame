@@ -1,7 +1,7 @@
 package com.superapi.gamerealm.model.resources;
 
 import com.superapi.gamerealm.model.Village;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 @Entity

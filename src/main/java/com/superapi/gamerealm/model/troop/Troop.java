@@ -1,7 +1,7 @@
 package com.superapi.gamerealm.model.troop;
 
 import com.superapi.gamerealm.model.Village;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class Troop {

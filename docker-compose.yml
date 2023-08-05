@@ -13,8 +13,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=RubyKxd_?l3
 
   db:
-    image: postgres:12
-    restart: always
+    image: postgres:15
     environment:
       POSTGRES_PASSWORD: RubyKxd_?l3
       POSTGRES_USER: postgres

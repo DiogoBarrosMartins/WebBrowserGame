@@ -132,27 +132,28 @@ public class Upgrade {
 
         // ... (keep the other constants as they are)
 
-    public static Map<TypeOfResource, Double> getResourceNeeded(BuildingType buildingType, int level) {
-        int[] resourcesNeededArray;
-        switch (buildingType) {
-            case FOREST:
-                resourcesNeededArray = FOREST_RESOURCES_NEEDED[level];
-                break;
-            case MINE:
-                resourcesNeededArray = MINE_RESOURCES_NEEDED[level];
-                break;
-            case QUARRY:
-                resourcesNeededArray = QUARRY_RESOURCES_NEEDED[level];
-                break;
-            case FARM:
-                resourcesNeededArray = FARM_RESOURCES_NEEDED[level];
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid building type: " + buildingType);
-        }
-        // rest of the code
+        public static Map<TypeOfResource, Double> getResourceNeeded(BuildingType buildingType, int level) {
+            int[] resourcesNeededArray;
 
-    Map<TypeOfResource, Double> resourcesNeeded = new HashMap<>();
+            switch (buildingType) {
+                case FOREST:
+                    resourcesNeededArray = FOREST_RESOURCES_NEEDED[level];
+                    break;
+                case MINE:
+                    resourcesNeededArray = MINE_RESOURCES_NEEDED[level];
+                    break;
+                case QUARRY:
+                    resourcesNeededArray = QUARRY_RESOURCES_NEEDED[level];
+                    break;
+                case FARM:
+                    resourcesNeededArray = FARM_RESOURCES_NEEDED[level];
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid building type: " + buildingType);
+            }
+
+
+            Map<TypeOfResource, Double> resourcesNeeded = new HashMap<>();
             resourcesNeeded.put(TypeOfResource.WOOD, (double) resourcesNeededArray[0]);
             resourcesNeeded.put(TypeOfResource.WHEAT, (double) resourcesNeededArray[1]);
             resourcesNeeded.put(TypeOfResource.STONE, (double) resourcesNeededArray[2]);

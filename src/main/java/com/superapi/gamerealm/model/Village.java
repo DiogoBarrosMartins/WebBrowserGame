@@ -3,7 +3,7 @@ package com.superapi.gamerealm.model;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.model.troop.Troop;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -57,6 +57,21 @@ public class Village {
         this.lastUpdated = LocalDateTime.now();
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
 
     public long getId() {
         return id;
@@ -88,21 +103,8 @@ public class Village {
     }
 
 
-    public int getX() {
-        return x;
-    }
 
-    public void setX(int x) {
-        this.x = x;
-    }
 
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
 
     public List<Resources> getResources() {
         return resources;

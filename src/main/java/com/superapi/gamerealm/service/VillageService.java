@@ -12,8 +12,6 @@ import com.superapi.gamerealm.repository.VillageRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +26,6 @@ public class VillageService {
     private final CombatService combatService;
     private final VillageMapper villageMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
-
-
     @Autowired
     public VillageService(VillageRepository villageRepository, ModelMapper modelMapper, ResourceService resourceService, CombatService combatService, VillageMapper villageMapper) {
         this.villageRepository = villageRepository;
@@ -41,6 +36,7 @@ public class VillageService {
     }
 
     public Village createVillageForAccount(Account account) {
+        // Define the boundaries of your grid
         int minCoordinate = 0;
         int maxCoordinate = 100; // adjust this according to the size of your grid
 
@@ -51,15 +47,15 @@ public class VillageService {
             y = minCoordinate + (int) (Math.random() * ((maxCoordinate - minCoordinate) + 1));
         } while (villageRepository.findByXAndY(x, y) != null);
 
-        Village village = new Village();
-        village.setX(x);
-        village.setY(y);
-        village.setName("default");
-        village.setAccount(account);
-        village = villageRepository.save(village); // save the village to the database immediately after it's created
-        logger.info("Created village: {}", village);
+        // Create the new Village entity with the selected coordinates
+        Village newVillage = new Village(x, y);
+        newVillage.setAccount(account);
+        initializeDefaultResources(newVillage);
+        initializeDefaultBuildings(newVillage);
 
-        return village;
+        villageRepository.save(newVillage);
+
+        return newVillage;
     }
 
     private void initializeDefaultBuildings(Village village) {
@@ -101,11 +97,9 @@ public class VillageService {
         List<Village> villages = villageRepository.findAll();
 
         return villages.stream()
-                .peek(resourceService::updateVillageResources)
                 .map(villageMapper::villageToVillageDTO)
                 .collect(Collectors.toList());
     }
-
 
     public VillageDTO getVillageByAccountUsername(String username) {
         List<Village> villages = villageRepository.findByAccountUsername(username);
