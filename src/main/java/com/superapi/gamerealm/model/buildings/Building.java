@@ -1,9 +1,9 @@
 package com.superapi.gamerealm.model.buildings;
 
+
+import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.superapi.gamerealm.model.Village;
-import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;

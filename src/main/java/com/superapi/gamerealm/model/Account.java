@@ -1,5 +1,6 @@
 package com.superapi.gamerealm.model;
 
+
 import jakarta.persistence.*;
 
 import java.util.ArrayList;

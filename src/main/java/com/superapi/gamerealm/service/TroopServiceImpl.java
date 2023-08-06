@@ -4,7 +4,6 @@ import com.superapi.gamerealm.dto.TroopDTO;
 import com.superapi.gamerealm.dto.TroopMapper;
 import com.superapi.gamerealm.model.troop.Troop;
 import com.superapi.gamerealm.repository.TroopRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class TroopServiceImpl {
 
         public TroopDTO getTroopById(Long id) {
             Troop troop = troopRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Troop not found"));
+                    .orElseThrow(() -> new RuntimeException("Troop not found"));
             return TroopMapper.toDTO(troop);
         }
     }

@@ -3,8 +3,9 @@ package com.superapi.gamerealm.model;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.model.troop.Troop;
-import jakarta.persistence.*;
 
+
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

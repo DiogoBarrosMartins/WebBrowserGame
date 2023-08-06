@@ -1,9 +1,8 @@
 package com.superapi.gamerealm.model.resources;
 
+
 import com.superapi.gamerealm.model.Village;
 import jakarta.persistence.*;
-
-import java.math.BigDecimal;
 @Entity
 public class Resources {
 

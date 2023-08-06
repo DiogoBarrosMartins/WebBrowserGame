@@ -1,8 +1,8 @@
 package com.superapi.gamerealm.model;
 
+
+
 import jakarta.persistence.*;
-
-
 @Entity
 public class GameServer {
 
