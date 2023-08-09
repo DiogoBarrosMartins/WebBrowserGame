@@ -112,4 +112,9 @@ public class Account {
     public int hashCode() {
         return Objects.hash(id, email, password, tribe, username);
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

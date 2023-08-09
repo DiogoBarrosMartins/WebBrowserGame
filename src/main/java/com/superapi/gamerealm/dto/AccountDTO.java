@@ -6,7 +6,7 @@ public class AccountDTO {
     private String email;
     private String tribe;
     private String username;
-
+    private String password;
     // Constructors, getters, and setters
 
     public Long getId() {
@@ -35,6 +35,14 @@ public class AccountDTO {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setUsername(String username) {

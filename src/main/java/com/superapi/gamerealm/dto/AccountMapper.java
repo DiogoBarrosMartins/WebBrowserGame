@@ -12,6 +12,7 @@ public class AccountMapper {
         }
 
         Account entity = new Account();
+       entity.setPassword(dto.getPassword());
         entity.setId(dto.getId());
         entity.setUsername(dto.getUsername());
         entity.setEmail(dto.getEmail());

@@ -48,12 +48,17 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
+    public boolean authenticate(String username, String password) {
+       Account a = accountRepository.findByUsername(username).orElseThrow();
+        return accountRepository.countByUsernameAndPassword(username, password) > 0;
+    }
+
+
+
     public List<VillageDTO> findAllVillagesByAccountId(Long accountId) {
         return villageService.findAllVillagesByAccountId(accountId);
     }
-    public boolean authenticate(String username, String password) {
-        return accountRepository.existsByUsernameAndPassword(username, password);
-    }
+
 
     public void purgePlayerAccounts() {
         accountRepository.deleteAll();

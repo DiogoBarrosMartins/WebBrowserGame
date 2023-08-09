@@ -5,7 +5,6 @@ package com.superapi.gamerealm.model;
         private String username;
         private String password;
 
-        // Getters, setters, constructors..
 
         public String getUsername() {
             return username;
@@ -22,5 +21,11 @@ package com.superapi.gamerealm.model;
         public void setPassword(String password) {
             this.password = password;
         }
+
+        @Override
+        public String toString() {
+            return "LoginRequest{username='" + username + "', password='" + password + "'}";
+        }
+
     }
 
