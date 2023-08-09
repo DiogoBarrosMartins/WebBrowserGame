@@ -1,7 +1,5 @@
 package com.superapi.gamerealm.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +11,9 @@ public class VillageDTO{
         private Long accountId;
         private Date lastUpdated;
         private List<ResourcesDTO> resourcesDTO;
+        private List<ResourceBuildingDTO> resourceBuildings;
+        private List<NonResourceBuildingDTO> nonResourceBuildings;
+
 
         public VillageDTO() {
         }
@@ -83,5 +84,19 @@ public class VillageDTO{
                 this.resourcesDTO = resourcesDTO;
         }
 
+        public List<ResourceBuildingDTO> getResourceBuildings() {
+                return resourceBuildings;
+        }
 
+        public void setResourceBuildings(List<ResourceBuildingDTO> resourceBuildings) {
+                this.resourceBuildings = resourceBuildings;
+        }
+
+        public List<NonResourceBuildingDTO> getNonResourceBuildings() {
+                return nonResourceBuildings;
+        }
+
+        public void setNonResourceBuildings(List<NonResourceBuildingDTO> nonResourceBuildings) {
+                this.nonResourceBuildings = nonResourceBuildings;
+        }
 }

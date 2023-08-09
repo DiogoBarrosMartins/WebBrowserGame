@@ -1,5 +1,6 @@
 package com.superapi.gamerealm.controller;
 import com.superapi.gamerealm.model.Account;
+import com.superapi.gamerealm.model.LoginRequest;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.troop.Troop;
 import com.superapi.gamerealm.service.AccountService;
@@ -33,7 +34,16 @@ public class AccountController {
         AccountDTO createdAccount = accountService.createAccount(accountDTO);
         return new ResponseEntity<>(createdAccount, HttpStatus.CREATED);
     }
+    @PostMapping("/login")
+    public ResponseEntity<String> authenticate(@RequestBody LoginRequest loginRequest) {
+        boolean isAuthenticated = accountService.authenticate(loginRequest.getUsername(), loginRequest.getPassword());
 
+        if (isAuthenticated) {
+            return ResponseEntity.ok("Authenticated successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid username or password");
+        }
+    }
     @GetMapping("/{username}")
     public ResponseEntity<AccountDTO> getAccountByUsername(@PathVariable String username) {
         return accountService.getAccountByUsername(username)

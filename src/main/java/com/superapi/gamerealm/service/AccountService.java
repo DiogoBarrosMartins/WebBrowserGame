@@ -51,6 +51,9 @@ public class AccountService {
     public List<VillageDTO> findAllVillagesByAccountId(Long accountId) {
         return villageService.findAllVillagesByAccountId(accountId);
     }
+    public boolean authenticate(String username, String password) {
+        return accountRepository.existsByUsernameAndPassword(username, password);
+    }
 
     public void purgePlayerAccounts() {
         accountRepository.deleteAll();

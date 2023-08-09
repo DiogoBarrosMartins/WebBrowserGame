@@ -30,14 +30,18 @@ public class VillageController {
         return new ResponseEntity<>(createdVillage, HttpStatus.CREATED);
     }
 
-    // Endpoint to get all villages
+    @GetMapping("/{username}/")
+    public ResponseEntity<VillageDTO> getVillageDetailsByUsername(@PathVariable String username) {
+        VillageDTO village = villageService.getVillageWithDetailsByUsername(username);
+        return ResponseEntity.ok(village);
+    }
+
     // Endpoint to get all villages
     @GetMapping
     public List<VillageDTO> getAllVillages() {
         return villageService.getAllVillages();
     }
 
-    // Endpoint to get village by account username
     // Endpoint to get village by account username
     @GetMapping("/byAccountUsername/{username}")
     public VillageDTO getVillageByAccountUsername(@PathVariable String username) {

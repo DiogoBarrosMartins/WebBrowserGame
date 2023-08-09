@@ -1,7 +1,6 @@
 package com.superapi.gamerealm.service;
 
-import com.superapi.gamerealm.dto.VillageDTO;
-import com.superapi.gamerealm.dto.VillageMapper;
+import com.superapi.gamerealm.dto.*;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Attack;
 import com.superapi.gamerealm.model.Village;
@@ -23,17 +22,47 @@ public class VillageService {
     private final VillageRepository villageRepository;
     private final ModelMapper modelMapper;
     private final ResourceService resourceService;
-    private final CombatService combatService;
+    private final BuildingMapper buildingMapper;
+    private final ResourcesMapper resourcesMapper;
+
     private final VillageMapper villageMapper;
 
     @Autowired
-    public VillageService(VillageRepository villageRepository, ModelMapper modelMapper, ResourceService resourceService, CombatService combatService, VillageMapper villageMapper) {
+    public VillageService(VillageRepository villageRepository,
+                          ResourcesMapper resourcesMapper,
+                          BuildingMapper buildingMapper,
+                          ModelMapper modelMapper,
+                          ResourceService resourceService,
+                          CombatService combatService,
+                          VillageMapper villageMapper) {
         this.villageRepository = villageRepository;
+        this.resourcesMapper = resourcesMapper;
+        this.buildingMapper = buildingMapper;
         this.modelMapper = modelMapper;
         this.resourceService = resourceService;
-        this.combatService = combatService;
         this.villageMapper = villageMapper;
     }
+
+    public VillageDTO getVillageWithDetailsByUsername(String username) {
+        Village village = villageRepository.findVillageByUsername(username).orElseThrow();
+        List<ResourceBuildingDTO> resourceBuildings = new ArrayList<>();
+        List<NonResourceBuildingDTO> nonResourceBuildings = new ArrayList<>();
+
+        for (Building building : village.getBuildings()) {
+            if (building.isResourceBuilding()) {
+                resourceBuildings.add(BuildingMapper.toResourceBuildingDTO(building));
+            } else {
+                nonResourceBuildings.add(BuildingMapper.toNonResourceBuildingDTO(building));
+            }
+        }
+
+        VillageDTO villageDTO = villageMapper.villageToVillageDTO(village);
+        villageDTO.setResourceBuildings(resourceBuildings);
+        villageDTO.setNonResourceBuildings(nonResourceBuildings);
+        return villageDTO;
+    }
+
+
 
     public Village createVillageForAccount(Account account) {
         // Define the boundaries of your grid
