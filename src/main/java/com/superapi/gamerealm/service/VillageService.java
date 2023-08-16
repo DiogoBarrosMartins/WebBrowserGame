@@ -45,6 +45,8 @@ public class VillageService {
 
     public VillageDTO getVillageWithDetailsByUsername(String username) {
         Village village = villageRepository.findVillageByUsername(username).orElseThrow();
+        resourceService.updateVillageResources(village);
+        village = villageRepository.findVillageByUsername(username).orElseThrow();
         List<ResourceBuildingDTO> resourceBuildings = new ArrayList<>();
         List<NonResourceBuildingDTO> nonResourceBuildings = new ArrayList<>();
 
@@ -65,9 +67,8 @@ public class VillageService {
 
 
     public Village createVillageForAccount(Account account) {
-        // Define the boundaries of your grid
         int minCoordinate = 0;
-        int maxCoordinate = 100; // adjust this according to the size of your grid
+        int maxCoordinate = 100;
 
         // Generate a random spot within the grid
         int x, y;
@@ -190,21 +191,5 @@ public class VillageService {
 
 
 }
-
-/**
- * class Building
- * <p>
- * <p>
- * p Construction Cost
- * build(){
- * <p>
- * <p>
- * <p>
- * }
- * <p>
- * class Quarry extends Building
- *
- * @Override p Construction cost = new List<>
- */
 
 
