@@ -32,7 +32,7 @@ public class AccountController {
         boolean isAuthenticated = accountService.authenticate(loginRequest.getUsername(), loginRequest.getPassword());
         System.out.println(isAuthenticated + "isAuth");
         if (isAuthenticated) {
-            return ResponseEntity.ok(" ");
+            return ResponseEntity.ok("Authenticated successfully");
         } else {
             return ResponseEntity.badRequest().body("Invalid username or password");
         }
