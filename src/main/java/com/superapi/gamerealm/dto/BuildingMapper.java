@@ -5,8 +5,6 @@ import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.resources.Upgrade;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-
 @Component
 public class BuildingMapper {
     public static ResourceBuildingDTO toResourceBuildingDTO(Building building) {
@@ -16,7 +14,8 @@ public class BuildingMapper {
         dto.setLevel(building.getLevel());
         dto.setProductionRate(building.getProductionRate());
         dto.setMaxLevel(building.getMaxLevel());
-
+        dto.setNextLevelProductionRate(building.getNextLevelProductionRate());
+      dto.setTimeToUpgrade(Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel()]);
         // Set the resourcesNeeded attribute based on the building type and level
         String buildingTypeString = building.getType().toString();
         int[] resourcesNeeded = Upgrade.getResourceBuildingResourcesNeeded(buildingTypeString, building.getLevel());

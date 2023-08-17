@@ -36,6 +36,11 @@ public class VillageController {
         return ResponseEntity.ok(village);
     }
 
+    @RequestMapping(value = "/update-name/{username}", method = RequestMethod.PUT)
+    public ResponseEntity<VillageDTO> updateVillageName(@PathVariable String username, @RequestBody String newName) {
+        Village updatedVillage = villageService.updateVillageName(username, newName);
+        return ResponseEntity.ok(villageMapper.villageToVillageDTO(updatedVillage));
+    }
     // Endpoint to get all villages
     @GetMapping
     public List<VillageDTO> getAllVillages() {

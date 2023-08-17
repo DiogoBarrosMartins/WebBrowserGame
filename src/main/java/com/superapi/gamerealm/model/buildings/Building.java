@@ -1,12 +1,16 @@
 package com.superapi.gamerealm.model.buildings;
 
 
-import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.superapi.gamerealm.model.Village;
+import com.superapi.gamerealm.model.resources.Upgrade;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
+
+import static java.lang.Integer.valueOf;
 
 @Entity
 public class Building {
@@ -40,7 +44,7 @@ public class Building {
         this.village = village;
         this.type = type;
         this.buildingLevel = 0;
-        this.productionRate = BigDecimal.valueOf(1000);
+        this.productionRate = BigDecimal.valueOf(8);
     }
 
     public Building() {
@@ -130,4 +134,7 @@ public class Building {
         this.timeToUpgrade = timeToUpgrade;
     }
 
+    public BigDecimal getNextLevelProductionRate(){
+   return BigDecimal.valueOf(Upgrade.RESOURCE_BUILDING_PRODUCTION_RATES[valueOf(buildingLevel)+1]);
+}
 }

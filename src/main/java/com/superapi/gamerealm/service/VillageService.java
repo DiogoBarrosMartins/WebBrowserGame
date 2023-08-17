@@ -65,7 +65,6 @@ public class VillageService {
     }
 
 
-
     public Village createVillageForAccount(Account account) {
         int minCoordinate = 0;
         int maxCoordinate = 100;
@@ -176,7 +175,12 @@ public class VillageService {
         villageRepository.save(village);
     }
 
-
+    public Village updateVillageName(String username, String newName) {
+        Village village = villageRepository.findVillageByUsername(username).orElseThrow();
+                village.setName(newName);
+                saveVillage(village);
+        return village;
+    }
     // change to ded xd
     public void deleteVillage(Long id) {
         Optional<Village> optionalVillage = villageRepository.findById(id);

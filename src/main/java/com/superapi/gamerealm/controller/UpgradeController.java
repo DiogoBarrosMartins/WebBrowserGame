@@ -27,7 +27,7 @@ public class UpgradeController {
     }
 
     @PostMapping("/upgrade")
-    public ResponseEntity<?> upgradeBuilding(@PathVariable Long villageId, @PathVariable Long buildingId) {
+    public ResponseEntity<?> upgradeBuilding(  @PathVariable Long buildingId) {
         try {
             Building building = buildingService.upgradeBuilding(buildingId);
             resourceService.updateVillageResources(building.getVillage());
