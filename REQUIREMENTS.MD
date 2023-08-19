@@ -1,3 +1,5 @@
+this is ever changing as the project grows . 
+
 User
 
 User should be able to create an account.
@@ -60,3 +62,4 @@ And instead of producing 4 wood each hour, they should produce 10 at level 1. Yo
 Every building should take time to evolve. Let's say that it takes 5 minutes for a forest building to evolve from level 0 to level 1. 
 
 
+ 
