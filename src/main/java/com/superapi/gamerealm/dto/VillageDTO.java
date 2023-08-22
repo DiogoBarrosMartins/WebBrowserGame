@@ -13,8 +13,7 @@ public class VillageDTO{
         private List<ResourcesDTO> resourcesDTO;
         private List<ResourceBuildingDTO> resourceBuildings;
         private List<NonResourceBuildingDTO> nonResourceBuildings;
-
-
+        private List<ConstructionDTO> constructionDTOS;
         public VillageDTO() {
         }
 
@@ -92,6 +91,14 @@ public class VillageDTO{
                 this.resourceBuildings = resourceBuildings;
         }
 
+        public List<ConstructionDTO> getConstructionDTOS() {
+                return constructionDTOS;
+        }
+
+        public void setConstructionDTOS(List<ConstructionDTO> constructionDTOS) {
+                this.constructionDTOS = constructionDTOS;
+        }
+
         public List<NonResourceBuildingDTO> getNonResourceBuildings() {
                 return nonResourceBuildings;
         }
@@ -99,4 +106,5 @@ public class VillageDTO{
         public void setNonResourceBuildings(List<NonResourceBuildingDTO> nonResourceBuildings) {
                 this.nonResourceBuildings = nonResourceBuildings;
         }
+
 }

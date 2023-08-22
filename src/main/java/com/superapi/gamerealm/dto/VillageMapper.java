@@ -14,6 +14,7 @@ public interface VillageMapper {
     @Mapping(source = "lastUpdated", target = "lastUpdated")
     @Mapping(source = "account.id", target = "accountId")
     @Mapping(source = "resources", target = "resourcesDTO")
+    @Mapping(source = "constructions", target = "constructionDTOS")  // New mapping for construction queue
     VillageDTO villageToVillageDTO(Village village);
 
     @InheritInverseConfiguration

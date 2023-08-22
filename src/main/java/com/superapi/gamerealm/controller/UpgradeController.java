@@ -1,16 +1,14 @@
 package com.superapi.gamerealm.controller;
 
-import com.superapi.gamerealm.dto.BuildingMapper;
-import com.superapi.gamerealm.dto.NonResourceBuildingDTO;
-import com.superapi.gamerealm.dto.ResourceBuildingDTO;
+import com.superapi.gamerealm.dto.VillageDTO;
+import com.superapi.gamerealm.dto.VillageMapper;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.service.BuildingService;
 import com.superapi.gamerealm.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,30 +17,30 @@ import org.springframework.web.bind.annotation.RestController;
 public class UpgradeController {
     private final BuildingService buildingService;
     private final ResourceService resourceService;
+    private final VillageMapper villageMapper;
 
     @Autowired
-    public UpgradeController(BuildingService buildingService, ResourceService resourceService) {
+    public UpgradeController(BuildingService buildingService, ResourceService resourceService, VillageMapper villageMapper) {
         this.buildingService = buildingService;
         this.resourceService = resourceService;
+        this.villageMapper = villageMapper;
     }
 
-    @PostMapping("/upgrade")
-    public ResponseEntity<?> upgradeBuilding(  @PathVariable Long buildingId) {
+    @PutMapping("/upgrade")
+    public ResponseEntity<VillageDTO> upgradeBuilding(@PathVariable Long buildingId) {
+        System.out.println("upgrade called" );
+        Building building = buildingService.findById(buildingId);
+        if (building == null) {
+            return ResponseEntity.notFound().build();
+        }
         try {
-            Building building = buildingService.upgradeBuilding(buildingId);
-            resourceService.updateVillageResources(building.getVillage());
-
-            if (building.isResourceBuilding()) {
-                ResourceBuildingDTO buildingDTO = BuildingMapper.toResourceBuildingDTO(building);
-                return ResponseEntity.ok(buildingDTO);
-            } else {
-                NonResourceBuildingDTO buildingDTO = BuildingMapper.toNonResourceBuildingDTO(building);
-                return ResponseEntity.ok(buildingDTO);
-            }
-        } catch (IllegalStateException ex) {
-            return ResponseEntity.badRequest().build();
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Building upgradedBuilding = buildingService.upgradeBuilding(building);
+            // Assuming you have a service or mapper to convert a Village entity to VillageDTO
+            VillageDTO villageDTO = villageMapper.villageToVillageDTO(upgradedBuilding.getVillage());
+            return ResponseEntity.ok(villageDTO);
+        } catch (IllegalStateException e) {
+            return null;
         }
     }
 }
+

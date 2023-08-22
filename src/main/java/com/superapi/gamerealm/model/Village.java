@@ -1,11 +1,11 @@
 package com.superapi.gamerealm.model;
 
 import com.superapi.gamerealm.model.buildings.Building;
+import com.superapi.gamerealm.model.buildings.Construction;
 import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.model.troop.Troop;
-
-
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,8 @@ public class Village {
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Troop> troops = new ArrayList<>();
 
+    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Construction> constructions = new ArrayList<>();
 
 
 
@@ -104,8 +106,13 @@ public class Village {
     }
 
 
+    public List<Construction> getConstructions() {
+        return constructions;
+    }
 
-
+    public void setConstructions(List<Construction> constructions) {
+        this.constructions = constructions;
+    }
 
     public List<Resources> getResources() {
         return resources;
