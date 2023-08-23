@@ -24,6 +24,7 @@ public class VillageDTO{
                 this.name = name;
                 this.accountId = accountId;
                 this.lastUpdated = lastUpdated;
+
         }
 
 

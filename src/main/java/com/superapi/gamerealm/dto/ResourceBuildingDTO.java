@@ -15,7 +15,7 @@ public class ResourceBuildingDTO {
     private long timeLeft;
     private BigDecimal nextLevelProductionRate;
 
-    private int timeToUpgrade;
+    private double timeToUpgrade;
 
     public ResourceBuildingDTO() {
     }
@@ -40,11 +40,11 @@ public class ResourceBuildingDTO {
         return nextLevelProductionRate;
     }
 
-    public int getTimeToUpgrade() {
+    public double getTimeToUpgrade() {
         return timeToUpgrade;
     }
 
-    public void setTimeToUpgrade(int timeToUpgrade) {
+    public void setTimeToUpgrade(double timeToUpgrade) {
         this.timeToUpgrade = timeToUpgrade;
     }
 

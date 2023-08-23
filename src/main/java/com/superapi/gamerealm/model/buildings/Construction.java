@@ -51,7 +51,28 @@ public class Construction {
         return endsAt;
     }
 
+    public Village getVillage() {
+        return village;
+    }
+
+    public void setVillage(Village village) {
+        this.village = village;
+    }
+
     public void setEndsAt(LocalDateTime endsAt) {
         this.endsAt = endsAt;
     }
+
+
+@Override
+public String toString() {
+    return "Construction{" +
+            "id=" + id +
+            ", building=" + building +
+            ", village=" + village +
+            ", startedAt=" + startedAt +
+            ", endsAt=" + endsAt +
+            '}';
+}
+
 }

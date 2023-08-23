@@ -137,4 +137,18 @@ public class Building {
     public BigDecimal getNextLevelProductionRate(){
    return BigDecimal.valueOf(Upgrade.RESOURCE_BUILDING_PRODUCTION_RATES[valueOf(buildingLevel)+1]);
 }
+
+    @Override
+    public String toString() {
+        return "Building{" +
+                "id=" + id +
+                ", village=" + village +
+                ", startedAt=" + startedAt +
+                ", timeToUpgrade=" + timeToUpgrade +
+                ", type=" + type +
+                ", productionRate=" + productionRate +
+                ", buildingLevel=" + buildingLevel +
+                ", maxLevel=" + maxLevel +
+                '}';
+    }
 }

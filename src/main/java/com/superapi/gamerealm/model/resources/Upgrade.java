@@ -8,7 +8,7 @@ import java.util.Map;
 public class Upgrade {
 
     public static final int[] RESOURCE_BUILDING_PRODUCTION_RATES = {4, 10, 22, 46, 94, 140, 200, 306, 500, 1070};
-    public static final int[] RESOURCE_BUILDING_UPGRADE_TIMES = {1, 5, 10, 40, 80, 120, 240, 640, 1280, 2560};
+    public static final double[] RESOURCE_BUILDING_UPGRADE_TIMES = {1, 5, 10, 40, 80, 120, 240, 640, 1280, 2560};
     public static final int[][] FOREST_RESOURCES_NEEDED = {
             {100, 200, 100, 50},
             {150, 300, 150, 75},
@@ -161,7 +161,8 @@ public class Upgrade {
 
             return resourcesNeeded;
         }
-    }
+
+}
 
 
 

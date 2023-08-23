@@ -8,6 +8,8 @@ public class ConstructionDTO {
     private LocalDateTime startedAt;
     private LocalDateTime endsAt;
 
+
+
     public Long getBuildingId() {
         return buildingId;
     }
