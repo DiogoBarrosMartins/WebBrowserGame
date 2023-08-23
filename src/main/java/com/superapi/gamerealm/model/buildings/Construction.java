@@ -11,8 +11,8 @@ public class Construction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
-    private Building building;
+
+    private long buildingId;
     @ManyToOne
     @JoinColumn(name = "village_id")
     private Village village;
@@ -31,12 +31,18 @@ public class Construction {
         this.id = id;
     }
 
-    public Building getBuilding() {
-        return building;
+    public Construction(int buildingId, Village village, LocalDateTime startedAt, LocalDateTime endsAt) {
+        this.buildingId = buildingId;
+        this.village = village;
+        this.startedAt = startedAt;
+        this.endsAt = endsAt;
     }
 
-    public void setBuilding(Building building) {
-        this.building = building;
+    public Construction() {
+    }
+
+    public void setBuildingId(long buildingId) {
+        this.buildingId = buildingId;
     }
 
     public LocalDateTime getStartedAt() {
@@ -63,12 +69,19 @@ public class Construction {
         this.endsAt = endsAt;
     }
 
+    public long getBuildingId() {
+        return buildingId;
+    }
 
-@Override
+    public void setBuildingId(int buildingId) {
+        this.buildingId = buildingId;
+    }
+
+    @Override
 public String toString() {
     return "Construction{" +
             "id=" + id +
-            ", building=" + building +
+            ", buildingId=" + buildingId +
             ", village=" + village +
             ", startedAt=" + startedAt +
             ", endsAt=" + endsAt +

@@ -4,7 +4,7 @@ import com.superapi.gamerealm.model.Village;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-@Mapper(componentModel = "spring", uses = {ResourcesMapper.class})
+@Mapper(componentModel = "spring", uses = {ResourcesMapper.class, ConstructionMapper.class})
 public interface VillageMapper {
 
     @Mapping(source = "id", target = "id")

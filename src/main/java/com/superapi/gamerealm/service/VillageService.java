@@ -26,11 +26,13 @@ public class VillageService {
     private final ResourcesMapper resourcesMapper;
 
     private final VillageMapper villageMapper;
+    private final BuildingService buildingService;
 
     @Autowired
     public VillageService(VillageRepository villageRepository,
                           ResourcesMapper resourcesMapper,
                           BuildingMapper buildingMapper,
+                        BuildingService buildingService,
                           ModelMapper modelMapper,
                           ResourceService resourceService,
                           CombatService combatService,
@@ -38,6 +40,7 @@ public class VillageService {
         this.villageRepository = villageRepository;
         this.resourcesMapper = resourcesMapper;
         this.buildingMapper = buildingMapper;
+        this.buildingService = buildingService;
         this.modelMapper = modelMapper;
         this.resourceService = resourceService;
         this.villageMapper = villageMapper;
@@ -46,6 +49,7 @@ public class VillageService {
     public VillageDTO getVillageWithDetailsByUsername(String username) {
         Village village = villageRepository.findVillageByUsername(username).orElseThrow();
         resourceService.updateVillageResources(village);
+        buildingService.processOverdueConstructions(village.getId());
         village = villageRepository.findVillageByUsername(username).orElseThrow();
         List<ResourceBuildingDTO> resourceBuildings = new ArrayList<>();
         List<NonResourceBuildingDTO> nonResourceBuildings = new ArrayList<>();

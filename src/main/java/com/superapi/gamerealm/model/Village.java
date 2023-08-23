@@ -32,8 +32,10 @@ public class Village {
     @Column
     private LocalDateTime lastUpdated;
 
+
+    //THIS HAS TO BE CHANGED TO A SINGLE OBJECT INSTEAD OF A LIST
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Resources> resources;
+    private List<Resources>resources;
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Building> buildings = new ArrayList<>();
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -10,8 +10,6 @@ import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.resources.Upgrade;
 import com.superapi.gamerealm.repository.BuildingRepository;
 import com.superapi.gamerealm.repository.ConstructionRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +29,6 @@ public class BuildingService {
     private final BuildingRepository buildingRepository;
     private final ResourceService resourceService;
 
-    private final Logger logger = LoggerFactory.getLogger(BuildingService.class);
-
     private final ConstructionRepository constructionRepository;
 
     @Autowired
@@ -45,12 +41,6 @@ public class BuildingService {
 
     public List<ResourceBuildingDTO> getAllResourceBuildingsInVillage(Long villageId) {
         List<Building> buildings = buildingRepository.findByVillageId(villageId);
-
-        // Calculate production rates for all buildings
-        for (Building building : buildings) {
-            BigDecimal productionRate = resourceService.calculateProductionRate(building);
-            building.setProductionRate(productionRate);
-        }
 
         return buildings.stream()
                 .filter(building -> building.getType() == BuildingType.FARM
@@ -75,12 +65,6 @@ public class BuildingService {
 
     public Building upgradeBuilding(Building building) {
 
-        System.out.println(building.toString());
-
-        for (Construction c : constructionRepository.findAll()) {
-            System.out.println(c.toString());
-        }
-
         Construction existingConstruction = constructionRepository.findByBuildingId(building.getId());
         if (existingConstruction != null) {
             // Handle the situation, e.g., throw an exception with a custom message
@@ -100,11 +84,11 @@ public class BuildingService {
             resourceService.deductResources(building.getVillage().getId(), resourcesNeeded);
 
             Construction construction = new Construction();
-            construction.setBuilding(building);
+            construction.setBuildingId(building.getId());
             construction.setVillage(building.getVillage());
 
             // Calculate the upgrade time and set the construction's startedAt and endsAt
-            Double upgradeTimeInMinutes = Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel() + 1];
+            Double upgradeTimeInMinutes = Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel()];
             LocalDateTime now = LocalDateTime.now();
             construction.setStartedAt(now);
             construction.setEndsAt(now.plusMinutes(upgradeTimeInMinutes.longValue()));
@@ -131,27 +115,52 @@ public class BuildingService {
     }
 
 
+    public void processOverdueConstructions(Long villageId) {
+        List<Construction> constructions = constructionRepository.findByVillageId(villageId);
+        LocalDateTime now = LocalDateTime.now();
+        for (Construction construction : constructions) {
+            if (construction.getEndsAt().isBefore(now)) {
+                completeConstruction(construction);
+            }
+        }
+    }
 
     private void scheduleConstructionCompletion(Construction construction) {
         long delay = Duration.between(LocalDateTime.now(), construction.getEndsAt()).toMillis();
+        System.out.println("Scheduling construction completion with a delay of: " + delay + " milliseconds.");
+
         CompletableFuture.delayedExecutor(delay, TimeUnit.MILLISECONDS)
                 .execute(() -> completeConstruction(construction));
     }
 
-    private void completeConstruction(Construction construction) {
-        Building building = construction.getBuilding();
-        building.setLevel(building.getLevel() + 1);
-        // any other updates to the building...
-buildingRepository.save(building);
+    public void completeConstruction(Construction construction) {
+        System.out.println("Starting construction completion check for construction ID: " + construction.getId());
 
-        // Remove the construction item from the repository
-        constructionRepository.delete(construction);
+        if (construction.getEndsAt().isBefore(LocalDateTime.now())) {
+            System.out.println("Construction with ID " + construction.getId() + " is ready for completion.");
+
+            Building building = buildingRepository.findById(construction.getBuildingId()).orElseThrow();
+
+            building.setLevel(building.getLevel() + 1);
+            building.setProductionRate(BigDecimal.valueOf(Upgrade.RESOURCE_BUILDING_PRODUCTION_RATES[building.getLevel()]));
+            buildingRepository.save(building);
+
+            System.out.println("Building with ID " + building.getId() + " has been upgraded to level " + building.getLevel());
+
+            // Remove construction from the queue
+            construction.getVillage().getConstructions().remove(construction);
+            constructionRepository.delete(construction);
+
+            System.out.println("Construction with ID " + construction.getId() + " has been removed from the queue.");
+        } else {
+            System.out.println("Construction with ID " + construction.getId() + " is not yet ready for completion.");
+        }
     }
+
 
     public Building findById(Long buildingId) {
         return buildingRepository.findById(buildingId).orElse(null);
     }
-
 
 
 }
