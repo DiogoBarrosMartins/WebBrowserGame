@@ -80,7 +80,8 @@ public class ResourceService {
 
     public boolean hasEnoughResources(Long villageId, Map<TypeOfResource, Double> resourcesNeeded) {
         Village village = getVillageById(villageId);
-        Resources resources = village.getResources().get(0); // Assuming there's always at least one Resources object in the list
+        // we will need to return here once we change the resources object
+        Resources resources = village.getResources().get(0);
 
         return resources.getWood() >= resourcesNeeded.getOrDefault(TypeOfResource.WOOD, 0.0) &&
                 resources.getWheat() >= resourcesNeeded.getOrDefault(TypeOfResource.WHEAT, 0.0) &&
@@ -90,8 +91,8 @@ public class ResourceService {
 
     public void deductResources(Long villageId, Map<TypeOfResource, Double> resourcesToDeduct) {
         Village village = getVillageById(villageId);
-        Resources resources = village.getResources().get(0); // Assuming there's always at least one Resources object in the list
-
+        //same here
+        Resources resources = village.getResources().get(0);
         double newWood = resources.getWood() - resourcesToDeduct.getOrDefault(TypeOfResource.WOOD, 0.0);
         if (newWood >= 0) {
             resources.setWood(newWood);
