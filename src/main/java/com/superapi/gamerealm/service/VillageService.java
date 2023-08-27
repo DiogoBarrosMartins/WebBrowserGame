@@ -69,6 +69,19 @@ public class VillageService {
     }
 
 
+
+    public List<VillageDTO> getSurroundingVillages(int x, int y) {
+        int radius = 24;  // Or any other desired value
+        List<Village> villages = villageRepository.findVillagesInArea(x - radius, x + radius, y - radius, y + radius);
+
+        // Convert the list of Village entities to a list of VillageDTO objects
+        List<VillageDTO> villageDTOs = villages.stream()
+                .map(village -> new VillageDTO(village.getId(), village.getX(), village.getY(), village.getName()))
+                .collect(Collectors.toList());
+
+        return villageDTOs;
+    }
+
     public Village createVillageForAccount(Account account) {
         int minCoordinate = 0;
         int maxCoordinate = 100;

@@ -29,7 +29,8 @@ public interface VillageRepository extends JpaRepository<Village, Long> {
     List<Troop> findTroopsByVillageUsername(String username);
     @Query("SELECT v FROM Village v LEFT JOIN FETCH v.resources LEFT JOIN FETCH v.troops WHERE v.account.username = :username")
     Optional<Village> findVillageWithResourcesAndTroopsByUsername(@Param("username") String username);
-
+    @Query("SELECT v FROM Village v WHERE v.x BETWEEN :minX AND :maxX AND v.y BETWEEN :minY AND :maxY")
+    List<Village> findVillagesInArea(@Param("minX") int minX, @Param("maxX") int maxX, @Param("minY") int minY, @Param("maxY") int maxY);
     Village findByXAndY(int x, int y);
     @Query("SELECT v FROM Village v WHERE v.account.username = :username")
     List<Village> findByAccountUsername(String username);

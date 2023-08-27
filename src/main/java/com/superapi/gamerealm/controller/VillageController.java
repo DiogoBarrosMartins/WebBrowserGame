@@ -70,4 +70,17 @@ public class VillageController {
         }
         return ResponseEntity.ok(villageDTO);
     }
+
+
+
+    @GetMapping("/surrounding")
+    public ResponseEntity<List<VillageDTO>> getSurroundingVillages(@RequestParam("x") int x, @RequestParam("y") int y) {
+        List<VillageDTO> surroundingVillages = villageService.getSurroundingVillages(x, y);
+        return new ResponseEntity<>(surroundingVillages, HttpStatus.OK);
+    }
+
+
+
+
+
 }

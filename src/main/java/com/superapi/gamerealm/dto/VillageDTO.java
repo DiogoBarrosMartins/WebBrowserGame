@@ -27,8 +27,14 @@ public class VillageDTO{
 
         }
 
+    public VillageDTO(long id, int x, int y, String name) { this.id = id;
+        this.x = x;
+        this.y = y;
+        this.name = name;
+    }
 
-        public void setLastUpdated(Date lastUpdated) {
+
+    public void setLastUpdated(Date lastUpdated) {
                 this.lastUpdated = lastUpdated;
         }
 
