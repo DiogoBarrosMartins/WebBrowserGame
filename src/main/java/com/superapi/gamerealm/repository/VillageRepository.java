@@ -4,6 +4,7 @@ import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.model.troop.Troop;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,4 +36,6 @@ public interface VillageRepository extends JpaRepository<Village, Long> {
     @Query("SELECT v FROM Village v WHERE v.account.username = :username")
     List<Village> findByAccountUsername(String username);
 
+    @Query("SELECT v FROM Village v ORDER BY v.id DESC")
+    List<Village> findLatestVillage(Pageable pageable);
 }

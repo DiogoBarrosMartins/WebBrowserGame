@@ -10,11 +10,10 @@ import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.repository.VillageRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +31,7 @@ public class VillageService {
     public VillageService(VillageRepository villageRepository,
                           ResourcesMapper resourcesMapper,
                           BuildingMapper buildingMapper,
-                        BuildingService buildingService,
+                          BuildingService buildingService,
                           ModelMapper modelMapper,
                           ResourceService resourceService,
                           CombatService combatService,
@@ -82,25 +81,75 @@ public class VillageService {
     }
 
     public void createVillageForAccount(Account account) {
-        int minCoordinate = 0;
-        int maxCoordinate = 100;
+        int maxAttempts = 10;
+        int attempts = 0;
 
-        // Generate a random spot within the grid
+        // Declare x and y here
         int x, y;
-        do {
-            x = minCoordinate + (int) (Math.random() * ((maxCoordinate - minCoordinate) + 1));
-            y = minCoordinate + (int) (Math.random() * ((maxCoordinate - minCoordinate) + 1));
-        } while (villageRepository.findByXAndY(x, y) != null);
 
-        // Create the new Village entity with the selected coordinates
+        long villageCount = villageRepository.count();
+
+        if (villageCount == 0) {
+            x = 0;
+            y = 0;
+        } else {
+            // Get the latest village from the database
+            Village latestVillage = villageRepository.findLatestVillage(PageRequest.of(0, 1)).get(0);
+
+            x = latestVillage.getX();
+            y = latestVillage.getY();
+
+            List<String> directions = Arrays.asList("N", "S", "E", "W", "NE", "NW", "SE", "SW");
+            Collections.shuffle(directions); // Randomize the direction order
+
+            for (String direction : directions) {
+                int buffer = (Math.random() < 0.5) ? 2 : 3; // 50% chance to jump 2 or 3 squares
+
+                switch (direction) {
+                    case "N":
+                        y -= buffer;
+                        break;
+                    case "S":
+                        y += buffer;
+                        break;
+                    case "E":
+                        x += buffer;
+                        break;
+                    case "W":
+                        x -= buffer;
+                        break;
+                    case "NE":
+                        x += buffer;
+                        y -= buffer;
+                        break;
+                    case "NW":
+                        x -= buffer;
+                        y -= buffer;
+                        break;
+                    case "SE":
+                        x += buffer;
+                        y += buffer;
+                        break;
+                    case "SW":
+                        x -= buffer;
+                        y += buffer;
+                        break;
+                }
+
+                if (villageRepository.findByXAndY(x, y) == null) {
+                    break; // Exit the loop once we find a vacant spot
+                }
+            }
+        }
+
         Village newVillage = new Village(x, y);
         newVillage.setAccount(account);
         initializeDefaultResources(newVillage);
         initializeDefaultBuildings(newVillage);
-
         villageRepository.save(newVillage);
-
     }
+
+
 
     private void initializeDefaultBuildings(Village village) {
         List<Building> buildings = new ArrayList<>();
