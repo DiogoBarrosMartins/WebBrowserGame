@@ -3,7 +3,6 @@ package com.superapi.gamerealm.controller;
 import com.superapi.gamerealm.dto.AccountDTO;
 import com.superapi.gamerealm.model.LoginRequest;
 import com.superapi.gamerealm.service.AccountService;
-import com.superapi.gamerealm.service.CombatService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +13,9 @@ import java.util.List;
 @RequestMapping("/accounts")
 public class AccountController {
     private final AccountService accountService;
-    private final CombatService combatService;
 
-    public AccountController(AccountService accountService, CombatService combatService) {
+    public AccountController(AccountService accountService ) {
         this.accountService = accountService;
-        this.combatService = combatService;
     }
 
     @PostMapping

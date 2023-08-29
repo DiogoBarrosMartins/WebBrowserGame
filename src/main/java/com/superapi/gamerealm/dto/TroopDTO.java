@@ -11,8 +11,9 @@ public class TroopDTO {
     private int attack;
     private int defense;
     private int health;
+    private int carryCapacity;
 
-    public TroopDTO(Long id, TroopType type, int level, int trainingTime, int[] resourcesNeeded, int attack, int defense, int health) {
+    public TroopDTO(Long id, TroopType type, int level, int trainingTime, int[] resourcesNeeded, int attack, int defense, int health, int carryCapacity) {
         this.id = id;
         this.type = type;
         this.level = level;
@@ -21,6 +22,7 @@ public class TroopDTO {
         this.attack = attack;
         this.defense = defense;
         this.health = health;
+        this.carryCapacity = carryCapacity;
     }
 
     public Long getId() {
@@ -85,6 +87,10 @@ public class TroopDTO {
 
     public void setHealth(int health) {
         this.health = health;
+    }
+
+    public int getCarryCapacity() {
+   return carryCapacity;
     }
     // constructors, getters, and setters omitted for brevity
 }

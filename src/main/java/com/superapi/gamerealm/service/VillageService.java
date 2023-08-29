@@ -34,7 +34,6 @@ public class VillageService {
                           BuildingService buildingService,
                           ModelMapper modelMapper,
                           ResourceService resourceService,
-                          CombatService combatService,
                           VillageMapper villageMapper) {
         this.villageRepository = villageRepository;
         this.resourcesMapper = resourcesMapper;

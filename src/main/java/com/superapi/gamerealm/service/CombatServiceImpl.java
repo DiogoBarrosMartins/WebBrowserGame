@@ -1,10 +1,6 @@
 package com.superapi.gamerealm.service;
 
-import com.superapi.gamerealm.model.troop.Troop;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
+/**
 @Service
     public class CombatServiceImpl implements CombatService{
         public void attack(List<Troop> attackingTroops, List<Troop> defendingTroops) {
@@ -58,3 +54,4 @@ import java.util.List;
 
 
 
+**/

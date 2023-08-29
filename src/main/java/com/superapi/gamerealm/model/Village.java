@@ -3,7 +3,7 @@ package com.superapi.gamerealm.model;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.buildings.Construction;
 import com.superapi.gamerealm.model.resources.Resources;
-import com.superapi.gamerealm.model.troop.Troop;
+import com.superapi.gamerealm.model.troop.VillageTroops;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -38,13 +38,14 @@ public class Village {
     private List<Resources>resources;
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Building> buildings = new ArrayList<>();
-    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Troop> troops = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Construction> constructions = new ArrayList<>();
 
-
+    // Bidirectional mapping to VillageTroops
+    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL)
+    private List<VillageTroops> troops;
 
     private boolean underAttack;
 
@@ -133,11 +134,11 @@ public class Village {
         building.setVillage(this);
     }
 
-    public List<Troop> getTroops() {
+    public List<VillageTroops> getTroops() {
         return troops;
     }
 
-    public void setTroops(List<Troop> troops) {
+    public void setTroops(List<VillageTroops> troops) {
         this.troops = troops;
     }
 
