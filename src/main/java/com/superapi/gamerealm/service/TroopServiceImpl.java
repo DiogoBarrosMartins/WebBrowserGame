@@ -12,10 +12,18 @@ import java.util.stream.Collectors;
 @Service
 public class TroopServiceImpl {
         private final TroopRepository troopRepository;
+private final ResourceService resourceService;
 
-        public TroopServiceImpl(TroopRepository troopRepository) {
+        public TroopServiceImpl(TroopRepository troopRepository, ResourceService resourceService) {
             this.troopRepository = troopRepository;
+            this.resourceService = resourceService;
         }
+    public List<Troop> getAvailableTroops() {
+        // Get all troops that have finished training
+        return troopRepository.findAll().stream()
+                .filter(Troop::isTrained)
+                .collect(Collectors.toList());
+    }
 
         public TroopDTO createTroop(TroopDTO troopDTO) {
             Troop troop = TroopMapper.toEntity(troopDTO);

@@ -1,14 +1,17 @@
 package com.superapi.gamerealm.model.troop;
 
 
-import jakarta.persistence.*;
 import com.superapi.gamerealm.model.Village;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+
 @Entity
 public class Troop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private LocalDateTime finishTrainingTime;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "village_id")
     private Village village;
@@ -72,7 +75,13 @@ public class Troop {
     public void setTrainingTime(int trainingTime) {
         this.trainingTime = trainingTime;
     }
+    public boolean isTrained() {
+        return LocalDateTime.now().isAfter(finishTrainingTime);
+    }
 
+    public void setFinishTrainingTime(LocalDateTime finishTime) {
+        this.finishTrainingTime = finishTime;
+    }
     public int[] getResourcesNeeded() {
         return resourcesNeeded;
     }
