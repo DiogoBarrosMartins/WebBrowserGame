@@ -1,10 +1,9 @@
 package com.superapi.gamerealm.controller;
 
+import com.superapi.gamerealm.dto.TroopTrainingQueueDTO;
 import com.superapi.gamerealm.dto.troops.TrainTroopsRequest;
 import com.superapi.gamerealm.dto.troops.TroopMapper;
-import com.superapi.gamerealm.dto.TroopTrainingQueueDTO;
 import com.superapi.gamerealm.model.troop.TroopTrainingQueue;
-import com.superapi.gamerealm.repository.TroopTrainingQueueRepository;
 import com.superapi.gamerealm.service.TroopTrainingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +17,9 @@ public class TroopController {
 
     private final TroopTrainingService troopTrainingService;
 
-    private final TroopTrainingQueueRepository troopTrainingQueueRepository;
 
-    public TroopController(TroopTrainingService troopTrainingService, TroopTrainingQueueRepository troopTrainingQueueRepository) {
+    public TroopController(TroopTrainingService troopTrainingService) {
         this.troopTrainingService = troopTrainingService;
-        this.troopTrainingQueueRepository = troopTrainingQueueRepository;
     }
 
     // Endpoint to train a specific type of troop

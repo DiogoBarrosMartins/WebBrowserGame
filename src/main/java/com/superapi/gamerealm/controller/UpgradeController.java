@@ -4,7 +4,6 @@ import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.dto.VillageMapper;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.service.BuildingService;
-import com.superapi.gamerealm.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,13 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/{villageId}/buildings/{buildingId}")
 public class UpgradeController {
     private final BuildingService buildingService;
-    private final ResourceService resourceService;
     private final VillageMapper villageMapper;
 
     @Autowired
-    public UpgradeController(BuildingService buildingService, ResourceService resourceService, VillageMapper villageMapper) {
+    public UpgradeController(BuildingService buildingService, VillageMapper villageMapper) {
         this.buildingService = buildingService;
-        this.resourceService = resourceService;
         this.villageMapper = villageMapper;
     }
 

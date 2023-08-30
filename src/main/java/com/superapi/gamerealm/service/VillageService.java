@@ -1,6 +1,7 @@
 package com.superapi.gamerealm.service;
 
-import com.superapi.gamerealm.dto.*;
+import com.superapi.gamerealm.dto.VillageDTO;
+import com.superapi.gamerealm.dto.VillageMapper;
 import com.superapi.gamerealm.dto.building.BuildingMapper;
 import com.superapi.gamerealm.dto.building.NonResourceBuildingDTO;
 import com.superapi.gamerealm.dto.building.ResourceBuildingDTO;
@@ -24,23 +25,17 @@ public class VillageService {
     private final VillageRepository villageRepository;
     private final ModelMapper modelMapper;
     private final ResourceService resourceService;
-    private final BuildingMapper buildingMapper;
-    private final ResourcesMapper resourcesMapper;
     private final TroopTrainingService troopTrainingService;
     private final VillageMapper villageMapper;
     private final BuildingService buildingService;
 
     @Autowired
     public VillageService(VillageRepository villageRepository,
-                          ResourcesMapper resourcesMapper,
-                          BuildingMapper buildingMapper,
                           BuildingService buildingService,
                           ModelMapper modelMapper, TroopTrainingService troopTrainingService,
                           ResourceService resourceService,
                           VillageMapper villageMapper) {
         this.villageRepository = villageRepository;
-        this.resourcesMapper = resourcesMapper;
-        this.buildingMapper = buildingMapper;
         this.buildingService = buildingService;
         this.modelMapper = modelMapper;
         this.troopTrainingService = troopTrainingService;
@@ -53,7 +48,6 @@ public class VillageService {
         resourceService.updateVillageResources(village);
         buildingService.processOverdueConstructions(village.getId());
         troopTrainingService.processOverdueTroopTrainings(village.getId());
-        village = villageRepository.findVillageByUsername(username).orElseThrow();
         List<ResourceBuildingDTO> resourceBuildings = new ArrayList<>();
         List<NonResourceBuildingDTO> nonResourceBuildings = new ArrayList<>();
 
@@ -70,7 +64,6 @@ public class VillageService {
         villageDTO.setNonResourceBuildings(nonResourceBuildings);
         return villageDTO;
     }
-
 
 
     public List<VillageDTO> getSurroundingVillages(int x, int y) {
@@ -134,6 +127,7 @@ public class VillageService {
                         x -= buffer;
                         y += buffer;
                         break;
+
                 }
 
                 if (villageRepository.findByXAndY(x, y) == null) {
@@ -148,7 +142,6 @@ public class VillageService {
         initializeDefaultBuildings(newVillage);
         villageRepository.save(newVillage);
     }
-
 
 
     private void initializeDefaultBuildings(Village village) {
@@ -242,10 +235,11 @@ public class VillageService {
 
     public Village updateVillageName(String username, String newName) {
         Village village = villageRepository.findVillageByUsername(username).orElseThrow();
-                village.setName(newName);
-                saveVillage(village);
+        village.setName(newName);
+        saveVillage(village);
         return village;
     }
+
     // change to ded xd
     public void deleteVillage(Long id) {
         Optional<Village> optionalVillage = villageRepository.findById(id);

@@ -1,6 +1,5 @@
 package com.superapi.gamerealm.dto.account;
 
-import com.superapi.gamerealm.dto.account.AccountDTO;
 import com.superapi.gamerealm.model.Account;
 import org.springframework.stereotype.Component;
 

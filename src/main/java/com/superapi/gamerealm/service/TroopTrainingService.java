@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -21,12 +24,12 @@ import java.util.concurrent.TimeUnit;
 public class TroopTrainingService {
 
     private final TroopTrainingQueueRepository troopTrainingQueueRepository;
- private final VillageRepository villageRepository;
+    private final VillageRepository villageRepository;
     private final VillageTroopsRepository villageTroopsRepository;
 
-private final ResourceService resourceService;
+    private final ResourceService resourceService;
 
-    public TroopTrainingService(TroopTrainingQueueRepository troopTrainingQueueRepository, VillageRepository villageRepository,VillageTroopsRepository villageTroopsRepository, ResourceService resourceService) {
+    public TroopTrainingService(TroopTrainingQueueRepository troopTrainingQueueRepository, VillageRepository villageRepository, VillageTroopsRepository villageTroopsRepository, ResourceService resourceService) {
         this.troopTrainingQueueRepository = troopTrainingQueueRepository;
         this.villageRepository = villageRepository;
         this.villageTroopsRepository = villageTroopsRepository;
@@ -71,7 +74,7 @@ private final ResourceService resourceService;
 
         for (TroopTrainingQueue training : overdueTrainings) {
             if (training.getTrainingEndTime().isBefore(now)) {
-              completeTroopTraining(training);
+                completeTroopTraining(training);
             }
 
         }
@@ -80,7 +83,6 @@ private final ResourceService resourceService;
     @Transactional
     public void completeTroopTraining(TroopTrainingQueue troopTrainingQueue) {
         // Fetch the next troop training queue item that is overdue
-        Optional<TroopTrainingQueue> nextTraining = troopTrainingQueueRepository.findById(troopTrainingQueue.getId());
         if (troopTrainingQueue.getTrainingEndTime().isBefore(LocalDateTime.now())) {
             System.out.println("training with ID " + troopTrainingQueue.getId() + " is ready for completion.");
 
@@ -109,7 +111,7 @@ private final ResourceService resourceService;
     }
 
 
-    private void scheduleTrainingCompletion( TroopTrainingQueue troopTrainingQueue) {
+    private void scheduleTrainingCompletion(TroopTrainingQueue troopTrainingQueue) {
 
         long delay = Duration.between(LocalDateTime.now(), troopTrainingQueue.getTrainingEndTime()).toMillis();
         System.out.println("Scheduling Training completion with a delay of: " + delay + " milliseconds.");

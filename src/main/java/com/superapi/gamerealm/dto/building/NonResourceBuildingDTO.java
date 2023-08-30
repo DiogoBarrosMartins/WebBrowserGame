@@ -10,11 +10,7 @@ public class NonResourceBuildingDTO {
     private int[] resourcesNeeded;
     private long timeLeft;
 
-    public NonResourceBuildingDTO(Long id, BuildingType type, int level, int maxLevel, int[] nonResourceBuildingResourcesNeeded) {
-    }
 
-    public NonResourceBuildingDTO() {
-    }
 
     public NonResourceBuildingDTO(Long id, BuildingType type, int level, int maxLevel, int[] resourcesNeeded, long timeLeft) {
         this.id = id;

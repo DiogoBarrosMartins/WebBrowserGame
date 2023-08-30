@@ -4,7 +4,6 @@ import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.resources.Resources;
 import com.superapi.gamerealm.model.resources.TypeOfResource;
-import com.superapi.gamerealm.repository.BuildingRepository;
 import com.superapi.gamerealm.repository.ResourcesRepository;
 import com.superapi.gamerealm.repository.VillageRepository;
 import jakarta.transaction.Transactional;
@@ -16,12 +15,10 @@ import java.util.Map;
 
 @Service
 public class ResourceService {
-    private final BuildingRepository buildingRepository;
     private final ResourcesRepository resourcesRepository;
     private final VillageRepository villageRepository;
 
-    public ResourceService(BuildingRepository buildingRepository, ResourcesRepository resourcesRepository, VillageRepository villageRepository) {
-        this.buildingRepository = buildingRepository;
+    public ResourceService(ResourcesRepository resourcesRepository, VillageRepository villageRepository) {
         this.resourcesRepository = resourcesRepository;
         this.villageRepository = villageRepository;
     }
