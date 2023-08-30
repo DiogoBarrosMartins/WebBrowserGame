@@ -3,6 +3,7 @@ package com.superapi.gamerealm.model;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.buildings.Construction;
 import com.superapi.gamerealm.model.resources.Resources;
+import com.superapi.gamerealm.model.troop.TroopTrainingQueue;
 import com.superapi.gamerealm.model.troop.VillageTroops;
 import jakarta.persistence.*;
 
@@ -47,6 +48,8 @@ public class Village {
     @OneToMany(mappedBy = "village", cascade = CascadeType.ALL)
     private List<VillageTroops> troops;
 
+    @OneToMany(mappedBy = "village", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TroopTrainingQueue> troopQueue;
     private boolean underAttack;
 
     public Village() {
@@ -170,5 +173,13 @@ public class Village {
 
     public void setLastUpdated(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public List<TroopTrainingQueue> getTroopQueue() {
+        return troopQueue;
+    }
+
+    public void setTroopQueue(List<TroopTrainingQueue> troopQueue) {
+        this.troopQueue = troopQueue;
     }
 }

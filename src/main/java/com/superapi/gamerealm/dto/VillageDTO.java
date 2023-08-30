@@ -1,5 +1,8 @@
 package com.superapi.gamerealm.dto;
 
+import com.superapi.gamerealm.dto.building.NonResourceBuildingDTO;
+import com.superapi.gamerealm.dto.building.ResourceBuildingDTO;
+
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +17,9 @@ public class VillageDTO{
         private List<ResourceBuildingDTO> resourceBuildings;
         private List<NonResourceBuildingDTO> nonResourceBuildings;
         private List<ConstructionDTO> constructionDTOS;
+
+        private List<TroopTrainingQueueDTO> troopTrainingQueueDTOS;
+        private List<VillageTroopsDTO> villageTroopDTOS;
         public VillageDTO() {
         }
 
@@ -114,4 +120,19 @@ public class VillageDTO{
                 this.nonResourceBuildings = nonResourceBuildings;
         }
 
+    public List<TroopTrainingQueueDTO> getTroopTrainingQueueDTOS() {
+        return troopTrainingQueueDTOS;
+    }
+
+    public void setTroopTrainingQueueDTOS(List<TroopTrainingQueueDTO> troopTrainingQueueDTOS) {
+        this.troopTrainingQueueDTOS = troopTrainingQueueDTOS;
+    }
+
+    public List<VillageTroopsDTO> getVillageTroopDTOS() {
+        return villageTroopDTOS;
+    }
+
+    public void setVillageTroopDTOS(List<VillageTroopsDTO> villageTroopDTOS) {
+        this.villageTroopDTOS = villageTroopDTOS;
+    }
 }

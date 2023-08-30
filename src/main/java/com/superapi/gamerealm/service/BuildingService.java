@@ -1,8 +1,8 @@
 package com.superapi.gamerealm.service;
 
-import com.superapi.gamerealm.dto.BuildingMapper;
-import com.superapi.gamerealm.dto.NonResourceBuildingDTO;
-import com.superapi.gamerealm.dto.ResourceBuildingDTO;
+import com.superapi.gamerealm.dto.building.BuildingMapper;
+import com.superapi.gamerealm.dto.building.NonResourceBuildingDTO;
+import com.superapi.gamerealm.dto.building.ResourceBuildingDTO;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.buildings.Construction;

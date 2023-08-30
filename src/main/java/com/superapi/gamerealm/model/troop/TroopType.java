@@ -15,7 +15,7 @@ public enum TroopType {
     private final int carryCapacity;
     private int trainingTime;
     private final Map<TypeOfResource, Double> resourcesRequired;
-
+private String name;
     TroopType(int health, int armor, int attack, int trainingTime, int carryCapacity, Map<TypeOfResource, Double> resourcesRequired) {
         this.health = health;
         this.armor = armor;
@@ -39,9 +39,6 @@ public enum TroopType {
         return trainingTime;
     }
 
-public String getName(){
-        return this.name();
-}
     public int getHealth() {
         return health;
     }
@@ -61,6 +58,12 @@ public String getName(){
     public Map<TypeOfResource, Double> getResourcesRequired() {
         return resourcesRequired;
     }
+
+
+    public String getName() {
+        return this.name().substring(0, 1).toUpperCase() + this.name().substring(1).toLowerCase();
+    }
+
 }
 
 

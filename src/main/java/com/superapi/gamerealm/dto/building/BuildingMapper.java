@@ -1,4 +1,4 @@
-package com.superapi.gamerealm.dto;
+package com.superapi.gamerealm.dto.building;
 
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.model.buildings.BuildingType;

@@ -1,4 +1,4 @@
-package com.superapi.gamerealm.dto;
+package com.superapi.gamerealm.dto.account;
 
 
 public class AccountDTO {

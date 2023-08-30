@@ -1,7 +1,7 @@
 package com.superapi.gamerealm.controller;
 
-import com.superapi.gamerealm.dto.TrainTroopsRequest;
-import com.superapi.gamerealm.dto.TroopMapper;
+import com.superapi.gamerealm.dto.troops.TrainTroopsRequest;
+import com.superapi.gamerealm.dto.troops.TroopMapper;
 import com.superapi.gamerealm.dto.TroopTrainingQueueDTO;
 import com.superapi.gamerealm.model.troop.TroopTrainingQueue;
 import com.superapi.gamerealm.repository.TroopTrainingQueueRepository;

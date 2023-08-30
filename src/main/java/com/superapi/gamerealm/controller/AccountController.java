@@ -1,6 +1,6 @@
 package com.superapi.gamerealm.controller;
 
-import com.superapi.gamerealm.dto.AccountDTO;
+import com.superapi.gamerealm.dto.account.AccountDTO;
 import com.superapi.gamerealm.model.LoginRequest;
 import com.superapi.gamerealm.service.AccountService;
 import org.springframework.http.HttpStatus;

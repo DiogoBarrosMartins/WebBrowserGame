@@ -4,7 +4,7 @@ import com.superapi.gamerealm.model.Village;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-@Mapper(componentModel = "spring", uses = {ResourcesMapper.class, ConstructionMapper.class})
+@Mapper(componentModel = "spring", uses = {ResourcesMapper.class, ConstructionMapper.class, VillageTroopsMapper.class, TroopTrainingQueueMapper.class})
 public interface VillageMapper {
 
     @Mapping(source = "id", target = "id")
@@ -14,7 +14,9 @@ public interface VillageMapper {
     @Mapping(source = "lastUpdated", target = "lastUpdated")
     @Mapping(source = "account.id", target = "accountId")
     @Mapping(source = "resources", target = "resourcesDTO")
-    @Mapping(source = "constructions", target = "constructionDTOS")  // New mapping for construction queue
+    @Mapping(source = "constructions", target = "constructionDTOS")
+    @Mapping(source = "troopQueue", target = "troopTrainingQueueDTOS")
+    @Mapping(source = "troops", target = "villageTroopDTOS")
     VillageDTO villageToVillageDTO(Village village);
 
     @InheritInverseConfiguration

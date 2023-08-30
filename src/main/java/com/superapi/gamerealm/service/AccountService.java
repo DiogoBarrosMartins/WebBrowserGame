@@ -1,7 +1,7 @@
 package com.superapi.gamerealm.service;
 
-import com.superapi.gamerealm.dto.AccountDTO;
-import com.superapi.gamerealm.dto.AccountMapper;
+import com.superapi.gamerealm.dto.account.AccountDTO;
+import com.superapi.gamerealm.dto.account.AccountMapper;
 import com.superapi.gamerealm.dto.VillageDTO;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Message;

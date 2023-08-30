@@ -1,7 +1,7 @@
 package com.superapi.gamerealm.controller;
 
-import com.superapi.gamerealm.dto.NonResourceBuildingDTO;
-import com.superapi.gamerealm.dto.ResourceBuildingDTO;
+import com.superapi.gamerealm.dto.building.NonResourceBuildingDTO;
+import com.superapi.gamerealm.dto.building.ResourceBuildingDTO;
 import com.superapi.gamerealm.service.BuildingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -34,8 +34,6 @@ private final ResourceService resourceService;
     }
 
 
-
-
     @Transactional
     public boolean addTroopsToTrainingQueue(Long villageId, TroopType troopType, int quantity) {
         // Check if the village has enough resources to train the specified number of troops
@@ -91,27 +89,30 @@ private final ResourceService resourceService;
                     .filter(t -> t.getTroopType() == troopTrainingQueue.getTroopType())
                     .findFirst()
                     .orElseGet(() -> {
-                        VillageTroops newTroops = new VillageTroops(village, troopTrainingQueue.getTroopType(), 1);
+                        VillageTroops newTroops = new VillageTroops(village, troopTrainingQueue.getTroopType(), 0);
                         village.getTroops().add(newTroops);
                         return newTroops;
                     });
 
-        villageTroopsRepository.save(villageTroops);
-        villageRepository.save(village);
+            // Increment the quantity of the troops by the number that was trained
+            villageTroops.setQuantity(villageTroops.getQuantity() + 1);
+
+            villageTroopsRepository.save(villageTroops);
+            villageRepository.save(village);
             troopTrainingQueueRepository.delete(troopTrainingQueue);
             // Remove construction from the queue
 
-            System.out.println("Construction with ID " + troopTrainingQueue.getId() + " has been removed from the queue.");
+            System.out.println("Training with ID " + troopTrainingQueue.getId() + " has been removed from the queue.");
         } else {
-            System.out.println("Construction with ID " + troopTrainingQueue.getId() + " is not yet ready for completion.");
+            System.out.println("Training with ID " + troopTrainingQueue.getId() + " is not yet ready for completion.");
         }
     }
 
 
     private void scheduleTrainingCompletion( TroopTrainingQueue troopTrainingQueue) {
-        long delay = Duration.between(LocalDateTime.now(), troopTrainingQueue.getTrainingEndTime()).toMillis();
-        System.out.println("Scheduling construction completion with a delay of: " + delay + " milliseconds.");
 
+        long delay = Duration.between(LocalDateTime.now(), troopTrainingQueue.getTrainingEndTime()).toMillis();
+        System.out.println("Scheduling Training completion with a delay of: " + delay + " milliseconds.");
         CompletableFuture.delayedExecutor(delay, TimeUnit.MILLISECONDS)
                 .execute(() -> completeTroopTraining(troopTrainingQueue));
     }

@@ -1,5 +1,6 @@
-package com.superapi.gamerealm.dto;
+package com.superapi.gamerealm.dto.troops;
 
+import com.superapi.gamerealm.dto.TroopTrainingQueueDTO;
 import com.superapi.gamerealm.model.troop.TroopTrainingQueue;
 import com.superapi.gamerealm.model.troop.TroopType;
 

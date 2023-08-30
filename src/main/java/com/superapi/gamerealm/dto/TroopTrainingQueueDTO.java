@@ -37,6 +37,5 @@ public class TroopTrainingQueueDTO {
     public void setTrainingEndTime(LocalDateTime trainingEndTime) {
         this.trainingEndTime = trainingEndTime;
     }
-// Getters and setters
-    // ...
+
 }

@@ -1,6 +1,9 @@
 package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.dto.*;
+import com.superapi.gamerealm.dto.building.BuildingMapper;
+import com.superapi.gamerealm.dto.building.NonResourceBuildingDTO;
+import com.superapi.gamerealm.dto.building.ResourceBuildingDTO;
 import com.superapi.gamerealm.model.Account;
 import com.superapi.gamerealm.model.Attack;
 import com.superapi.gamerealm.model.Village;
@@ -23,7 +26,7 @@ public class VillageService {
     private final ResourceService resourceService;
     private final BuildingMapper buildingMapper;
     private final ResourcesMapper resourcesMapper;
-private final TroopTrainingService troopTrainingService;
+    private final TroopTrainingService troopTrainingService;
     private final VillageMapper villageMapper;
     private final BuildingService buildingService;
 
@@ -74,16 +77,12 @@ private final TroopTrainingService troopTrainingService;
         int radius = 24;  // Or any other desired value
         List<Village> villages = villageRepository.findVillagesInArea(x - radius, x + radius, y - radius, y + radius);
 
-        // Convert the list of Village entities to a list of VillageDTO objects
-
         return villages.stream()
                 .map(village -> new VillageDTO(village.getId(), village.getX(), village.getY(), village.getName()))
                 .collect(Collectors.toList());
     }
 
     public void createVillageForAccount(Account account) {
-        int maxAttempts = 10;
-        int attempts = 0;
 
         // Declare x and y here
         int x, y;
@@ -205,7 +204,8 @@ private final TroopTrainingService troopTrainingService;
         Village village = villages.get(0);
 
         resourceService.updateVillageResources(village);
-
+        buildingService.processOverdueConstructions(village.getId());
+        troopTrainingService.processOverdueTroopTrainings(village.getId());
         return villageMapper.villageToVillageDTO(village);
     }
 
