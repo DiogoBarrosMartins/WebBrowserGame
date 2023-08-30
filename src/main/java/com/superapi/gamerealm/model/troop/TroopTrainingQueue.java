@@ -16,11 +16,11 @@ public class TroopTrainingQueue {
     @JoinColumn(name = "village_id")
     private Village village;
 
-    @ManyToOne
-    @JoinColumn(name = "troop_type_id")
+    @Enumerated(EnumType.STRING) // or EnumType.ORDINAL if you prefer to map to int
+    @Column(name = "troop_type")
     private TroopType troopType;
 
-    private int quantity;  // Number of troops being trained
+    int remaining;
 
     private LocalDateTime trainingStartTime;
 
@@ -30,6 +30,14 @@ public class TroopTrainingQueue {
 
     public Long getId() {
         return id;
+    }
+
+    public int getRemaining() {
+        return remaining;
+    }
+
+    public void setRemaining(int remaining) {
+        this.remaining = remaining;
     }
 
     public void setId(Long id) {
@@ -52,13 +60,7 @@ public class TroopTrainingQueue {
         this.troopType = troopType;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
 
     public LocalDateTime getTrainingStartTime() {
         return trainingStartTime;

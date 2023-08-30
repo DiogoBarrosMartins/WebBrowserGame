@@ -4,21 +4,45 @@ import com.superapi.gamerealm.model.Village;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "VillageTroops")
 public class VillageTroops {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "villageId")
+    @JoinColumn(name = "village_id")
     private Village village;
 
     @Enumerated(EnumType.STRING)
     private TroopType troopType;
 
-    private int count;
+    private int quantity;
 
+    public VillageTroops(Village village, TroopType troopType, int quantity) {
+        this.village = village;
+        this.troopType = troopType;
+        this.quantity = quantity;
+    }
+
+    public VillageTroops() {
+
+    }
+
+    // Add Troops
+    public void addTroops(int quantity) {
+        this.quantity += quantity;
+    }
+
+    // Remove Troops
+    public void removeTroops(int quantity) {
+        this.quantity -= quantity;
+        if (this.quantity < 0) {
+            this.quantity = 0;
+        }
+    }
+
+    // ... getters, setters, etc.
 
     public Long getId() {
         return id;
@@ -44,11 +68,11 @@ public class VillageTroops {
         this.troopType = troopType;
     }
 
-    public int getCount() {
-        return count;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

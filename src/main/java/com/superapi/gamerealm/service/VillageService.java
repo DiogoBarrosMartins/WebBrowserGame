@@ -23,7 +23,7 @@ public class VillageService {
     private final ResourceService resourceService;
     private final BuildingMapper buildingMapper;
     private final ResourcesMapper resourcesMapper;
-
+private final TroopTrainingService troopTrainingService;
     private final VillageMapper villageMapper;
     private final BuildingService buildingService;
 
@@ -32,7 +32,7 @@ public class VillageService {
                           ResourcesMapper resourcesMapper,
                           BuildingMapper buildingMapper,
                           BuildingService buildingService,
-                          ModelMapper modelMapper,
+                          ModelMapper modelMapper, TroopTrainingService troopTrainingService,
                           ResourceService resourceService,
                           VillageMapper villageMapper) {
         this.villageRepository = villageRepository;
@@ -40,6 +40,7 @@ public class VillageService {
         this.buildingMapper = buildingMapper;
         this.buildingService = buildingService;
         this.modelMapper = modelMapper;
+        this.troopTrainingService = troopTrainingService;
         this.resourceService = resourceService;
         this.villageMapper = villageMapper;
     }
@@ -48,6 +49,7 @@ public class VillageService {
         Village village = villageRepository.findVillageByUsername(username).orElseThrow();
         resourceService.updateVillageResources(village);
         buildingService.processOverdueConstructions(village.getId());
+        troopTrainingService.processOverdueTroopTrainings(village.getId());
         village = villageRepository.findVillageByUsername(username).orElseThrow();
         List<ResourceBuildingDTO> resourceBuildings = new ArrayList<>();
         List<NonResourceBuildingDTO> nonResourceBuildings = new ArrayList<>();
