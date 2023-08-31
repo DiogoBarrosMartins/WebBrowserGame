@@ -88,7 +88,11 @@ public class BuildingService {
             construction.setVillage(building.getVillage());
 
             // Calculate the upgrade time and set the construction's startedAt and endsAt
-            Double upgradeTimeInMinutes = Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel()];
+            Double upgradeTimeInMinutes = building.isResourceBuilding() ?
+                    Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel()] :
+                    Upgrade.NON_RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel()];
+
+
             LocalDateTime now = LocalDateTime.now();
             construction.setStartedAt(now);
             construction.setEndsAt(now.plusMinutes(upgradeTimeInMinutes.longValue()));

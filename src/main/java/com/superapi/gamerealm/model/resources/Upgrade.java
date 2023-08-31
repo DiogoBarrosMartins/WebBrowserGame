@@ -9,6 +9,8 @@ public class Upgrade {
 
     public static final int[] RESOURCE_BUILDING_PRODUCTION_RATES = {4, 10, 22, 46, 94, 140, 200, 306, 500, 1070};
     public static final double[] RESOURCE_BUILDING_UPGRADE_TIMES = {1, 5, 10, 40, 80, 120, 240, 640, 1280, 2560};
+    public static final double[] NON_RESOURCE_BUILDING_UPGRADE_TIMES = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024};
+
     public static final int[][] FOREST_RESOURCES_NEEDED = {
             {100, 200, 100, 50},
             {150, 300, 150, 75},
@@ -130,7 +132,7 @@ public class Upgrade {
 
 
 
-        // ... (keep the other constants as they are)
+
 
         public static Map<TypeOfResource, Double> getResourceNeeded(BuildingType buildingType, int level) {
             int[] resourcesNeededArray;
@@ -148,6 +150,10 @@ public class Upgrade {
                 case FARM:
                     resourcesNeededArray = FARM_RESOURCES_NEEDED[level];
                     break;
+                case BARRACKS:
+                    resourcesNeededArray = BARRACKS_RESOURCES_NEEDED[level];
+
+
                 default:
                     throw new IllegalArgumentException("Invalid building type: " + buildingType);
             }
