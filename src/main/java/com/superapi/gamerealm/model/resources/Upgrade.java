@@ -152,7 +152,7 @@ public class Upgrade {
                     break;
                 case BARRACKS:
                     resourcesNeededArray = BARRACKS_RESOURCES_NEEDED[level];
-
+break;
 
                 default:
                     throw new IllegalArgumentException("Invalid building type: " + buildingType);

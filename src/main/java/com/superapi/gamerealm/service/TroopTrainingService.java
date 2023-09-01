@@ -1,6 +1,8 @@
 package com.superapi.gamerealm.service;
 
 import com.superapi.gamerealm.model.Village;
+import com.superapi.gamerealm.model.buildings.Building;
+import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.troop.TroopTrainingQueue;
 import com.superapi.gamerealm.model.troop.TroopType;
@@ -38,19 +40,71 @@ public class TroopTrainingService {
 
 
     @Transactional
-    public boolean addTroopsToTrainingQueue(Long villageId, TroopType troopType, int quantity) {
-        // Check if the village has enough resources to train the specified number of troops
+    public void addTroopsToTrainingQueue(Long villageId, TroopType troopType, int quantity) {
+
+
+
+        Village village = villageRepository.findById(villageId).orElse(null);
+        if (village == null) {
+            // Village not found
+            return;
+        }
+
+        // Fetch the barracks building from the list of buildings
+        Building barracks = village.getBuildings().stream()
+                .filter(b -> BuildingType.BARRACKS.equals(b.getType()))
+                .findFirst()
+                .orElse(null);
+
+        if (barracks == null) {
+            // Barracks not found in the village
+            return;
+        }
+
+        // Check the barracks level based on the troop type
+        switch (troopType) {
+            case SCOUT:
+                if (barracks.getLevel() < 1) {
+                    return;  // Barracks level is not sufficient
+                }
+                break;
+            case SOLDIER:
+                if (barracks.getLevel() < 4) {
+                    return;  // Barracks level is not sufficient
+                }
+                break;
+            case KNIGHT:
+                if (barracks.getLevel() < 8) {
+                    return;  // Barracks level is not sufficient
+                }
+                break;
+            default:
+                // Unsupported troop type
+                return;
+        }
+
         Map<TypeOfResource, Double> totalCost = new HashMap<>();
-        troopType.getResourcesRequired().forEach((resourceType, cost) -> {
+        for (Map.Entry<TypeOfResource, Double> entry : troopType.getResourcesRequired().entrySet()) {
+            TypeOfResource resourceType = entry.getKey();
+            Double cost = entry.getValue();
             totalCost.put(resourceType, cost * quantity);
-        });
+        }
 
         if (!resourceService.hasEnoughResources(villageId, totalCost)) {
-            return false;
+            return;
         }
 
         // Deduct the resources from the village
         resourceService.deductResources(villageId, totalCost);
+        // Adjust training time based on barracks level
+        double reductionPercentagePerLevel = 0.02;  // 2% reduction for each level
+        double adjustedTrainingTime = troopType.getTrainingTime() * (1 - reductionPercentagePerLevel * barracks.getLevel());
+
+        // Calculate training start and end times
+        LocalDateTime trainingStartTime = LocalDateTime.now();
+        LocalDateTime trainingEndTime = trainingStartTime.plusSeconds((long) adjustedTrainingTime);
+
+        // Use the adjustedTrainingTime for the troop training...
 
         List<TroopTrainingQueue> troopsToTrain = new ArrayList<>();
         for (int i = 0; i < quantity; i++) {
@@ -58,14 +112,13 @@ public class TroopTrainingService {
             queueEntry.setTroopType(troopType);
             queueEntry.setVillage(villageRepository.findById(villageId).orElseThrow());
             queueEntry.setTrainingStartTime(LocalDateTime.now());
-            queueEntry.setTrainingEndTime(LocalDateTime.now().plusSeconds((long) troopType.getTrainingTime() * (i + 1)));
+            queueEntry.setTrainingEndTime(trainingEndTime);
             troopsToTrain.add(queueEntry);
             scheduleTrainingCompletion(queueEntry);
         }
 
         troopTrainingQueueRepository.saveAll(troopsToTrain);
 
-        return true;
     }
 
     public void processOverdueTroopTrainings(Long villageId) {
