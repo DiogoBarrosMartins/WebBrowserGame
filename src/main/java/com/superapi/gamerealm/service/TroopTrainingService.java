@@ -155,7 +155,6 @@ public class TroopTrainingService {
             villageTroopsRepository.save(villageTroops);
             villageRepository.save(village);
             troopTrainingQueueRepository.delete(troopTrainingQueue);
-            // Remove construction from the queue
 
             System.out.println("Training with ID " + troopTrainingQueue.getId() + " has been removed from the queue.");
         } else {

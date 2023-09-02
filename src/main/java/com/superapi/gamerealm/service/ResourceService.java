@@ -27,7 +27,7 @@ public class ResourceService {
     @Transactional
     public void updateVillageResources(Village village) {
         synchronized(village) {
-            Resources resources = village.getResources().get(0); // Assuming there's always at least one Resources object in the list
+            Resources resources = village.getResources().get(0);
 
             // calculate the time elapsed since the last update
             LocalDateTime now = LocalDateTime.now();

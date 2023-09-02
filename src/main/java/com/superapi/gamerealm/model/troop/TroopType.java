@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.HashMap;
 
 public enum TroopType {
-    SCOUT(10, 1, 3, 60, 100,createResourceMap(10, 5, 0,20)),
+    SCOUT(8, 1, 3, 60, 100,createResourceMap(50, 40, 20,20)),
     // health, armor, attack, trainingTime in seconds,  carryCapacity, resources
-    SOLDIER(8, 1, 5, 120, 150,createResourceMap(8, 4, 2,10)),
-    KNIGHT(15, 2, 4, 240,200, createResourceMap(15, 7, 3,40));
+    SOLDIER(10, 2, 5, 120, 200,createResourceMap(100, 75, 40,50)),
+    KNIGHT(20, 4, 10, 300,150, createResourceMap(200, 100, 150,50));
 
     private final int health;
     private final int armor;

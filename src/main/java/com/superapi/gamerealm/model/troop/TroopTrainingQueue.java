@@ -16,7 +16,7 @@ public class TroopTrainingQueue {
     @JoinColumn(name = "village_id")
     private Village village;
 
-    @Enumerated(EnumType.STRING) // or EnumType.ORDINAL if you prefer to map to int
+    @Enumerated(EnumType.STRING) // or EnumType.ORDINAL  to map to int
     @Column(name = "troop_type")
     private TroopType troopType;
 
