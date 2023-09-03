@@ -10,13 +10,40 @@ public enum TroopType {
     SOLDIER(10, 2, 5, 120, 200,createResourceMap(100, 75, 40,50)),
     KNIGHT(20, 4, 10, 300,150, createResourceMap(200, 100, 150,50));
 
+
+    /**
+     *
+     *  // Human Troops
+     *     HUMAN_FOOT_TROOP(10, 2, 5, 120, 200, createResourceMap(100, 75, 40, 50), "Human foot troops are well-trained infantry."),
+     *     HUMAN_ARCHER(8, 1, 6, 90, 100, createResourceMap(80, 60, 30, 40), "Human archers are skilled marksmen."),
+     *     HUMAN_CAVALRY(15, 3, 8, 240, 150, createResourceMap(150, 80, 100, 60), "Human cavalry is fast and deadly."),
+     *     HUMAN_SIEGE(25, 5, 12, 360, 300, createResourceMap(300, 200, 250, 100), "Human siege troops can breach any fortress."),
+     *
+     *     // Orc Troops
+     *     ORC_FOOT_TROOP(12, 1, 6, 100, 180, createResourceMap(80, 60, 50, 30), "Orc foot troops are fearsome warriors."),
+     *     ORC_ARCHER(9, 2, 4, 110, 110, createResourceMap(70, 55, 40, 25), "Orc archers shoot deadly arrows."),
+     *     ORC_CAVALRY(18, 4, 9, 260, 120, createResourceMap(120, 70, 80, 40), "Orc cavalry charges with brute force."),
+     *     ORC_SIEGE(30, 6, 15, 400, 280, createResourceMap(250, 150, 200, 80), "Orc siege engines smash through defenses."),
+     *
+     *     // Elf Troops
+     *     ELF_FOOT_TROOP(8, 1, 4, 140, 220, createResourceMap(90, 70, 60, 40), "Elf foot troops are agile and precise."),
+     *     ELF_ARCHER(10, 2, 8, 110, 90, createResourceMap(70, 50, 30, 35), "Elf archers have unparalleled accuracy."),
+     *     ELF_CAVALRY(16, 3, 10, 280, 130, createResourceMap(130, 90, 70, 45), "Elf cavalry rides swift and silent."),
+     *     ELF_SIEGE(22, 4, 14, 380, 260, createResourceMap(220, 140, 180, 75), "Elf siege engines blend nature and technology.");
+     *
+     *
+     *
+     *
+     *
+     *
+     */
+
     private final int health;
     private final int armor;
     private final int attack;
     private final int carryCapacity;
     private int trainingTime;
     private final Map<TypeOfResource, Double> resourcesRequired;
-private String name;
     TroopType(int health, int armor, int attack, int trainingTime, int carryCapacity, Map<TypeOfResource, Double> resourcesRequired) {
         this.health = health;
         this.armor = armor;
