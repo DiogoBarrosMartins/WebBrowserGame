@@ -3,7 +3,9 @@ package com.superapi.gamerealm.controller;
 import com.superapi.gamerealm.dto.TroopTrainingQueueDTO;
 import com.superapi.gamerealm.dto.troops.TrainTroopsRequest;
 import com.superapi.gamerealm.dto.troops.TroopMapper;
+import com.superapi.gamerealm.dto.troops.TroopTypeDTO;
 import com.superapi.gamerealm.model.troop.TroopTrainingQueue;
+import com.superapi.gamerealm.model.troop.TroopType;
 import com.superapi.gamerealm.service.TroopTrainingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +43,14 @@ public class TroopController {
         return ResponseEntity.ok(dtoList);
     }
 
+    @GetMapping("/list")
+    public List<TroopTypeDTO> getAllTroopTypes() {
+        // Fetch all troop types from your service
+        List<TroopType> troopTypes = troopTrainingService.getAllTroopTypes();
 
+        // Convert TroopType entities to TroopTypeDTOs
+        return troopTypes.stream()
+                .map(TroopMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

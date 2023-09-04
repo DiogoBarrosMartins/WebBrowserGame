@@ -17,8 +17,13 @@ public class TroopMapper {
     public static TroopTypeDTO toDTO(TroopType entity) {
         return new TroopTypeDTO(
                 entity.getName(),
+                entity.getHealth(),
+                entity.getArmor(),
+                entity.getAttack(),
+                entity.getCarryCapacity(),
+                entity.getTrainingTime(),
                 entity.getResourcesRequired(),
-                entity.getTrainingTime()
+                entity.getDescription()
         );
     }
 

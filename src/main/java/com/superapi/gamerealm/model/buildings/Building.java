@@ -115,7 +115,8 @@ public class Building {
                 type != BuildingType.STABLE &&
                 type != BuildingType.RESEARCH_CENTER &&
                 type != BuildingType.STORAGE &&
-                type != BuildingType.SIEGE_WORKSHOP;
+                type != BuildingType.SIEGE_WORKSHOP&&
+        type != BuildingType.ARCHERY_RANGE;
     }
 
     public LocalDateTime getStartedAt() {

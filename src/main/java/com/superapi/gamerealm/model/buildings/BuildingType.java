@@ -13,8 +13,8 @@ public enum BuildingType {
     STORAGE("Storage"),
     RESEARCH_CENTER("Research Center"),
     STABLE("Stable"),
-    SIEGE_WORKSHOP("Siege Workshop");
-
+    SIEGE_WORKSHOP("Siege Workshop"),
+ARCHERY_RANGE("Archery range");
     private final String displayName;
 
     BuildingType(String displayName) {
