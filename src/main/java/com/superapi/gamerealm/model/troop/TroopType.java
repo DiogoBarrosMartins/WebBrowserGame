@@ -8,10 +8,10 @@ public enum TroopType {
 
 
     // Human Foot Troops
-    HUMAN_FOOT_SOLDIER(12, 3, 6, 120, 200, createResourceMap(100, 75, 40, 50), "Well-trained foot soldiers in the Human army."),
+    HUMAN_FOOT_SOLDIER(12, 3, 6, 120, 200, createResourceMap(100, 75, 40, 50), "Well-trained soldiers in the Human army."),
     HUMAN_IMPERIAL_GUARD(14, 4, 7, 140, 220, createResourceMap(120, 90, 50, 60), "Elite Imperial Guards loyal to the Human kingdom."),
-    HUMAN_FOOT_KNIGHT(16, 5, 8, 160, 240, createResourceMap(140, 110, 60, 70), "Foot Knights renowned for their valor."),
-    HUMAN_FOOT_MAGES(14, 3, 10, 180, 180, createResourceMap(150, 100, 120, 70), "Mages wielding destructive spells for Human foot troops."),
+    HUMAN_FOOT_KNIGHT(16, 5, 8, 160, 240, createResourceMap(140, 110, 60, 70), "Knights renowned for their valor."),
+    HUMAN_FOOT_MAGES(14, 3, 10, 180, 180, createResourceMap(150, 100, 120, 70), "Mages wielding destructive spells for Human troops."),
 
     // Human Archers
     HUMAN_ARCHER_CORPS(10, 2, 8, 100, 100, createResourceMap(80, 60, 30, 40), "Elite archers skilled in precision and accuracy."),
