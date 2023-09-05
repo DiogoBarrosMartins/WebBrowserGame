@@ -43,7 +43,7 @@ This is the REST API documentation for the Web Browser Game, an exciting online 
 - **Retrieve All Non-Resource Producing Buildings by Village ID**:
   - Endpoint: `GET http://localhost:8080/buildings/{villageID}/non-resource`
 
-- **Upgrade Buildings** (stats change, but the timer is yet to be refined):
+- **Upgrade Buildings**:
   - Endpoint: `POST http://localhost:8080/{villageID}/buildings/{buildingID}/upgrade`
 
 ### Troop Management
