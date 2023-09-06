@@ -8,6 +8,7 @@ import com.superapi.gamerealm.model.buildings.BuildingType;
 import com.superapi.gamerealm.model.buildings.Construction;
 import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.resources.Upgrade;
+import com.superapi.gamerealm.model.troop.TroopType;
 import com.superapi.gamerealm.repository.BuildingRepository;
 import com.superapi.gamerealm.repository.ConstructionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -166,5 +168,85 @@ public class BuildingService {
         return buildingRepository.findById(buildingId).orElse(null);
     }
 
+
+    public List<String> getBuildableTroopsForBuilding(Building building) {
+        List<String> buildableTroops = new ArrayList<>();
+
+        // Check race
+        String race = building.getVillage().getAccount().getTribe();
+
+        // Check building level
+        int level = building.getLevel();
+
+        // Determine the appropriate building type for the given troop type
+        BuildingType buildingType;
+        switch (race) {
+            case "human":
+                switch (level) {
+                    case 1:
+                        buildingType = BuildingType.BARRACKS;
+                        break;
+                    case 2:
+                        buildingType = BuildingType.ARCHERY_RANGE;
+                        break;
+                    case 3:
+                        buildingType = BuildingType.STABLE;
+                        break;
+                    case 4:
+                        buildingType = BuildingType.SIEGE_WORKSHOP;
+                        break;
+                    default:
+                        // Unsupported building level
+                        return buildableTroops;
+                }
+                break;
+            case "orc":
+                switch (level) {
+                    case 1:
+                        buildingType = BuildingType.BARRACKS;
+                        break;
+                    // Add logic for orc building levels 2, 3, and 4 here
+                    // ...
+                    default:
+                        // Unsupported building level
+                        return buildableTroops;
+                }
+                break;
+            case "elf":
+                switch (level) {
+                    case 1:
+                        buildingType = BuildingType.BARRACKS;
+                        break;
+                    // Add logic for elf building levels 2, 3, and 4 here
+                    // ...
+                    default:
+                        // Unsupported building level
+                        return buildableTroops;
+                }
+                break;
+            default:
+                // Unsupported player race
+                return buildableTroops;
+        }
+
+        // Filter troops based on their names and descriptions
+        for (TroopType troopType : TroopType.values()) {
+            String troopName = troopType.name();
+            String troopDescription = troopType.getDescription();
+
+            // Check if the troop's name starts with "ORC" and the description contains "foot troop"
+            if (troopName.startsWith("ORC") && troopDescription.contains("foot troop")) {
+                if (buildingType == BuildingType.BARRACKS) {
+                    buildableTroops.add(troopName);
+                }
+            }
+
+            // Add similar checks for other troop types and building types
+            // ...
+
+        }
+
+        return buildableTroops;
+    }
 
 }
