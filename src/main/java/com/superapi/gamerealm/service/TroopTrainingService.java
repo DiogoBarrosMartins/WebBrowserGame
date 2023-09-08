@@ -233,7 +233,14 @@ public class TroopTrainingService {
     public List<TroopTrainingQueue> getTrainingQueueForVillage(Long villageId) {
         return troopTrainingQueueRepository.findByVillageId(villageId);
     }
+    public List<TroopType> getTroopsByBuildingAndRaceAndLevel(BuildingType buildingTypee, int level) {
 
+        return allTroops.stream()
+                .filter(troop -> troop.getBuildingType().equals(buildingType))
+                .filter(troop -> troop.getRace().equals(race))
+                .filter(troop -> troop.getRequiredLevel() <= level)
+                .collect(Collectors.toList());
+    }
     public List<TroopType> getAllTroopTypes() {     // Return all troop types defined in the TroopType enum
         return Arrays.asList(TroopType.values());
     }

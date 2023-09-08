@@ -5,6 +5,7 @@ import com.superapi.gamerealm.dto.building.ResourceBuildingDTO;
 import com.superapi.gamerealm.dto.troops.BuildingTroopInfoDTO;
 import com.superapi.gamerealm.model.buildings.Building;
 import com.superapi.gamerealm.service.BuildingService;
+import com.superapi.gamerealm.service.TroopTrainingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +18,10 @@ import java.util.List;
 @RequestMapping("buildings/{villageId}/")
 public class BuildingController {
     private final BuildingService buildingService;
-
-    public BuildingController(BuildingService buildingService) {
+    private final TroopTrainingService troopTrainingService;
+    public BuildingController(BuildingService buildingService, TroopTrainingService troopTrainingService) {
         this.buildingService = buildingService;
+        this.troopTrainingService =  troopTrainingService;
     }
 
     @GetMapping("/resource")
@@ -48,7 +50,7 @@ public class BuildingController {
         List<String> buildableTroops = buildingService.getBuildableTroopsForBuilding(building);
 
         BuildingTroopInfoDTO troopInfoDTO = new BuildingTroopInfoDTO();
-        troopInfoDTO.setBuildingType(building.getType());
+        troopInfoDTO.setBuildingType(building.getType().toString());
         troopInfoDTO.setBuildableTroops(buildableTroops);
 
         return ResponseEntity.ok(troopInfoDTO);
@@ -56,4 +58,4 @@ public class BuildingController {
 }
 
 
-}
+
