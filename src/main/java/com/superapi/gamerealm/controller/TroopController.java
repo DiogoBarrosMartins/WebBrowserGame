@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/villages/{villageId}/troops")
+@RequestMapping("/troops")
 public class TroopController {
 
     private final TroopTrainingService troopTrainingService;
@@ -25,7 +25,7 @@ public class TroopController {
     }
 
     // Endpoint to train a specific type of troop
-    @PostMapping("/train")
+    @PostMapping("/train/{villageId}")
     public ResponseEntity<Void> trainTroops(@PathVariable Long villageId,
                                             @RequestBody TrainTroopsRequest trainTroopsRequest) {
         troopTrainingService.addTroopsToTrainingQueue(villageId, trainTroopsRequest.getTroopType(), trainTroopsRequest.getQuantity());
@@ -34,7 +34,7 @@ public class TroopController {
 
 
     // Endpoint to check the training queue for a village
-    @GetMapping("/training-queue")
+    @GetMapping("/training-queue/{villageId}")
     public ResponseEntity<List<TroopTrainingQueueDTO>> getTrainingQueue(@PathVariable Long villageId) {
         List<TroopTrainingQueue> queue = troopTrainingService.getTrainingQueueForVillage(villageId);
         List<TroopTrainingQueueDTO> dtoList = queue.stream()
@@ -43,14 +43,15 @@ public class TroopController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @GetMapping("/list")
-    public List<TroopTypeDTO> getAllTroopTypes() {
-        // Fetch all troop types from your service
-        List<TroopType> troopTypes = troopTrainingService.getAllTroopTypes();
+    @GetMapping("/{buildingId}/list")
+    public List<TroopTypeDTO> getAllTroopTypes(@PathVariable Long buildingId) {
+        // Fetch all available troop types for the given building from your service
+        List<TroopType> troopTypes = troopTrainingService.getAvailableTroopsForBuilding(buildingId);
 
         // Convert TroopType entities to TroopTypeDTOs
         return troopTypes.stream()
                 .map(TroopMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
 }

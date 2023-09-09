@@ -50,25 +50,25 @@ public enum TroopType {
     ORC_LAVA_RAMMERS(45, 14, 22, 460, 360, createResourceMap(310, 200, 260, 140), "Lava Rams that spew molten lava on impact."),
 
     // Elf Foot Troops
-    ELF_SCOUTS(10, 1, 4, 140, 220, createResourceMap(90, 70, 60, 40), "Swift and agile scouts from the Elven realm."),
-    ELF_FOREST_ARCHERS(12, 2, 8, 110, 90, createResourceMap(70, 50, 30, 35), "Archers who are one with the forest."),
-    ELF_ELITE_RANGERS(14, 3, 10, 130, 120, createResourceMap(80, 60, 40, 45), "Elite Rangers with unmatched accuracy."),
-    ELF_DRUID_WARRIORS(16, 4, 12, 150, 140, createResourceMap(100, 70, 50, 50), "Druid Warriors with nature-infused abilities."),
+    ELVISH_SCOUTS(10, 1, 4, 140, 220, createResourceMap(90, 70, 60, 40), "Swift and agile scouts from the Elven realm."),
+    ELVISH_FOREST_ARCHERS(12, 2, 8, 110, 90, createResourceMap(70, 50, 30, 35), "Archers who are one with the forest."),
+    ELVISH_ELITE_RANGERS(14, 3, 10, 130, 120, createResourceMap(80, 60, 40, 45), "Elite Rangers with unmatched accuracy."),
+    ELVISH_DRUID_WARRIORS(16, 4, 12, 150, 140, createResourceMap(100, 70, 50, 50), "Druid Warriors with nature-infused abilities."),
 
     // Elf Archers
-    ELF_WINDRIDER_ARCHERS(14, 3, 9, 120, 100, createResourceMap(80, 55, 40, 30), "Windrider Archers known for their speed and precision."),
-    ELF_SILVERLEAF_BOWMEN(16, 4, 10, 140, 120, createResourceMap(90, 65, 50, 35), "Silverleaf Bowmen with silver-tipped arrows."),
-    ELF_STORMRIDER_SNIPERS(18, 5, 12, 160, 140, createResourceMap(100, 70, 60, 40), "Stormrider Snipers with lightning-fast shots."),
+    ELVISH_WINDRIDER_ARCHERS(14, 3, 9, 120, 100, createResourceMap(80, 55, 40, 30), "Windrider Archers known for their speed and precision."),
+    ELVISH_SILVERLEAF_BOWMEN(16, 4, 10, 140, 120, createResourceMap(90, 65, 50, 35), "Silverleaf Bowmen with silver-tipped arrows."),
+    ELVISH_STORMRIDER_SNIPERS(18, 5, 12, 160, 140, createResourceMap(100, 70, 60, 40), "Stormrider Snipers with lightning-fast shots."),
 
     // Elf Cavalry
-    ELF_GRYPHON_KNIGHTS(16, 4, 12, 280, 130, createResourceMap(130, 90, 70, 45), "Noble knights mounted on Gryphons."),
-    ELF_FOREST_RIDERS(18, 5, 14, 260, 150, createResourceMap(140, 100, 80, 50), "Forest Riders on swift forest creatures."),
-    ELF_MOONSHADOW_DRAGOONS(20, 6, 16, 240, 160, createResourceMap(150, 110, 90, 60), "Moonshadow Dragoons with lunar-powered spears."),
+    ELVISH_GRYPHON_KNIGHTS(16, 4, 12, 280, 130, createResourceMap(130, 90, 70, 45), "Noble knights mounted on Gryphons."),
+    ELVISH_FOREST_RIDERS(18, 5, 14, 260, 150, createResourceMap(140, 100, 80, 50), "Forest Riders on swift forest creatures."),
+    ELVISH_MOONSHADOW_DRAGOONS(20, 6, 16, 240, 160, createResourceMap(150, 110, 90, 60), "Moonshadow Dragoons with lunar-powered spears."),
 
     // Elf Siege Workshop
-    ELF_TREANT_SIEGE(30, 8, 20, 400, 260, createResourceMap(220, 140, 180, 75), "Ancient Treants transformed into siege engines."),
-    ELF_EARTHEN_CATAPULTS(35, 10, 22, 420, 280, createResourceMap(240, 160, 200, 80), "Earthen Catapults with earth-shaking projectiles."),
-    ELF_STARBREAKER_BALLISTAE(40, 12, 24, 440, 320, createResourceMap(260, 180, 220, 100), "Starbreaker Ballistae with celestial arrows.");
+    ELVISH_TREANT_SIEGE(30, 8, 20, 400, 260, createResourceMap(220, 140, 180, 75), "Ancient Treants transformed into siege engines."),
+    ELVISH_EARTHEN_CATAPULTS(35, 10, 22, 420, 280, createResourceMap(240, 160, 200, 80), "Earthen Catapults with earth-shaking projectiles."),
+    ELVISH_STARBREAKER_BALLISTAE(40, 12, 24, 440, 320, createResourceMap(260, 180, 220, 100), "Starbreaker Ballistae with celestial arrows.");
 
 
     private final int health;

@@ -7,6 +7,7 @@ import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.troop.TroopTrainingQueue;
 import com.superapi.gamerealm.model.troop.TroopType;
 import com.superapi.gamerealm.model.troop.VillageTroops;
+import com.superapi.gamerealm.repository.BuildingRepository;
 import com.superapi.gamerealm.repository.TroopTrainingQueueRepository;
 import com.superapi.gamerealm.repository.VillageRepository;
 import com.superapi.gamerealm.repository.VillageTroopsRepository;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class TroopTrainingService {
@@ -25,41 +27,68 @@ public class TroopTrainingService {
     private final TroopTrainingQueueRepository troopTrainingQueueRepository;
     private final VillageRepository villageRepository;
     private final VillageTroopsRepository villageTroopsRepository;
-
+    private final BuildingRepository buildingRepository;
     private final ResourceService resourceService;
 
-    public TroopTrainingService(TroopTrainingQueueRepository troopTrainingQueueRepository, VillageRepository villageRepository, VillageTroopsRepository villageTroopsRepository, ResourceService resourceService) {
+    public TroopTrainingService(TroopTrainingQueueRepository troopTrainingQueueRepository, VillageRepository villageRepository, VillageTroopsRepository villageTroopsRepository,BuildingRepository buildingRepository, ResourceService resourceService) {
         this.troopTrainingQueueRepository = troopTrainingQueueRepository;
         this.villageRepository = villageRepository;
         this.villageTroopsRepository = villageTroopsRepository;
+        this.buildingRepository = buildingRepository;
         this.resourceService = resourceService;
     }
 
+    private BuildingType getTrainingBuildingForTroopType(TroopType troopType) {
+        // Determine the appropriate building based on troop type
+        BuildingType buildingType;
+        switch (troopType) {
+            case HUMAN_FOOT_SOLDIER:
+            case HUMAN_IMPERIAL_GUARD:
+            case HUMAN_FOOT_KNIGHT:
+            case HUMAN_FOOT_MAGES, ORC_WARRIORS, ORC_BRUTE_WARRIORS, ORC_BLOODRAGE_BERSERKERS, ORC_SHAMAN_WARRIORS, ELVISH_SCOUTS, ELVISH_FOREST_ARCHERS, ELVISH_ELITE_RANGERS, ELVISH_DRUID_WARRIORS:
+                buildingType = BuildingType.BARRACKS;
+                break;
+            case HUMAN_ARCHER_CORPS:
+            case HUMAN_LONG_BOWMEN:
+            case HUMAN_CROSSBOWMEN, ORC_SHADOW_ARCHERS, ORC_POISON_BOWMEN, ORC_EXPLOSIVE_ARCHERS, ELVISH_WINDRIDER_ARCHERS, ELVISH_SILVERLEAF_BOWMEN, ELVISH_STORMRIDER_SNIPERS:
+                buildingType = BuildingType.ARCHERY_RANGE;
+                break;
+            case HUMAN_CAVALRY_KNIGHTS:
+            case HUMAN_LIGHT_CAVALRY:
+            case HUMAN_ROYAL_LANCERS, ORC_BLOODRIDERS, ORC_WAR_BOARS, ORC_WOLF_RAIDERS, ELVISH_GRYPHON_KNIGHTS, ELVISH_FOREST_RIDERS, ELVISH_MOONSHADOW_DRAGOONS:
+                buildingType = BuildingType.STABLE;
+                break;
+            case HUMAN_SIEGE_ENGINEERS:
+            case HUMAN_CATAPULTS:
+            case HUMAN_TREBUCHETS, ORC_SIEGE_GOLEMS, ORC_DEMOLISHERS, ORC_LAVA_RAMMERS, ELVISH_TREANT_SIEGE, ELVISH_EARTHEN_CATAPULTS, ELVISH_STARBREAKER_BALLISTAE:
+                buildingType = BuildingType.SIEGE_WORKSHOP;
+                break;
+            default:
+                // Unsupported troop type
+                return null;
+        }
+        return buildingType;
+    }
 
     @Transactional
     public void addTroopsToTrainingQueue(Long villageId, TroopType troopType, int quantity) {
 
-
         Village village = villageRepository.findById(villageId).orElse(null);
         assert village != null;
-        String playerRace = village.getAccount().getTribe();
+                BuildingType trainingBuilding = getTrainingBuildingForTroopType(troopType);
+                Building building =  village.getBuildings().stream()
+                        .filter(b -> b.getType() == trainingBuilding)
+                        .findFirst()
+                        .orElse(null);
+                assert trainingBuilding != null;
+                assert building != null;
+                List<TroopType> availableTroops = getAvailableTroopsForBuilding(building.getId());
 
-        // Check if the player's race matches the troop's race
-        if (!isValidTroopForRace(troopType, playerRace)) {
-            return;
-        }
-        // Check if the building level is sufficient for training
-        // Fetch the appropriate building based on troop type
-        Building trainingBuilding = getTrainingBuildingForTroopType(troopType, village);
-        if (trainingBuilding == null) {
-            // Building not found for troop type
+        // Check if the requested troopType is available for training in this building
+        if (!availableTroops.contains(troopType)) {
             return;
         }
 
-        // Check if the building level is sufficient for training
-        if (!isBuildingLevelSufficientForTroop(trainingBuilding, troopType)) {
-            return;
-        }
 
 
         Map<TypeOfResource, Double> totalCost = new HashMap<>();
@@ -77,7 +106,7 @@ public class TroopTrainingService {
         resourceService.deductResources(villageId, totalCost);
         // Adjust training time based on barracks level
         double reductionPercentagePerLevel = 0.02;  // 2% reduction for each level
-        double adjustedTrainingTime = troopType.getTrainingTime() * (1 - reductionPercentagePerLevel * trainingBuilding.getLevel());
+        double adjustedTrainingTime = troopType.getTrainingTime() * (1 - reductionPercentagePerLevel * building.getLevel());
 
         // Calculate training start and end times
         LocalDateTime trainingStartTime = LocalDateTime.now();
@@ -142,53 +171,69 @@ public class TroopTrainingService {
 
 
     private boolean isValidTroopForRace(TroopType troopType, String playerRace) {
-        // Check if the player's race matches the troop's race
-        return switch (playerRace) {
-            case "human" -> troopType.ordinal() < TroopType.HUMAN_FOOT_SOLDIER.ordinal() + 4; // 4 types of foot troops
-            case "orc" -> troopType.ordinal() >= TroopType.ORC_WARRIORS.ordinal()
-                    && troopType.ordinal() < TroopType.ORC_WARRIORS.ordinal() + 4; // 4 types of foot troops
-            case "elf" -> troopType.ordinal() >= TroopType.ELF_SCOUTS.ordinal()
-                    && troopType.ordinal() < TroopType.ELF_SCOUTS.ordinal() + 4; // 4 types of foot troops
-            default -> false; // Unsupported player race
+        String firstThreeCharsOfTroopType = troopType.name().substring(0, 3).toLowerCase();
+        String firstThreeCharsOfPlayerRace = playerRace.length() >= 3 ? playerRace.substring(0, 3).toLowerCase() : playerRace.toLowerCase();
+
+        System.out.println("First three characters of troop type: " + firstThreeCharsOfTroopType);
+        System.out.println("First three characters of player race: " + firstThreeCharsOfPlayerRace);
+
+        return firstThreeCharsOfTroopType.equals(firstThreeCharsOfPlayerRace);
+    }
+
+
+
+
+
+    public List<TroopType> getAvailableTroopsForBuilding(Long buildingId) {
+        Building building = buildingRepository.findById(buildingId).orElse(null);
+        if (building == null) {
+            return List.of();  // Return an empty list if the building is not found
+        }
+
+        // Assume Building has an Account
+        String playerRace =   building.getVillage().getAccount().getTribe();  // Assume Account has a race field
+        BuildingType buildingType = building.getType();
+
+        System.out.println("Method getAvailableTroopsForBuilding called with buildingId: " + buildingId);
+
+        return Arrays.stream(TroopType.values())
+                .peek(troop -> System.out.println("Initial troop: " + troop))
+                .filter(troop -> isValidTroopForRace(troop, playerRace))
+                .peek(troop -> System.out.println("After isValidTroopForRace: " + troop))
+                .filter(troop -> canBeTrainedInBuilding(troop, buildingType))
+                .peek(troop -> System.out.println("After canBeTrainedInBuilding: " + troop))
+                .filter(troop -> isBuildingLevelSufficientForTroop(building, troop))
+                .peek(troop -> System.out.println("After isBuildingLevelSufficientForTroop: " + troop))
+                .collect(Collectors.toList());
+    }
+
+    private boolean canBeTrainedInBuilding(TroopType troop, BuildingType buildingType) {
+        return switch (buildingType) {
+            case BARRACKS -> Arrays.asList(TroopType.HUMAN_FOOT_SOLDIER, TroopType.HUMAN_IMPERIAL_GUARD,
+                    TroopType.HUMAN_FOOT_KNIGHT, TroopType.HUMAN_FOOT_MAGES,
+                    TroopType.ORC_WARRIORS, TroopType.ORC_BRUTE_WARRIORS,
+                    TroopType.ORC_BLOODRAGE_BERSERKERS, TroopType.ORC_SHAMAN_WARRIORS,
+                    TroopType.ELVISH_SCOUTS, TroopType.ELVISH_FOREST_ARCHERS,
+                    TroopType.ELVISH_ELITE_RANGERS, TroopType.ELVISH_DRUID_WARRIORS).contains(troop);
+            case ARCHERY_RANGE -> Arrays.asList(TroopType.HUMAN_ARCHER_CORPS, TroopType.HUMAN_LONG_BOWMEN,
+                    TroopType.HUMAN_CROSSBOWMEN, TroopType.ORC_SHADOW_ARCHERS,
+                    TroopType.ORC_POISON_BOWMEN, TroopType.ORC_EXPLOSIVE_ARCHERS,
+                    TroopType.ELVISH_WINDRIDER_ARCHERS, TroopType.ELVISH_SILVERLEAF_BOWMEN,
+                    TroopType.ELVISH_STORMRIDER_SNIPERS).contains(troop);
+            case STABLE -> Arrays.asList(TroopType.HUMAN_CAVALRY_KNIGHTS, TroopType.HUMAN_LIGHT_CAVALRY,
+                    TroopType.HUMAN_ROYAL_LANCERS, TroopType.ORC_BLOODRIDERS,
+                    TroopType.ORC_WAR_BOARS, TroopType.ORC_WOLF_RAIDERS,
+                    TroopType.ELVISH_GRYPHON_KNIGHTS, TroopType.ELVISH_FOREST_RIDERS,
+                    TroopType.ELVISH_MOONSHADOW_DRAGOONS).contains(troop);
+            case SIEGE_WORKSHOP -> Arrays.asList(TroopType.HUMAN_SIEGE_ENGINEERS, TroopType.HUMAN_CATAPULTS,
+                    TroopType.HUMAN_TREBUCHETS, TroopType.ORC_SIEGE_GOLEMS,
+                    TroopType.ORC_DEMOLISHERS, TroopType.ORC_LAVA_RAMMERS,
+                    TroopType.ELVISH_TREANT_SIEGE, TroopType.ELVISH_EARTHEN_CATAPULTS,
+                    TroopType.ELVISH_STARBREAKER_BALLISTAE).contains(troop);
+            default -> false;
         };
     }
 
-    private Building getTrainingBuildingForTroopType(TroopType troopType, Village village) {
-        // Determine the appropriate building based on troop type
-        BuildingType buildingType;
-        switch (troopType) {
-            case HUMAN_FOOT_SOLDIER:
-            case HUMAN_IMPERIAL_GUARD:
-            case HUMAN_FOOT_KNIGHT:
-            case HUMAN_FOOT_MAGES, ORC_WARRIORS, ORC_BRUTE_WARRIORS, ORC_BLOODRAGE_BERSERKERS, ORC_SHAMAN_WARRIORS, ELF_SCOUTS, ELF_FOREST_ARCHERS, ELF_ELITE_RANGERS, ELF_DRUID_WARRIORS:
-                buildingType = BuildingType.BARRACKS;
-                break;
-            case HUMAN_ARCHER_CORPS:
-            case HUMAN_LONG_BOWMEN:
-            case HUMAN_CROSSBOWMEN, ORC_SHADOW_ARCHERS, ORC_POISON_BOWMEN, ORC_EXPLOSIVE_ARCHERS, ELF_WINDRIDER_ARCHERS, ELF_SILVERLEAF_BOWMEN, ELF_STORMRIDER_SNIPERS:
-                buildingType = BuildingType.ARCHERY_RANGE;
-                break;
-            case HUMAN_CAVALRY_KNIGHTS:
-            case HUMAN_LIGHT_CAVALRY:
-            case HUMAN_ROYAL_LANCERS, ORC_BLOODRIDERS, ORC_WAR_BOARS, ORC_WOLF_RAIDERS, ELF_GRYPHON_KNIGHTS, ELF_FOREST_RIDERS, ELF_MOONSHADOW_DRAGOONS:
-                buildingType = BuildingType.STABLE;
-                break;
-            case HUMAN_SIEGE_ENGINEERS:
-            case HUMAN_CATAPULTS:
-            case HUMAN_TREBUCHETS, ORC_SIEGE_GOLEMS, ORC_DEMOLISHERS, ORC_LAVA_RAMMERS, ELF_TREANT_SIEGE, ELF_EARTHEN_CATAPULTS, ELF_STARBREAKER_BALLISTAE:
-                buildingType = BuildingType.SIEGE_WORKSHOP;
-                break;
-            default:
-                // Unsupported troop type
-                return null;
-        }
-
-        // Find the building of the specified type in the village
-        return village.getBuildings().stream()
-                .filter(b -> b.getType() == buildingType)
-                .findFirst()
-                .orElse(null);
-    }
 
     private boolean isBuildingLevelSufficientForTroop(Building building, TroopType troopType) {
         // Check if the building level is sufficient for training the troop
@@ -196,22 +241,22 @@ public class TroopTrainingService {
         switch (troopType) {
             case HUMAN_FOOT_SOLDIER:
             case ORC_WARRIORS:
-            case ELF_SCOUTS, HUMAN_ARCHER_CORPS, ORC_SHADOW_ARCHERS, ELF_WINDRIDER_ARCHERS, HUMAN_CAVALRY_KNIGHTS, ORC_BLOODRIDERS, ELF_GRYPHON_KNIGHTS, HUMAN_SIEGE_ENGINEERS, ORC_SIEGE_GOLEMS, ELF_TREANT_SIEGE:
+            case ELVISH_SCOUTS, HUMAN_ARCHER_CORPS, ORC_SHADOW_ARCHERS, ELVISH_WINDRIDER_ARCHERS, HUMAN_CAVALRY_KNIGHTS, ORC_BLOODRIDERS, ELVISH_GRYPHON_KNIGHTS, HUMAN_SIEGE_ENGINEERS, ORC_SIEGE_GOLEMS, ELVISH_TREANT_SIEGE:
                 requiredLevel = 1;
                 break;
             case HUMAN_IMPERIAL_GUARD:
             case ORC_BRUTE_WARRIORS:
-            case ELF_FOREST_ARCHERS, HUMAN_LONG_BOWMEN, ORC_POISON_BOWMEN, ELF_SILVERLEAF_BOWMEN, HUMAN_LIGHT_CAVALRY, ORC_WAR_BOARS, ELF_FOREST_RIDERS, HUMAN_CATAPULTS, ORC_DEMOLISHERS, ELF_EARTHEN_CATAPULTS:
+            case ELVISH_FOREST_ARCHERS, HUMAN_LONG_BOWMEN, ORC_POISON_BOWMEN, ELVISH_SILVERLEAF_BOWMEN, HUMAN_LIGHT_CAVALRY, ORC_WAR_BOARS, ELVISH_FOREST_RIDERS, HUMAN_CATAPULTS, ORC_DEMOLISHERS, ELVISH_EARTHEN_CATAPULTS:
                 requiredLevel = 2;
                 break;
             case HUMAN_FOOT_KNIGHT:
             case ORC_BLOODRAGE_BERSERKERS:
-            case ELF_ELITE_RANGERS, HUMAN_CROSSBOWMEN, ORC_EXPLOSIVE_ARCHERS, ELF_STORMRIDER_SNIPERS, HUMAN_ROYAL_LANCERS, ORC_WOLF_RAIDERS, ELF_MOONSHADOW_DRAGOONS, HUMAN_TREBUCHETS, ORC_LAVA_RAMMERS, ELF_STARBREAKER_BALLISTAE:
+            case ELVISH_ELITE_RANGERS, HUMAN_CROSSBOWMEN, ORC_EXPLOSIVE_ARCHERS, ELVISH_STORMRIDER_SNIPERS, HUMAN_ROYAL_LANCERS, ORC_WOLF_RAIDERS, ELVISH_MOONSHADOW_DRAGOONS, HUMAN_TREBUCHETS, ORC_LAVA_RAMMERS, ELVISH_STARBREAKER_BALLISTAE:
                 requiredLevel = 3;
                 break;
             case HUMAN_FOOT_MAGES:
             case ORC_SHAMAN_WARRIORS:
-            case ELF_DRUID_WARRIORS:
+            case ELVISH_DRUID_WARRIORS:
                 requiredLevel = 4;
                 break;
             default:
@@ -221,7 +266,6 @@ public class TroopTrainingService {
 
         return building.getLevel() >= requiredLevel;
     }
-
     private void scheduleTrainingCompletion(TroopTrainingQueue troopTrainingQueue) {
 
         long delay = Duration.between(LocalDateTime.now(), troopTrainingQueue.getTrainingEndTime()).toMillis();
@@ -233,15 +277,7 @@ public class TroopTrainingService {
     public List<TroopTrainingQueue> getTrainingQueueForVillage(Long villageId) {
         return troopTrainingQueueRepository.findByVillageId(villageId);
     }
-    public List<TroopType> getTroopsByBuildingAndRaceAndLevel(BuildingType buildingTypee, int level) {
 
-        return allTroops.stream()
-                .filter(troop -> troop.getBuildingType().equals(buildingType))
-                .filter(troop -> troop.getRace().equals(race))
-                .filter(troop -> troop.getRequiredLevel() <= level)
-                .collect(Collectors.toList());
-    }
-    public List<TroopType> getAllTroopTypes() {     // Return all troop types defined in the TroopType enum
-        return Arrays.asList(TroopType.values());
-    }
+
 }
+

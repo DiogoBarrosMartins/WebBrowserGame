@@ -53,13 +53,10 @@ public class Village {
     private boolean underAttack;
 
     public Village() {
-        System.out.println("VILLAGE NO ARGS CONSTRUCTOR ");
-
     }
 
 
     public Village(int x, int y) {
-        System.out.println("VILLAGE COORDINATE ARGS CONSTRUCTOR " + x + " " + y);
         this.x = x;
         this.y = y;
         this.name = "default name";
