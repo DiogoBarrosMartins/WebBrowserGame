@@ -241,8 +241,6 @@ public class BuildingService {
                 }
             }
 
-            // Add similar checks for other troop types and building types
-            // ...
 
         }
 
