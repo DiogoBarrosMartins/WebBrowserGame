@@ -41,34 +41,67 @@ public class TroopTrainingService {
     private BuildingType getTrainingBuildingForTroopType(TroopType troopType) {
         // Determine the appropriate building based on troop type
         BuildingType buildingType;
+
         switch (troopType) {
             case HUMAN_FOOT_SOLDIER:
             case HUMAN_IMPERIAL_GUARD:
             case HUMAN_FOOT_KNIGHT:
-            case HUMAN_FOOT_MAGES, ORC_WARRIORS, ORC_BRUTE_WARRIORS, ORC_BLOODRAGE_BERSERKERS, ORC_SHAMAN_WARRIORS, ELVISH_SCOUTS, ELVISH_FOREST_ARCHERS, ELVISH_ELITE_RANGERS, ELVISH_DRUID_WARRIORS:
+            case HUMAN_FOOT_MAGES:
+            case ORC_WARRIORS:
+            case ORC_BRUTE_WARRIORS:
+            case ORC_BLOODRAGE_BERSERKERS:
+            case ORC_SHAMAN_WARRIORS:
+            case ELVISH_SCOUTS:
+            case ELVISH_FOREST_ARCHERS:
+            case ELVISH_ELITE_RANGERS:
+            case ELVISH_DRUID_WARRIORS:
                 buildingType = BuildingType.BARRACKS;
                 break;
+
             case HUMAN_ARCHER_CORPS:
             case HUMAN_LONG_BOWMEN:
-            case HUMAN_CROSSBOWMEN, ORC_SHADOW_ARCHERS, ORC_POISON_BOWMEN, ORC_EXPLOSIVE_ARCHERS, ELVISH_WINDRIDER_ARCHERS, ELVISH_SILVERLEAF_BOWMEN, ELVISH_STORMRIDER_SNIPERS:
+            case HUMAN_CROSSBOWMEN:
+            case ORC_SHADOW_ARCHERS:
+            case ORC_POISON_BOWMEN:
+            case ORC_EXPLOSIVE_ARCHERS:
+            case ELVISH_WINDRIDER_ARCHERS:
+            case ELVISH_SILVERLEAF_BOWMEN:
+            case ELVISH_STORMRIDER_SNIPERS:
                 buildingType = BuildingType.ARCHERY_RANGE;
                 break;
+
             case HUMAN_CAVALRY_KNIGHTS:
             case HUMAN_LIGHT_CAVALRY:
-            case HUMAN_ROYAL_LANCERS, ORC_BLOODRIDERS, ORC_WAR_BOARS, ORC_WOLF_RAIDERS, ELVISH_GRYPHON_KNIGHTS, ELVISH_FOREST_RIDERS, ELVISH_MOONSHADOW_DRAGOONS:
+            case HUMAN_ROYAL_LANCERS:
+            case ORC_BLOODRIDERS:
+            case ORC_WAR_BOARS:
+            case ORC_WOLF_RAIDERS:
+            case ELVISH_GRYPHON_KNIGHTS:
+            case ELVISH_FOREST_RIDERS:
+            case ELVISH_MOONSHADOW_DRAGOONS:
                 buildingType = BuildingType.STABLE;
                 break;
+
             case HUMAN_SIEGE_ENGINEERS:
             case HUMAN_CATAPULTS:
-            case HUMAN_TREBUCHETS, ORC_SIEGE_GOLEMS, ORC_DEMOLISHERS, ORC_LAVA_RAMMERS, ELVISH_TREANT_SIEGE, ELVISH_EARTHEN_CATAPULTS, ELVISH_STARBREAKER_BALLISTAE:
+            case HUMAN_TREBUCHETS:
+            case ORC_SIEGE_GOLEMS:
+            case ORC_DEMOLISHERS:
+            case ORC_LAVA_RAMMERS:
+            case ELVISH_TREANT_SIEGE:
+            case ELVISH_EARTHEN_CATAPULTS:
+            case ELVISH_STARBREAKER_BALLISTAE:
                 buildingType = BuildingType.SIEGE_WORKSHOP;
                 break;
+
             default:
                 // Unsupported troop type
                 return null;
         }
+
         return buildingType;
     }
+
 
     @Transactional
     public void addTroopsToTrainingQueue(Long villageId, TroopType troopType, int quantity) {
