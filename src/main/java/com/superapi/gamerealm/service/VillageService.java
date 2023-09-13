@@ -131,7 +131,7 @@ public class VillageService {
                 }
 
                 if (villageRepository.findByXAndY(x, y) == null) {
-                    break; // Exit the loop once we find a vacant spot
+                    break;
                 }
             }
         }
@@ -240,7 +240,6 @@ public class VillageService {
         return village;
     }
 
-    // change to ded xd
     public void deleteVillage(Long id) {
         Optional<Village> optionalVillage = villageRepository.findById(id);
 
