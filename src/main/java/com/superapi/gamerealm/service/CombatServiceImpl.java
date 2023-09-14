@@ -21,7 +21,7 @@ import java.util.List;
 
         private int calculatePower(List<VillageTroops> troops) {
             return troops.stream()
-                    .mapToInt(Troop::getAttack)
+                    .mapToInt(VillageTroops::getAttack)
                     .sum();
         }
 
