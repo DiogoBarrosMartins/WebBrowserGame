@@ -1,9 +1,14 @@
 package com.superapi.gamerealm.service;
 
-/**
+
+import com.superapi.gamerealm.model.troop.VillageTroops;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 @Service
     public class CombatServiceImpl implements CombatService{
-        public void attack(List<Troop> attackingTroops, List<Troop> defendingTroops) {
+        public void attack(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops) {
             int attackingPower = calculatePower(attackingTroops);
             int defendingPower = calculatePower(defendingTroops);
 
@@ -14,7 +19,7 @@ package com.superapi.gamerealm.service;
             removeCasualties(defendingTroops, defendingCasualties);
         }
 
-        private int calculatePower(List<Troop> troops) {
+        private int calculatePower(List<VillageTroops> troops) {
             return troops.stream()
                     .mapToInt(Troop::getAttack)
                     .sum();
@@ -26,14 +31,14 @@ package com.superapi.gamerealm.service;
             return (int) Math.round(casualties * 100);
         }
 
-        private void removeCasualties(List<Troop> troops, int casualties) {
+        private void removeCasualties(List<VillageTroops> troops, int casualties) {
             int totalHealth = troops.stream()
                     .mapToInt(Troop::getHealth)
                     .sum();
 
             int casualtiesLeft = casualties;
 
-            for (Troop troop : troops) {
+            for (VillageTroops troop : troops) {
                 int troopHealth = troop.getHealth();
                 int troopCasualties = (int) Math.round((double) troopHealth / totalHealth * casualties);
 
@@ -52,6 +57,3 @@ package com.superapi.gamerealm.service;
     }
 
 
-
-
-**/
