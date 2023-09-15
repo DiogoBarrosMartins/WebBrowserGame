@@ -42,8 +42,9 @@ public class VillageTroops {
         }
     }
 
-    // ... getters, setters, etc.
-
+public int getAttack(){
+        return this.getTroopType().getAttack();
+}
     public Long getId() {
         return id;
     }
