@@ -1,19 +1,6 @@
 package com.superapi;
 
-import com.superapi.gamerealm.model.Village;
-import com.superapi.gamerealm.model.resources.Resources;
-import com.superapi.gamerealm.model.troop.TroopType;
-import com.superapi.gamerealm.model.troop.VillageTroops;
-import com.superapi.gamerealm.service.CombatService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+/**
 public class CombatServiceTest {
 
     private CombatService combatService;
@@ -88,3 +75,64 @@ public class CombatServiceTest {
 
 
 }
+
+ **/
+
+import com.superapi.gamerealm.model.Village;
+import com.superapi.gamerealm.model.troop.TroopType;
+import com.superapi.gamerealm.model.troop.VillageTroops;
+import com.superapi.gamerealm.service.CombatService;
+import com.superapi.gamerealm.service.ResourceService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.ArrayList;
+import java.util.List;
+    public class CombatServiceTest {
+
+        @InjectMocks
+    private CombatService combatService;
+
+    @Mock
+    private ResourceService resourceService;
+
+    @Mock
+    private Village defendingVillage;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+
+
+
+    @Test
+    public void testBasicAttack_AttackersWin() {
+
+        Village targetVillage = new Village();
+        targetVillage.setId(1L);  // Setting ID to avoid NullPointerException
+
+
+        Village targetVillage2 = new Village();
+        targetVillage.setId(2L);  // Setting ID to avoid NullPointerException
+        // Prepare test data
+        List<VillageTroops> attackingTroops = new ArrayList<>();
+        attackingTroops.add(new VillageTroops(targetVillage2,TroopType.HUMAN_FOOT_SOLDIER, 10));
+        attackingTroops.add(new VillageTroops(targetVillage2,TroopType.HUMAN_ARCHER_CORPS, 5));
+
+        List<VillageTroops> defendingTroops = new ArrayList<>();
+        defendingTroops.add(new VillageTroops(targetVillage,TroopType.HUMAN_FOOT_SOLDIER, 10));
+        defendingTroops.add(new VillageTroops(targetVillage,TroopType.HUMAN_ARCHER_CORPS, 5));
+
+        // Perform basic attack
+        combatService.basicAttack(attackingTroops, defendingTroops, targetVillage);
+
+
+    }
+
+}
+
