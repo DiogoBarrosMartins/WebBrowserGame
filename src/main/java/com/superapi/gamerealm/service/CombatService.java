@@ -190,25 +190,31 @@ public class CombatService {
     private void applyBasicDamage(List<VillageTroops> troops, int totalDamage) {
         System.out.println("Applying basic damage: " + totalDamage);
         for (VillageTroops troop : troops) {
-            if (troop.getQuantity() <= 0) {
-                System.out.println("Skipping, troop quantity is zero or below.");
+            if (troop.getQuantity() == 0) {
+                System.out.println("Skipping, troop quantity is zero.");
                 continue;
             }
 
             String troopType = troop.getTroopType().toString();
+            int previousDamage = accumulatedDamage.getOrDefault(troopType, 0);
+
             System.out.println("Troop Type: " + troopType + ", Quantity: " + troop.getQuantity());
 
-            int damagePerTroop = totalDamage / troop.getQuantity();
+            int newTotalDamage = previousDamage + totalDamage;
+            int damagePerTroop = newTotalDamage / troop.getQuantity();
+
             System.out.println("Damage per troop: " + damagePerTroop);
 
             int troopsKilled = damagePerTroop / troop.getTroopType().getHealth();
             System.out.println("Troops killed: " + troopsKilled);
 
             int survivingTroops = troop.getQuantity() - troopsKilled;
-            survivingTroops = Math.max(0, survivingTroops); // Ensure troop count doesn't go below zero
             System.out.println("Surviving troops: " + survivingTroops);
 
-            troop.setQuantity(survivingTroops);
+            int remainingDamage = newTotalDamage - (troopsKilled * troop.getTroopType().getHealth());
+            accumulatedDamage.put(troopType, remainingDamage);
+
+            troop.setQuantity(Math.max(0, survivingTroops));
         }
     }
 
@@ -230,7 +236,6 @@ public class CombatService {
     private boolean allTroopsDead(List<VillageTroops> troops) {
         return troops.stream().allMatch(t -> t.getQuantity() <= 0);
     }
-
 
 
     private void resolveCombat(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops, Village defendingVillage) {
