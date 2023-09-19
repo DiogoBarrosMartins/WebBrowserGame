@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -21,6 +22,21 @@ public class ResourceService {
     public ResourceService(ResourcesRepository resourcesRepository, VillageRepository villageRepository) {
         this.resourcesRepository = resourcesRepository;
         this.villageRepository = villageRepository;
+    }
+    public Map<TypeOfResource, Double> getAvailableResources(Long villageId) {
+        // Implement your logic to get the available resources for the given village
+        // This could involve database calls or other means to get the current resource levels
+        Map<TypeOfResource, Double> x = new HashMap<>();
+
+        Resources y = villageRepository.getById(villageId).getResources().get(0);
+x.put(TypeOfResource.WHEAT,y.getWheat());
+        x.put(TypeOfResource.STONE,y.getStone());
+
+        x.put(TypeOfResource.WOOD,y.getWood());
+
+        x.put(TypeOfResource.GOLD,y.getGold());
+
+return x;
     }
 
 

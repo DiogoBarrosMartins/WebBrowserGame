@@ -6,6 +6,7 @@ import com.superapi.gamerealm.model.troop.TroopType;
 import com.superapi.gamerealm.model.troop.VillageTroops;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +134,7 @@ public class CombatService {
 @Service
 public class CombatService {
 
-    private final Map<String, Integer> accumulatedDamage = new HashMap<>();
+
     private final ResourceService resourceService;
 
     public CombatService(ResourceService resourceService) {
@@ -141,20 +142,14 @@ public class CombatService {
     }
 
     public void basicAttack(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops, Village defendingVillage) {
+        Map<String, Integer> attackingAccumulatedDamage = new HashMap<>();
+        Map<String, Integer> defendingAccumulatedDamage = new HashMap<>();
         System.out.println("Starting basic attack...");
         boolean battleOver = false;
         while (!battleOver) {
             System.out.println("Simulating basic round...");
-
-            // Skip round if total attacking or defending damage is zero
-            int totalAttackingDamage = calculateTotalDamage(attackingTroops);
-            int totalDefendingDamage = calculateTotalDamage(defendingTroops);
-            if (totalAttackingDamage == 0 || totalDefendingDamage == 0) {
-                System.out.println("Skipping zero damage round.");
-                break;
-            }
-
-            simulateBasicRound(attackingTroops, defendingTroops);
+            simulateBasicRound(attackingTroops, defendingTroops, attackingAccumulatedDamage, defendingAccumulatedDamage);
+            // ... Other code
             battleOver = isBattleOver(attackingTroops, defendingTroops);
             System.out.println("Battle over? " + battleOver);
         }
@@ -162,10 +157,8 @@ public class CombatService {
         resolveCombat(attackingTroops, defendingTroops, defendingVillage);
     }
 
-
-    private void simulateBasicRound(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops) {
-
-        // Attack order simplified
+    public void simulateBasicRound(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops, Map<String, Integer> attackingAccumulatedDamage, Map<String, Integer> defendingAccumulatedDamage) {
+        // ... Other code
         TroopType.TroopCategory[] attackOrder = {
                 TroopType.TroopCategory.SIEGE,
                 TroopType.TroopCategory.ARCHER,
@@ -174,83 +167,91 @@ public class CombatService {
         };
 
         for (TroopType.TroopCategory category : attackOrder) {
-            System.out.println("Category: " + category);
-
             int attackingDamage = calculateTotalDamage(filterTroopsByCategory(attackingTroops, category));
             int defendingDamage = calculateTotalDamage(filterTroopsByCategory(defendingTroops, category));
-
-            System.out.println("Calculating attacking damage: " + attackingDamage);
-            System.out.println("Calculating defending damage: " + defendingDamage);
-
-            applyBasicDamage(defendingTroops, attackingDamage);
-            applyBasicDamage(attackingTroops, defendingDamage);
+            applyBasicDamage(defendingTroops, attackingDamage, defendingAccumulatedDamage);
+            applyBasicDamage(attackingTroops, defendingDamage, attackingAccumulatedDamage);
+            // ... Other code
         }
     }
 
-    private void applyBasicDamage(List<VillageTroops> troops, int totalDamage) {
-        System.out.println("Applying basic damage: " + totalDamage);
+    public void applyBasicDamage(List<VillageTroops> troops, int totalDamage, Map<String, Integer> accumulatedDamage) {
+        System.out.println("Total damage to be applied: " + totalDamage);
         for (VillageTroops troop : troops) {
-            if (troop.getQuantity() == 0) {
-                System.out.println("Skipping, troop quantity is zero.");
+            if (troop.getQuantity() <= 0) {
                 continue;
             }
 
             String troopType = troop.getTroopType().toString();
             int previousDamage = accumulatedDamage.getOrDefault(troopType, 0);
-
-            System.out.println("Troop Type: " + troopType + ", Quantity: " + troop.getQuantity());
-
             int newTotalDamage = previousDamage + totalDamage;
-            int damagePerTroop = newTotalDamage / troop.getQuantity();
 
-            System.out.println("Damage per troop: " + damagePerTroop);
+            System.out.println("Initial troop quantity: " + troop.getQuantity());
 
-            int troopsKilled = damagePerTroop / troop.getTroopType().getHealth();
-            System.out.println("Troops killed: " + troopsKilled);
+            int troopHealth = troop.getTroopType().getHealth();
+            int troopsKilled = newTotalDamage / troopHealth;
 
-            int survivingTroops = troop.getQuantity() - troopsKilled;
-            System.out.println("Surviving troops: " + survivingTroops);
+            // Calculate surviving troops
+            int survivingTroops = Math.max(0, troop.getQuantity() - troopsKilled);
 
-            int remainingDamage = newTotalDamage - (troopsKilled * troop.getTroopType().getHealth());
+            // Calculate remaining damage and update the map
+            int remainingDamage = newTotalDamage % troopHealth;
             accumulatedDamage.put(troopType, remainingDamage);
 
-            troop.setQuantity(Math.max(0, survivingTroops));
+            // Log and update
+            System.out.println("Troops killed: " + troopsKilled);
+            System.out.println("Surviving troops: " + survivingTroops);
+            troop.setQuantity(survivingTroops);
+
+            // Update totalDamage for the next troop type in the list
+            totalDamage = remainingDamage;
         }
     }
 
-
-    private int calculateTotalDamage(List<VillageTroops> troops) {
+    public int calculateTotalDamage(List<VillageTroops> troops) {
         return troops.stream().mapToInt(t -> t.getTroopType().getAttack() * t.getQuantity()).sum();
     }
 
-    private List<VillageTroops> filterTroopsByCategory(List<VillageTroops> troops, TroopType.TroopCategory category) {
+    public List<VillageTroops> filterTroopsByCategory(List<VillageTroops> troops, TroopType.TroopCategory category) {
         return troops.stream()
                 .filter(t -> t.getTroopType().getCategory() == category)
                 .collect(Collectors.toList());
     }
 
-    private boolean isBattleOver(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops) {
-        return allTroopsDead(attackingTroops) || allTroopsDead(defendingTroops);
+
+
+    public boolean isBattleOver(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops) {
+        boolean attackersDead = allTroopsDead(attackingTroops);
+        boolean defendersDead = allTroopsDead(defendingTroops);
+        System.out.println("Attackers all dead? " + attackersDead);
+        System.out.println("Defenders all dead? " + defendersDead);
+        return attackersDead || defendersDead;
     }
 
-    private boolean allTroopsDead(List<VillageTroops> troops) {
+    public boolean allTroopsDead(List<VillageTroops> troops) {
         return troops.stream().allMatch(t -> t.getQuantity() <= 0);
     }
 
 
-    private void resolveCombat(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops, Village defendingVillage) {
+    public void resolveCombat(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops, Village defendingVillage) {
         if (didAttackersWin(attackingTroops, defendingTroops)) {
             int totalCarryCapacity = calculateTotalCarryCapacity(attackingTroops);
-            System.out.println("Attackers won.");
-            // Divide the total carrying capacity by 4 to distribute among the resources
-            double perResourceCapacity = (double) totalCarryCapacity / 4;
+            System.out.println("Total Carrying Capacity: " + totalCarryCapacity);  // Debugging line
+
+
+            // Fetch available resources using the new method
+            Map<TypeOfResource, Double> availableResources = resourceService.getAvailableResources(defendingVillage.getId());
 
             // Create a map to store the resources to be deducted
-            Map<TypeOfResource, Double> resourcesToDeduct = new HashMap<>();
-            resourcesToDeduct.put(TypeOfResource.WOOD, perResourceCapacity);
-            resourcesToDeduct.put(TypeOfResource.WHEAT, perResourceCapacity);
-            resourcesToDeduct.put(TypeOfResource.STONE, perResourceCapacity);
-            resourcesToDeduct.put(TypeOfResource.GOLD, perResourceCapacity);
+            Map<TypeOfResource, Double> resourcesToDeduct = new EnumMap<>(TypeOfResource.class);
+            for (TypeOfResource resourceType : availableResources.keySet()) {
+                double availableAmount = availableResources.get(resourceType);
+                System.out.println("Resource Type: " + resourceType + ", Available Amount: " + availableAmount);  // Debugging line
+                double amountToDeduct = Math.min(availableAmount, totalCarryCapacity / 4.0);
+                resourcesToDeduct.put(resourceType, amountToDeduct);
+            }
+
+            System.out.println("Available Resources: " + availableResources);  // Debugging line
 
             // Deduct the resources from the defending village
             resourceService.deductResources(defendingVillage.getId(), resourcesToDeduct);
@@ -261,14 +262,9 @@ public class CombatService {
     }
 
 
-    private int calculateTotalCarryCapacity(List<VillageTroops> attackingTroops) {
-        int totalCarryCapacity = 0;
-        for (VillageTroops troop : attackingTroops) {
-            totalCarryCapacity += troop.getTroopType().getCarryCapacity() * troop.getQuantity();
-        }
-        return totalCarryCapacity;
+    public int calculateTotalCarryCapacity(List<VillageTroops> attackingTroops) {
+        return attackingTroops.stream().mapToInt(t -> t.getTroopType().getCarryCapacity() * t.getQuantity()).sum();
     }
-
 
     public boolean didAttackersWin(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops) {
         return allTroopsDead(defendingTroops);
