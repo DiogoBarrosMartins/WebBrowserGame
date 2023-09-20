@@ -1,83 +1,4 @@
 package com.superapi;
-
-/**
-public class CombatServiceTest {
-
-    private CombatService combatService;
-
-    @BeforeEach
-    public void setUp() {
-        combatService = new CombatService();
-    }
-
-    @Test
-    public void testAdvancedAttack() {
-        Village defendingVillage = new Village(); // Initialize as needed
-        Resources resources = new Resources();
-        resources.setWood(100.0);
-        resources.setStone(100.0);
-        resources.setGold(100.0);
-        resources.setWheat(100.0);
-        defendingVillage.setResources(Arrays.asList(resources));
-
-        List<VillageTroops> attackers = Arrays.asList(new VillageTroops(null, TroopType.HUMAN_FOOT_SOLDIER, 10));
-        List<VillageTroops> defenders = Arrays.asList(new VillageTroops(null, TroopType.HUMAN_FOOT_SOLDIER, 5));
-
-        combatService.advancedAttack(attackers, defenders, defendingVillage);
-
-        // Assert that attackers have won (indirectly tests isBattleOver() and didAttackersWin())
-        assertTrue(defenders.stream().allMatch(t -> t.getQuantity() <= 0));
-
-        // Assert that resources have been plundered (indirectly tests handleAdvancedResourceSpoils())
-        assertEquals(90.0, resources.getWood());  // Assuming 10% of resources are plundered
-    }
-    @Test
-    public void testAdvancedAttack_DefendersWin() {
-        Village defendingVillage = new Village(); // Initialize as needed
-        Resources resources = new Resources();
-        resources.setWood(100.0);
-        resources.setStone(100.0);
-        resources.setGold(100.0);
-        resources.setWheat(100.0);
-        defendingVillage.setResources(Arrays.asList(resources));
-
-        List<VillageTroops> attackers = Arrays.asList(new VillageTroops(null, TroopType.HUMAN_FOOT_SOLDIER, 5));
-        List<VillageTroops> defenders = Arrays.asList(new VillageTroops(null, TroopType.HUMAN_FOOT_SOLDIER, 10));
-
-        combatService.advancedAttack(attackers, defenders, defendingVillage);
-
-        // Indirectly test isBattleOver() and didAttackersWin() by asserting that defenders have won
-        assertTrue(attackers.stream().allMatch(t -> t.getQuantity() <= 0));
-
-        // Indirectly test handleAdvancedResourceSpoils() by asserting that resources have not been plundered
-        assertEquals(100.0, resources.getWood());  // Assuming no resources are plundered if defenders win
-    }
-
-    @Test
-    public void testSimulateRound() {
-        // Setup
-        Village defendingVillage = new Village();
-        Resources resources = new Resources();
-        resources.setWood(100.0);
-        resources.setStone(100.0);
-        resources.setGold(100.0);
-        resources.setWheat(100.0);
-        defendingVillage.setResources(Arrays.asList(resources));
-        List<VillageTroops> attackers = Arrays.asList(new VillageTroops(null, TroopType.HUMAN_FOOT_SOLDIER, 10));
-        List<VillageTroops> defenders = Arrays.asList(new VillageTroops(null, TroopType.HUMAN_FOOT_SOLDIER, 5));
-
-        // Act
-        combatService.advancedAttack(attackers, defenders, defendingVillage);
-
-        // Assert: You can indirectly test that `simulateRound` is doing its job correctly by checking the state of troops after the attack.
-        assertTrue(defenders.stream().allMatch(t -> t.getQuantity() <= 0));
-    }
-
-
-}
-
- **/
-
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.troop.TroopType;
@@ -89,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -495,6 +415,7 @@ public class CombatServiceTest {
 
         Village defendingVillage = new Village();
         defendingVillage.setId(2L);
+
         List<VillageTroops> attackingTroops = new ArrayList<>();
         attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_FOOT_SOLDIER, 100));
         attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_ARCHER_CORPS, 100));
@@ -503,16 +424,100 @@ public class CombatServiceTest {
         List<VillageTroops> defendingTroops = new ArrayList<>();
         defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_WARRIORS, 10));
 
+        combatService.basicAttack(attackingTroops, defendingTroops, defendingVillage);
+        assertTrue(combatService.allTroopsDead(defendingTroops));
+        assertFalse(combatService.allTroopsDead(attackingTroops));
+
+    }
+    @Test
+    public void testBasicAttack_AllHumanVsAllOrc_LargeScaleBattle() {
+        Village attackingVillage = new Village();
+        attackingVillage.setId(1L);
+
+        Village defendingVillage = new Village();
+        defendingVillage.setId(2L);
+
+        // All types of Human troops
+        List<VillageTroops> attackingTroops = new ArrayList<>();
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_FOOT_SOLDIER, 100));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_IMPERIAL_GUARD, 100));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_FOOT_KNIGHT, 100));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_FOOT_MAGES, 50));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_ARCHER_CORPS, 200));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_LONG_BOWMEN, 200));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_CROSSBOWMEN, 100));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_CAVALRY_KNIGHTS, 50));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_LIGHT_CAVALRY, 50));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_ROYAL_LANCERS, 20));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_SIEGE_ENGINEERS, 10));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_CATAPULTS, 5));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_TREBUCHETS, 3));
+        // All types of Orc troops, including the missing ones
+        List<VillageTroops> defendingTroops = new ArrayList<>();
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_WARRIORS, 100));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_BRUTE_WARRIORS, 100));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_BLOODRAGE_BERSERKERS, 100));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_SHAMAN_WARRIORS, 50));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_SHADOW_ARCHERS, 200));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_POISON_BOWMEN, 200));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_EXPLOSIVE_ARCHERS, 100));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_BLOODRIDERS, 50));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_WAR_BOARS, 50));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_WOLF_RAIDERS, 20));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_SIEGE_GOLEMS, 10));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_DEMOLISHERS, 5));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ORC_LAVA_RAMMERS, 3));
+
+        // Perform basic attack
+
+        combatService.basicAttack(attackingTroops, defendingTroops, defendingVillage);
+        assertFalse(combatService.allTroopsDead(defendingTroops));
+        assertTrue(combatService.allTroopsDead(attackingTroops));
+    }
+    @Test
+    public void testBasicAttack_AllHumanVsAllElf_LargeScaleBattle() {
+        Village attackingVillage = new Village();
+        attackingVillage.setId(1L);
+
+        Village defendingVillage = new Village();
+        defendingVillage.setId(2L);
+
+
+        // All types of Human troops
+        List<VillageTroops> attackingTroops = new ArrayList<>();
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_FOOT_SOLDIER, 100));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_IMPERIAL_GUARD, 100));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_FOOT_KNIGHT, 100));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_FOOT_MAGES, 50));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_ARCHER_CORPS, 200));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_LONG_BOWMEN, 200));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_CROSSBOWMEN, 100));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_CAVALRY_KNIGHTS, 50));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_LIGHT_CAVALRY, 50));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_ROYAL_LANCERS, 20));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_SIEGE_ENGINEERS, 10));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_CATAPULTS, 5));
+        attackingTroops.add(new VillageTroops(attackingVillage, TroopType.HUMAN_TREBUCHETS, 3));
+        List<VillageTroops> defendingTroops = new ArrayList<>();
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_SCOUTS, 100));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_FOREST_ARCHERS, 100));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_ELITE_RANGERS, 50));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_DRUID_WARRIORS, 50));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_WINDRIDER_ARCHERS, 200));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_SILVERLEAF_BOWMEN, 200));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_STORMRIDER_SNIPERS, 100));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_GRYPHON_KNIGHTS, 50));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_FOREST_RIDERS, 50));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_MOONSHADOW_DRAGOONS, 20));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_TREANT_SIEGE, 10));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_EARTHEN_CATAPULTS, 5));
+        defendingTroops.add(new VillageTroops(defendingVillage, TroopType.ELVISH_STARBREAKER_BALLISTAE, 3));
+
         // Perform basic attack
         combatService.basicAttack(attackingTroops, defendingTroops, defendingVillage);
-
-        // Assertions
-        assertTrue(combatService.allTroopsDead(attackingTroops));
         assertFalse(combatService.allTroopsDead(defendingTroops));
+        assertTrue(combatService.allTroopsDead(attackingTroops));
     }
-
-
-
     @Test
     public void testBasicAttack_MixedTroopTypes_DefendersWin() {
 

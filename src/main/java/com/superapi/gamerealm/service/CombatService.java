@@ -145,20 +145,15 @@ public class CombatService {
         Map<String, Integer> attackingAccumulatedDamage = new HashMap<>();
         Map<String, Integer> defendingAccumulatedDamage = new HashMap<>();
         System.out.println("Starting basic attack...");
-        boolean battleOver = false;
-        while (!battleOver) {
-            System.out.println("Simulating basic round...");
+        while (!isBattleOver(attackingTroops, defendingTroops)) {
             simulateBasicRound(attackingTroops, defendingTroops, attackingAccumulatedDamage, defendingAccumulatedDamage);
-            // ... Other code
-            battleOver = isBattleOver(attackingTroops, defendingTroops);
-            System.out.println("Battle over? " + battleOver);
         }
         System.out.println("Resolving combat...");
         resolveCombat(attackingTroops, defendingTroops, defendingVillage);
     }
-
-    public void simulateBasicRound(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops, Map<String, Integer> attackingAccumulatedDamage, Map<String, Integer> defendingAccumulatedDamage) {
-        // ... Other code
+    public void simulateBasicRound(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops,
+                                    Map<String, Integer> attackingAccumulatedDamage, Map<String, Integer> defendingAccumulatedDamage) {
+        // Define attack order based on troop categories
         TroopType.TroopCategory[] attackOrder = {
                 TroopType.TroopCategory.SIEGE,
                 TroopType.TroopCategory.ARCHER,
@@ -166,12 +161,13 @@ public class CombatService {
                 TroopType.TroopCategory.FOOT
         };
 
+        // Loop through each category and apply damage
         for (TroopType.TroopCategory category : attackOrder) {
             int attackingDamage = calculateTotalDamage(filterTroopsByCategory(attackingTroops, category));
             int defendingDamage = calculateTotalDamage(filterTroopsByCategory(defendingTroops, category));
+
             applyBasicDamage(defendingTroops, attackingDamage, defendingAccumulatedDamage);
             applyBasicDamage(attackingTroops, defendingDamage, attackingAccumulatedDamage);
-            // ... Other code
         }
     }
 
@@ -209,7 +205,11 @@ public class CombatService {
     }
 
     public int calculateTotalDamage(List<VillageTroops> troops) {
-        return troops.stream().mapToInt(t -> t.getTroopType().getAttack() * t.getQuantity()).sum();
+        int totalDamage = 0;
+        for (VillageTroops troop : troops) {
+            totalDamage += troop.getTroopType().getAttack() * troop.getQuantity();
+        }
+        return totalDamage;
     }
 
     public List<VillageTroops> filterTroopsByCategory(List<VillageTroops> troops, TroopType.TroopCategory category) {
