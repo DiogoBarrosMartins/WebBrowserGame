@@ -12,11 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
-
-@Service
-public class CombatService {
-
 
 
     /**
@@ -40,90 +35,6 @@ public class CombatService {
      * attacking archers
      * attacking foot troops
      * defending foot troops
-
-
-    public void advancedAttack(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops, Village defendingVillage) {
-        boolean battleOver = false;
-        while (!battleOver) {
-            simulateRound(attackingTroops, defendingTroops);
-            battleOver = isBattleOver(attackingTroops, defendingTroops);
-        }
-        resolveCombat(attackingTroops, defendingTroops, defendingVillage);
-    }
-
-    private void simulateRound(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops) {
-        distributeDamage(defendingTroops, calculateTotalDamage(filterTroopsByCategory(attackingTroops, TroopType.TroopCategory.SIEGE)));
-        distributeDamage(attackingTroops, calculateTotalDamage(filterTroopsByCategory(defendingTroops, TroopType.TroopCategory.SIEGE)));
-        distributeDamage(attackingTroops, calculateTotalDamage(filterTroopsByCategory(defendingTroops, TroopType.TroopCategory.ARCHER)));
-        distributeDamage(defendingTroops, calculateTotalDamage(filterTroopsByCategory(attackingTroops, TroopType.TroopCategory.CAVALRY)));
-        distributeDamage(attackingTroops, calculateTotalDamage(filterTroopsByCategory(defendingTroops, TroopType.TroopCategory.CAVALRY)));
-        distributeDamage(defendingTroops, calculateTotalDamage(filterTroopsByCategory(attackingTroops, TroopType.TroopCategory.ARCHER)));
-        distributeDamage(defendingTroops, calculateTotalDamage(filterTroopsByCategory(attackingTroops, TroopType.TroopCategory.FOOT)));
-        distributeDamage(attackingTroops, calculateTotalDamage(filterTroopsByCategory(defendingTroops, TroopType.TroopCategory.FOOT)));
-    }
-
-    private void distributeDamage(List<VillageTroops> receivingTroops, int totalDamage) {
-        Random rand = new Random();
-        while (totalDamage > 0 && !allTroopsDead(receivingTroops)) {
-            VillageTroops randomTroop = getRandomLivingTroop(receivingTroops, rand);
-            int damageToDeal = Math.min(totalDamage, randomTroop.getTroopType().getHealth());
-            int casualties = damageToDeal / randomTroop.getTroopType().getHealth();
-            int remainingTroops = randomTroop.getQuantity() - casualties;
-            randomTroop.setQuantity(Math.max(0, remainingTroops));
-            totalDamage -= damageToDeal;
-        }
-    }
-
-    private VillageTroops getRandomLivingTroop(List<VillageTroops> troops) {
-        Random rand = new Random();
-        List<VillageTroops> livingTroops = troops.stream().filter(t -> t.getQuantity() > 0).collect(Collectors.toList());
-        if (livingTroops.isEmpty()) {
-            return null;
-        }
-        return livingTroops.get(rand.nextInt(livingTroops.size()));
-    }
-
-
-    // Separates troops by category
-    private List<VillageTroops> filterTroopsByCategory(List<VillageTroops> troops, TroopType.TroopCategory category) {
-        return troops.stream()
-                .filter(t -> t.getTroopType().getCategory() == category)
-                .collect(Collectors.toList());
-    }
-
-    private int calculateTotalDamage(List<VillageTroops> troops) {
-        int totalDamage = 0;
-        for (VillageTroops troop : troops) {
-            totalDamage += troop.getTroopType().getAttack() * troop.getQuantity();
-        }
-        return totalDamage;
-    }
-
-    private List<VillageTroops> filterTroopsByCategory(List<VillageTroops> troops, TroopType.TroopCategory category) {
-        return troops.stream()
-                .filter(troop -> troop.getTroopType().getCategory() == category)
-                .collect(Collectors.toList());
-    }
-
-    private boolean isBattleOver(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops) {
-        return allTroopsDead(attackingTroops) || allTroopsDead(defendingTroops);
-    }
-
-    private boolean allTroopsDead(List<VillageTroops> troops) {
-        return troops.stream().allMatch(t -> t.getQuantity() <= 0);
-    }
-
-    private VillageTroops getRandomLivingTroop(List<VillageTroops> troops, Random rand) {
-        List<VillageTroops> livingTroops = troops.stream()
-                .filter(t -> t.getQuantity() > 0)
-                .collect(Collectors.toList());
-        return livingTroops.get(rand.nextInt(livingTroops.size()));
-    }
-    // Determine if the attackers won
-    private boolean didAttackersWin(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops) {
-        return defendingTroops.stream().allMatch(t -> t.getQuantity() <= 0);
-    }
-}
 
 **/
 
