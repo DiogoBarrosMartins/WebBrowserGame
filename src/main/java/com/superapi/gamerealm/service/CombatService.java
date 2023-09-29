@@ -64,7 +64,7 @@ public class CombatService {
     }
     public void simulateBasicRound(List<VillageTroops> attackingTroops, List<VillageTroops> defendingTroops,
                                     Map<String, Integer> attackingAccumulatedDamage, Map<String, Integer> defendingAccumulatedDamage) {
-        // Define attack order based on troop categories as commented above
+        // This order is a short version of what an "advanced" attack should do in the future
         TroopType.TroopCategory[] attackOrder = {
                 TroopType.TroopCategory.SIEGE,
                 TroopType.TroopCategory.ARCHER,
