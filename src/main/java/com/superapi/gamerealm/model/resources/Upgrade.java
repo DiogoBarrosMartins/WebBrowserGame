@@ -62,17 +62,13 @@ public class Upgrade {
             {7709, 3855, 3855, 1927}
     };
     public static int[] getResourceBuildingResourcesNeeded(String type, int level) {
-        if (type.equals("FOREST")) {
-            return FOREST_RESOURCES_NEEDED[level ];
-        } else if (type.equals("MINE")) {
-            return MINE_RESOURCES_NEEDED[level ];
-        } else if (type.equals("QUARRY")) {
-            return QUARRY_RESOURCES_NEEDED[level ];
-        } else if (type.equals("FARM")) {
-            return FARM_RESOURCES_NEEDED[level ];
-        } else {
-            throw new IllegalArgumentException("Invalid building type: " + type);
-        }
+        return switch (type) {
+            case "FOREST" -> FOREST_RESOURCES_NEEDED[level];
+            case "MINE" -> MINE_RESOURCES_NEEDED[level];
+            case "QUARRY" -> QUARRY_RESOURCES_NEEDED[level];
+            case "FARM" -> FARM_RESOURCES_NEEDED[level];
+            default -> throw new IllegalArgumentException("Invalid building type: " + type);
+        };
     }
     public static final int[][] BARRACKS_RESOURCES_NEEDED = {
             {200, 200, 100, 50},
@@ -127,7 +123,7 @@ public class Upgrade {
     };
 
     public static int[] getNonResourceBuildingResourcesNeeded(String type, int level) {
-            return BARRACKS_RESOURCES_NEEDED[level ];
+            return BARRACKS_RESOURCES_NEEDED[level];
         }
 
 
@@ -135,42 +131,16 @@ public class Upgrade {
 
 
         public static Map<TypeOfResource, Double> getResourceNeeded(BuildingType buildingType, int level) {
-            int[] resourcesNeededArray;
-
-            switch (buildingType) {
-                case FOREST:
-                    resourcesNeededArray = FOREST_RESOURCES_NEEDED[level];
-                    break;
-                case MINE:
-                    resourcesNeededArray = MINE_RESOURCES_NEEDED[level];
-                    break;
-                case QUARRY:
-                    resourcesNeededArray = QUARRY_RESOURCES_NEEDED[level];
-                    break;
-                case FARM:
-                    resourcesNeededArray = FARM_RESOURCES_NEEDED[level];
-                    break;
-                case BARRACKS:
-                    resourcesNeededArray = BARRACKS_RESOURCES_NEEDED[level];
-
-break;
-                case ARCHERY_RANGE:
-                    resourcesNeededArray = BARRACKS_RESOURCES_NEEDED[level];
-
-                    break;
-                case SIEGE_WORKSHOP:
-                    resourcesNeededArray = BARRACKS_RESOURCES_NEEDED[level];
-
-                    break;
-                case STABLE:
-
-                    resourcesNeededArray = BARRACKS_RESOURCES_NEEDED[level];
-
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("Invalid building type: " + buildingType);
-            }
+            int[] resourcesNeededArray = switch (buildingType) {
+                case FOREST -> FOREST_RESOURCES_NEEDED[level];
+                case MINE -> MINE_RESOURCES_NEEDED[level];
+                case QUARRY -> QUARRY_RESOURCES_NEEDED[level];
+                case FARM -> FARM_RESOURCES_NEEDED[level];
+                case BARRACKS, SIEGE_WORKSHOP, PUB -> BARRACKS_RESOURCES_NEEDED[level];
+                case ARCHERY_RANGE -> ARCHERY_RANGE_RESOURCES_NEEDED[level];
+                case STABLE -> STABLES_RESOURCES_NEEDED[level];
+                default -> throw new IllegalArgumentException("Invalid building type: " + buildingType);
+            };
 
 
             Map<TypeOfResource, Double> resourcesNeeded = new HashMap<>();
