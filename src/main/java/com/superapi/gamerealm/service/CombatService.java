@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public class CombatService {
 
 
-    private final ResourceService resourceService;
+        private final ResourceService resourceService;
 
     public CombatService(ResourceService resourceService) {
         this.resourceService = resourceService;
