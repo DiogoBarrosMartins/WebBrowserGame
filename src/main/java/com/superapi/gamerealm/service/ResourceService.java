@@ -29,14 +29,11 @@ public class ResourceService {
         Map<TypeOfResource, Double> x = new HashMap<>();
 
         Resources y = villageRepository.getById(villageId).getResources().get(0);
-x.put(TypeOfResource.WHEAT,y.getWheat());
+        x.put(TypeOfResource.WHEAT,y.getWheat());
         x.put(TypeOfResource.STONE,y.getStone());
-
         x.put(TypeOfResource.WOOD,y.getWood());
-
         x.put(TypeOfResource.GOLD,y.getGold());
-
-return x;
+        return x;
     }
 
 
