@@ -70,29 +70,6 @@ public class TroopTrainingService {
                 buildingType = BuildingType.ARCHERY_RANGE;
                 break;
 
-            case HUMAN_CAVALRY_KNIGHTS:
-            case HUMAN_LIGHT_CAVALRY:
-            case HUMAN_ROYAL_LANCERS:
-            case ORC_BLOODRIDERS:
-            case ORC_WAR_BOARS:
-            case ORC_WOLF_RAIDERS:
-            case ELVISH_GRYPHON_KNIGHTS:
-            case ELVISH_FOREST_RIDERS:
-            case ELVISH_MOONSHADOW_DRAGOONS:
-                buildingType = BuildingType.STABLE;
-                break;
-
-            case HUMAN_SIEGE_ENGINEERS:
-            case HUMAN_CATAPULTS:
-            case HUMAN_TREBUCHETS:
-            case ORC_SIEGE_GOLEMS:
-            case ORC_DEMOLISHERS:
-            case ORC_LAVA_RAMMERS:
-            case ELVISH_TREANT_SIEGE:
-            case ELVISH_EARTHEN_CATAPULTS:
-            case ELVISH_STARBREAKER_BALLISTAE:
-                buildingType = BuildingType.SIEGE_WORKSHOP;
-                break;
 
             default:
                 // Unsupported troop type
@@ -139,7 +116,7 @@ public class TroopTrainingService {
         resourceService.deductResources(villageId, totalCost);
         // Adjust training time based on barracks level
         double reductionPercentagePerLevel = 0.02;  // 2% reduction for each level
-        double adjustedTrainingTime = troopType.getTrainingTime() * (1 - reductionPercentagePerLevel * building.getLevel());
+        double adjustedTrainingTime = troopType.getTrainingTime() * (1 - reductionPercentagePerLevel * building.getBuildingLevel());
 
         // Calculate training start and end times
         LocalDateTime trainingStartTime = LocalDateTime.now();
@@ -253,16 +230,7 @@ public class TroopTrainingService {
                     TroopType.ORC_POISON_BOWMEN, TroopType.ORC_EXPLOSIVE_ARCHERS,
                     TroopType.ELVISH_WINDRIDER_ARCHERS, TroopType.ELVISH_SILVERLEAF_BOWMEN,
                     TroopType.ELVISH_STORMRIDER_SNIPERS).contains(troop);
-            case STABLE -> Arrays.asList(TroopType.HUMAN_CAVALRY_KNIGHTS, TroopType.HUMAN_LIGHT_CAVALRY,
-                    TroopType.HUMAN_ROYAL_LANCERS, TroopType.ORC_BLOODRIDERS,
-                    TroopType.ORC_WAR_BOARS, TroopType.ORC_WOLF_RAIDERS,
-                    TroopType.ELVISH_GRYPHON_KNIGHTS, TroopType.ELVISH_FOREST_RIDERS,
-                    TroopType.ELVISH_MOONSHADOW_DRAGOONS).contains(troop);
-            case SIEGE_WORKSHOP -> Arrays.asList(TroopType.HUMAN_SIEGE_ENGINEERS, TroopType.HUMAN_CATAPULTS,
-                    TroopType.HUMAN_TREBUCHETS, TroopType.ORC_SIEGE_GOLEMS,
-                    TroopType.ORC_DEMOLISHERS, TroopType.ORC_LAVA_RAMMERS,
-                    TroopType.ELVISH_TREANT_SIEGE, TroopType.ELVISH_EARTHEN_CATAPULTS,
-                    TroopType.ELVISH_STARBREAKER_BALLISTAE).contains(troop);
+
             default -> false;
         };
     }
@@ -297,7 +265,7 @@ public class TroopTrainingService {
                 return false;
         }
 
-        return building.getLevel() >= requiredLevel;
+        return building.getBuildingLevel() >= requiredLevel;
     }
     private void scheduleTrainingCompletion(TroopTrainingQueue troopTrainingQueue) {
 

@@ -31,7 +31,7 @@ public class UpgradeController {
             return ResponseEntity.notFound().build();
         }
         try {
-            Building upgradedBuilding = buildingService.upgradeBuilding(building);
+            Building upgradedBuilding = buildingService.upgradeBuilding(building.getId());
             // Assuming you have a service or mapper to convert a Village entity to VillageDTO
             VillageDTO villageDTO = villageMapper.villageToVillageDTO(upgradedBuilding.getVillage());
             return ResponseEntity.ok(villageDTO);

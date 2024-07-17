@@ -11,7 +11,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -41,6 +40,9 @@ public class Building {
     private BigDecimal productionRate;
     private int buildingLevel;
     private final int maxLevel = 10;
+
+
+
 
     // Existing constructors and methods...
 
@@ -106,13 +108,7 @@ public class Building {
         this.startedAt = startedAt;
     }
 
-    public long getTimeToUpgrade() {
-        return timeToUpgrade;
-    }
 
-    public void setTimeToUpgrade(Date timeToUpgrade) {
-        this.timeToUpgrade = timeToUpgrade;
-    }
 
     public BuildingType getType() {
         return type;
@@ -140,5 +136,13 @@ public class Building {
 
     public int getMaxLevel() {
         return maxLevel;
+    }
+
+    public LocalDateTime getTimeToUpgrade() {
+        return timeToUpgrade;
+    }
+
+    public void setTimeToUpgrade(LocalDateTime timeToUpgrade) {
+        this.timeToUpgrade = timeToUpgrade;
     }
 }

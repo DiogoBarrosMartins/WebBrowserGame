@@ -4,7 +4,7 @@ import com.superapi.gamerealm.dto.building.BuildingMapper;
 import com.superapi.gamerealm.dto.building.NonResourceBuildingDTO;
 import com.superapi.gamerealm.dto.building.ResourceBuildingDTO;
 import com.superapi.gamerealm.model.buildings.Building;
-import com.superapi.gamerealm.model.buildings.BuildingType;
+
 import com.superapi.gamerealm.model.buildings.Construction;
 import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.resources.Upgrade;
@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -94,23 +92,32 @@ public class BuildingService {
             throw new IllegalStateException("Player doesn't have enough resources to upgrade this building.");
         }
     }
-
     private void deductResourcesAndInitiateConstruction(Building building, Map<TypeOfResource, Double> resourcesNeeded) {
         resourceService.deductResources(building.getVillage().getId(), resourcesNeeded);
 
+
+        // Create a new Construction instance
         Construction construction = new Construction();
         construction.setBuildingId(building.getId());
         construction.setVillage(building.getVillage());
         LocalDateTime now = LocalDateTime.now();
         construction.setStartedAt(now);
-        construction.setEndsAt(now.plusMinutes(building.getTimeToUpgrade()));
 
+        // Calculate and set the end time for construction
+        LocalDateTime endsAt = now.plusMinutes(building.getTimeToUpgrade().getMinute()); // Assuming timeToUpgrade is a LocalDateTime
+        construction.setEndsAt(endsAt);
+
+        // Save the construction instance
         constructionRepository.save(construction);
-        building.setTimeToUpgrade(Date.from(construction.getEndsAt().atZone(ZoneId.systemDefault()).toInstant()));
-        buildingRepository.save(building);
 
+        // Set timeToUpgrade in the Building instance
+        building.setTimeToUpgrade(construction.getEndsAt());
+        buildingRepository.save(building); // Save the updated Building instance
+
+        // Schedule construction completion
         scheduleConstructionCompletion(construction);
     }
+
 
     private void scheduleConstructionCompletion(Construction construction) {
         long delay = Duration.between(LocalDateTime.now(), construction.getEndsAt()).toMillis();
