@@ -7,41 +7,36 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BuildingMapper {
+
     public static ResourceBuildingDTO toResourceBuildingDTO(Building building) {
         ResourceBuildingDTO dto = new ResourceBuildingDTO();
         dto.setId(building.getId());
         dto.setType(building.getType());
-        dto.setLevel(building.getLevel());
+        dto.setLevel(building.getBuildingLevel());
         dto.setProductionRate(building.getProductionRate());
         dto.setMaxLevel(building.getMaxLevel());
         dto.setNextLevelProductionRate(building.getNextLevelProductionRate());
-      dto.setTimeToUpgrade(Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel()]);
-        // Set the resourcesNeeded attribute based on the building type and level
-        String buildingTypeString = building.getType().toString();
-        int[] resourcesNeeded = Upgrade.getResourceBuildingResourcesNeeded(buildingTypeString, building.getLevel());
-        dto.setResourcesNeeded(resourcesNeeded);
+        dto.setTimeToUpgrade(Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES[building.getBuildingLevel()]);
+        dto.setResourcesNeeded(getResourcesNeeded(building.getType(), building.getBuildingLevel()));
 
         return dto;
     }
 
-
     public static NonResourceBuildingDTO toNonResourceBuildingDTO(Building building) {
-        int level = building.getLevel();
-        int maxLevel = building.getMaxLevel();
-        BuildingType type = building.getType();
-        int[] resourcesNeeded = Upgrade.getNonResourceBuildingResourcesNeeded(type.toString(), level);
+        int[] resourcesNeeded = Upgrade.getResourcesNeeded(BuildingType.valueOf(building.getType().toString()), building.getBuildingLevel());
 
         return new NonResourceBuildingDTO(
                 building.getId(),
-                type,
-                level,
-                maxLevel,
+                building.getType(),
+                building.getBuildingLevel(),
+                building.getMaxLevel(),
                 resourcesNeeded,
-                // You need to set the correct value for the timeLeft attribute based on your requirements
-                // For now, let's set it to 0 as you have in the NonResourceBuildingDTO constructor
-                0
+                0 // Placeholder for timeLeft, adjust as per your application logic
         );
     }
 
+    private static int[] getResourcesNeeded(BuildingType type, int level) {
+        return Upgrade.getResourcesNeeded(type,level);
 
+    }
 }

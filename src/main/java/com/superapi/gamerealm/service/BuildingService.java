@@ -10,6 +10,7 @@ import com.superapi.gamerealm.model.resources.TypeOfResource;
 import com.superapi.gamerealm.model.resources.Upgrade;
 import com.superapi.gamerealm.repository.BuildingRepository;
 import com.superapi.gamerealm.repository.ConstructionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,144 +27,113 @@ import java.util.stream.Collectors;
 
 @Service
 public class BuildingService {
-    private final BuildingRepository buildingRepository;
-    private final ResourceService resourceService;
 
+    private final BuildingRepository buildingRepository;
     private final ConstructionRepository constructionRepository;
+    private final ResourceService resourceService;
 
     @Autowired
     public BuildingService(BuildingRepository buildingRepository, ConstructionRepository constructionRepository, ResourceService resourceService) {
         this.buildingRepository = buildingRepository;
         this.constructionRepository = constructionRepository;
         this.resourceService = resourceService;
-
     }
 
     public List<ResourceBuildingDTO> getAllResourceBuildingsInVillage(Long villageId) {
         List<Building> buildings = buildingRepository.findByVillageId(villageId);
-
         return buildings.stream()
-                .filter(building -> building.getType() == BuildingType.FARM
-                        || building.getType() == BuildingType.QUARRY
-                        || building.getType() == BuildingType.MINE
-                        || building.getType() == BuildingType.FOREST)
+                .filter(Building::isResourceBuilding)
                 .map(BuildingMapper::toResourceBuildingDTO)
                 .collect(Collectors.toList());
     }
 
-
     public List<NonResourceBuildingDTO> getAllNonResourceBuildingsInVillage(Long villageId) {
         List<Building> buildings = buildingRepository.findByVillageId(villageId);
         return buildings.stream()
-                .filter(building -> building.getType() != BuildingType.FARM
-                        && building.getType() != BuildingType.QUARRY
-                        && building.getType() != BuildingType.MINE
-                        && building.getType() != BuildingType.FOREST)
+                .filter(building -> !building.isResourceBuilding())
                 .map(BuildingMapper::toNonResourceBuildingDTO)
                 .collect(Collectors.toList());
     }
 
-    public Building upgradeBuilding(Building building) {
+    @Transactional
+    public Building upgradeBuilding(Long buildingId) {
+        Building building = buildingRepository.findById(buildingId)
+                .orElseThrow(() -> new IllegalArgumentException("Building not found"));
 
-        Construction existingConstruction = constructionRepository.findByBuildingId(building.getId());
-        if (existingConstruction != null) {
-            // Handle the situation, e.g., throw an exception with a custom message
+        validateUpgradeConditions(building);
+
+        Map<TypeOfResource, Double> resourcesNeeded = Upgrade.getResourceNeeded(building.getType(), building.getBuildingLevel());
+        validateResourcesForUpgrade(building.getVillage().getId(), resourcesNeeded);
+
+        deductResourcesAndInitiateConstruction(building, resourcesNeeded);
+
+        return building;
+    }
+
+    @Transactional
+    public void processOverdueConstructions(Long villageId) {
+        List<Construction> constructions = constructionRepository.findByVillageId(villageId);
+        LocalDateTime now = LocalDateTime.now();
+        constructions.stream()
+                .filter(construction -> construction.getEndsAt().isBefore(now))
+                .forEach(this::completeConstruction);
+    }
+
+    private void validateUpgradeConditions(Building building) {
+        if (constructionRepository.findByBuildingId(building.getId()) != null) {
             throw new IllegalStateException("An upgrade is already in progress for this building.");
         }
 
-        // Check if the building can be upgraded
-        if (building.getLevel() >= building.getMaxLevel()) {
+        if (building.getBuildingLevel() >= building.getMaxLevel()) {
             throw new IllegalStateException("Building is already at the maximum level.");
         }
+    }
 
-        // Check if the player has enough resources to upgrade the building
-        Map<TypeOfResource, Double> resourcesNeeded = Upgrade.getResourceNeeded(building.getType(), building.getLevel());
-
-        if (resourceService.hasEnoughResources(building.getVillage().getId(), resourcesNeeded)) {
-            // Deduct the required resources from the player's inventory
-            resourceService.deductResources(building.getVillage().getId(), resourcesNeeded);
-
-            Construction construction = new Construction();
-            construction.setBuildingId(building.getId());
-            construction.setVillage(building.getVillage());
-
-            // Calculate the upgrade time and set the construction's startedAt and endsAt
-            Double upgradeTimeInMinutes = building.isResourceBuilding() ?
-                    Upgrade.RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel()] :
-                    Upgrade.NON_RESOURCE_BUILDING_UPGRADE_TIMES[building.getLevel()];
-
-
-            LocalDateTime now = LocalDateTime.now();
-            construction.setStartedAt(now);
-            construction.setEndsAt(now.plusMinutes(upgradeTimeInMinutes.longValue()));
-
-            // Calculate the Duration between startedAt and endsAt
-            Duration upgradeDuration = Duration.between(now, construction.getEndsAt());
-            // Convert the Duration to the expected format for timeToUpgrade (assuming it's a Date)
-            Date timeToUpgradeDate = Date.from(now.plus(upgradeDuration).atZone(ZoneId.systemDefault()).toInstant());
-            building.setTimeToUpgrade(timeToUpgradeDate);
-
-            building.getVillage().getConstructions().add(construction);
-
-            // Save the construction item to the repository
-            constructionRepository.save(construction);
-            buildingRepository.save(building);
-            // Schedule a task to be executed when the construction completes
-            scheduleConstructionCompletion(construction);
-
-            return building;
-
-        } else {
+    private void validateResourcesForUpgrade(Long villageId, Map<TypeOfResource, Double> resourcesNeeded) {
+        if (!resourceService.hasEnoughResources(villageId, resourcesNeeded)) {
             throw new IllegalStateException("Player doesn't have enough resources to upgrade this building.");
         }
     }
 
+    private void deductResourcesAndInitiateConstruction(Building building, Map<TypeOfResource, Double> resourcesNeeded) {
+        resourceService.deductResources(building.getVillage().getId(), resourcesNeeded);
 
-    public void processOverdueConstructions(Long villageId) {
-        List<Construction> constructions = constructionRepository.findByVillageId(villageId);
+        Construction construction = new Construction();
+        construction.setBuildingId(building.getId());
+        construction.setVillage(building.getVillage());
         LocalDateTime now = LocalDateTime.now();
-        for (Construction construction : constructions) {
-            if (construction.getEndsAt().isBefore(now)) {
-                completeConstruction(construction);
-            }
-        }
+        construction.setStartedAt(now);
+        construction.setEndsAt(now.plusMinutes(building.getTimeToUpgrade()));
+
+        constructionRepository.save(construction);
+        building.setTimeToUpgrade(Date.from(construction.getEndsAt().atZone(ZoneId.systemDefault()).toInstant()));
+        buildingRepository.save(building);
+
+        scheduleConstructionCompletion(construction);
     }
 
     private void scheduleConstructionCompletion(Construction construction) {
         long delay = Duration.between(LocalDateTime.now(), construction.getEndsAt()).toMillis();
-        System.out.println("Scheduling construction completion with a delay of: " + delay + " milliseconds.");
-
         CompletableFuture.delayedExecutor(delay, TimeUnit.MILLISECONDS)
                 .execute(() -> completeConstruction(construction));
     }
 
+    @Transactional
     public void completeConstruction(Construction construction) {
-        System.out.println("Starting construction completion check for construction ID: " + construction.getId());
-
         if (construction.getEndsAt().isBefore(LocalDateTime.now())) {
-            System.out.println("Construction with ID " + construction.getId() + " is ready for completion.");
+            Building building = buildingRepository.findById(construction.getBuildingId())
+                    .orElseThrow(() -> new IllegalStateException("Building not found"));
 
-            Building building = buildingRepository.findById(construction.getBuildingId()).orElseThrow();
-
-            building.setLevel(building.getLevel() + 1);
-            building.setProductionRate(BigDecimal.valueOf(Upgrade.RESOURCE_BUILDING_PRODUCTION_RATES[building.getLevel()]));
+            building.setBuildingLevel(building.getBuildingLevel() + 1);
+            building.setProductionRate(BigDecimal.valueOf(Upgrade.getProductionRate(building.getType(), building.getBuildingLevel())));
             buildingRepository.save(building);
 
-            System.out.println("Building with ID " + building.getId() + " has been upgraded to level " + building.getLevel());
-
-            // Remove construction from the queue
             construction.getVillage().getConstructions().remove(construction);
             constructionRepository.delete(construction);
-
-            System.out.println("Construction with ID " + construction.getId() + " has been removed from the queue.");
-        } else {
-            System.out.println("Construction with ID " + construction.getId() + " is not yet ready for completion.");
         }
     }
-
 
     public Building findById(Long buildingId) {
         return buildingRepository.findById(buildingId).orElse(null);
     }
-
 }

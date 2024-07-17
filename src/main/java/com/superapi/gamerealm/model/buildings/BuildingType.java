@@ -1,44 +1,20 @@
 package com.superapi.gamerealm.model.buildings;
 
-import com.superapi.gamerealm.model.resources.TypeOfResource;
-
 public enum BuildingType {
-    FARM("Farm"),
-    QUARRY("Quarry"),
-    MINE("Mine"),
-    FOREST("Forest"),
-    PUB("Pub"),
-    BARRACKS("Barracks"),
-    GRAIN_SILO("Grain Silo"),
-    STORAGE("Storage"),
-    RESEARCH_CENTER("Research Center"),
-    STABLE("Stable"),
-    SIEGE_WORKSHOP("Siege Workshop"),
-ARCHERY_RANGE("Archery range");
-    private final String displayName;
+    FOREST,
+    MINE,
+    QUARRY,
+    FARM,
+    BARRACKS,
+    ARCHERY_RANGE,
+    STABLES,
+    WALLS;
 
-    BuildingType(String displayName) {
-        this.displayName = displayName;
+
+    public boolean isResourceBuilding() {
+        return this == FOREST || this == MINE || this == QUARRY || this == FARM;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
 
-    public TypeOfResource getResourceName() {
-
-        switch (this) {
-            case FARM:
-                return TypeOfResource.WHEAT;
-            case FOREST:
-                return TypeOfResource.WOOD;
-            case QUARRY:
-                return TypeOfResource.STONE;
-            case MINE:
-                return TypeOfResource.GOLD;
-            default:
-                throw new IllegalArgumentException("Unsupported building type: " + this);
-        }
-    }
 
 }

@@ -13,9 +13,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
 @Service
 public class ResourceService {
+    private static final TypeOfResource[] RESOURCE_TYPES = {
+            TypeOfResource.WOOD, TypeOfResource.WHEAT, TypeOfResource.STONE, TypeOfResource.GOLD
+    };
+
     private final ResourcesRepository resourcesRepository;
     private final VillageRepository villageRepository;
 
@@ -23,122 +26,157 @@ public class ResourceService {
         this.resourcesRepository = resourcesRepository;
         this.villageRepository = villageRepository;
     }
+
     public Map<TypeOfResource, Double> getAvailableResources(Long villageId) {
-        // Implement your logic to get the available resources for the given village
-        // This could involve database calls or other means to get the current resource levels
-        Map<TypeOfResource, Double> x = new HashMap<>();
-
-        Resources y = villageRepository.getById(villageId).getResources().get(0);
-        x.put(TypeOfResource.WHEAT,y.getWheat());
-        x.put(TypeOfResource.STONE,y.getStone());
-        x.put(TypeOfResource.WOOD,y.getWood());
-        x.put(TypeOfResource.GOLD,y.getGold());
-        return x;
+        Village village = getVillageById(villageId);
+        Resources resources = village.getResources().get(0);
+        Map<TypeOfResource, Double> availableResources = new HashMap<>();
+        for (TypeOfResource type : RESOURCE_TYPES) {
+            switch (type) {
+                case WOOD:
+                    availableResources.put(TypeOfResource.WOOD, resources.getWood());
+                    break;
+                case WHEAT:
+                    availableResources.put(TypeOfResource.WHEAT, resources.getWheat());
+                    break;
+                case STONE:
+                    availableResources.put(TypeOfResource.STONE, resources.getStone());
+                    break;
+                case GOLD:
+                    availableResources.put(TypeOfResource.GOLD, resources.getGold());
+                    break;
+            }
+        }
+        return availableResources;
     }
-
 
     @Transactional
     public void updateVillageResources(Village village) {
         synchronized(village) {
             Resources resources = village.getResources().get(0);
-
-            // calculate the time elapsed since the last update
+            LocalDateTime lastUpdated = village.getLastUpdated();
             LocalDateTime now = LocalDateTime.now();
-            long minutesElapsed = Duration.between(village.getLastUpdated(), now).toMinutes();
+            long minutesElapsed = Duration.between(lastUpdated, now).toMinutes();
 
-            // Calculate production for each resource type based on the buildings in the village
-            double woodProduction = village.getBuildings().stream()
-                    .filter(building -> building.getType() == BuildingType.FOREST)
-                    .mapToDouble(building -> building.getProductionRate().doubleValue())
-                    .sum();
-            double totalWoodProduced = woodProduction * minutesElapsed;
+            for (TypeOfResource type : RESOURCE_TYPES) {
+                double productionRate = calculateProductionRate(village, type);
+                double totalProduced = productionRate * minutesElapsed;
 
-            double wheatProduction = village.getBuildings().stream()
-                    .filter(building -> building.getType() == BuildingType.FARM)
-                    .mapToDouble(building -> building.getProductionRate().doubleValue())
-                    .sum();
-            double totalWheatProduced = wheatProduction * minutesElapsed;
+                switch (type) {
+                    case WOOD:
+                        resources.setWood(resources.getWood() + totalProduced);
+                        break;
+                    case WHEAT:
+                        resources.setWheat(resources.getWheat() + totalProduced);
+                        break;
+                    case STONE:
+                        resources.setStone(resources.getStone() + totalProduced);
+                        break;
+                    case GOLD:
+                        resources.setGold(resources.getGold() + totalProduced);
+                        break;
+                }
+            }
 
-            double stoneProduction = village.getBuildings().stream()
-                    .filter(building -> building.getType() == BuildingType.QUARRY)
-                    .mapToDouble(building -> building.getProductionRate().doubleValue())
-                    .sum();
-            double totalStoneProduced = stoneProduction * minutesElapsed;
-
-            double goldProduction = village.getBuildings().stream()
-                    .filter(building -> building.getType() == BuildingType.MINE)
-                    .mapToDouble(building -> building.getProductionRate().doubleValue())
-                    .sum();
-            double totalGoldProduced = goldProduction * minutesElapsed;
-
-            // Update the resources
-            resources.setWood(resources.getWood() + totalWoodProduced);
-            resources.setWheat(resources.getWheat() + totalWheatProduced);
-            resources.setStone(resources.getStone() + totalStoneProduced);
-            resources.setGold(resources.getGold() + totalGoldProduced);
-
-
-            // Save the updated resources to the database
             resourcesRepository.save(resources);
-            // update the lastUpdated timestamp
-            village.setLastUpdated(LocalDateTime.now());
-
-            // save the updated village in the database
+            village.setLastUpdated(now);
             villageRepository.save(village);
         }
     }
 
     public boolean hasEnoughResources(Long villageId, Map<TypeOfResource, Double> resourcesNeeded) {
         Village village = getVillageById(villageId);
-        // we will need to return here once we change the resources object
         Resources resources = village.getResources().get(0);
 
-        return resources.getWood() >= resourcesNeeded.getOrDefault(TypeOfResource.WOOD, 0.0) &&
-                resources.getWheat() >= resourcesNeeded.getOrDefault(TypeOfResource.WHEAT, 0.0) &&
-                resources.getStone() >= resourcesNeeded.getOrDefault(TypeOfResource.STONE, 0.0) &&
-                resources.getGold() >= resourcesNeeded.getOrDefault(TypeOfResource.GOLD, 0.0);
+        for (TypeOfResource type : RESOURCE_TYPES) {
+            if (resourcesNeeded.containsKey(type)) {
+                double needed = resourcesNeeded.get(type);
+                switch (type) {
+                    case WOOD:
+                        if (resources.getWood() < needed) return false;
+                        break;
+                    case WHEAT:
+                        if (resources.getWheat() < needed) return false;
+                        break;
+                    case STONE:
+                        if (resources.getStone() < needed) return false;
+                        break;
+                    case GOLD:
+                        if (resources.getGold() < needed) return false;
+                        break;
+                }
+            }
+        }
+        return true;
     }
 
+    @Transactional
     public void deductResources(Long villageId, Map<TypeOfResource, Double> resourcesToDeduct) {
         Village village = getVillageById(villageId);
-        //same here
         Resources resources = village.getResources().get(0);
-        double newWood = resources.getWood() - resourcesToDeduct.getOrDefault(TypeOfResource.WOOD, 0.0);
-        if (newWood >= 0) {
-            resources.setWood(newWood);
-        } else {
-            throw new RuntimeException("Not enough wood to deduct");
+
+        for (TypeOfResource type : RESOURCE_TYPES) {
+            if (resourcesToDeduct.containsKey(type)) {
+                double toDeduct = resourcesToDeduct.get(type);
+                switch (type) {
+                    case WOOD:
+                        if (resources.getWood() >= toDeduct) {
+                            resources.setWood(resources.getWood() - toDeduct);
+                        } else {
+                            throw new RuntimeException("Not enough wood to deduct");
+                        }
+                        break;
+                    case WHEAT:
+                        if (resources.getWheat() >= toDeduct) {
+                            resources.setWheat(resources.getWheat() - toDeduct);
+                        } else {
+                            throw new RuntimeException("Not enough wheat to deduct");
+                        }
+                        break;
+                    case STONE:
+                        if (resources.getStone() >= toDeduct) {
+                            resources.setStone(resources.getStone() - toDeduct);
+                        } else {
+                            throw new RuntimeException("Not enough stone to deduct");
+                        }
+                        break;
+                    case GOLD:
+                        if (resources.getGold() >= toDeduct) {
+                            resources.setGold(resources.getGold() - toDeduct);
+                        } else {
+                            throw new RuntimeException("Not enough gold to deduct");
+                        }
+                        break;
+                }
+            }
         }
 
-        double newWheat = resources.getWheat() - resourcesToDeduct.getOrDefault(TypeOfResource.WHEAT, 0.0);
-        if (newWheat >= 0) {
-            resources.setWheat(newWheat);
-        } else {
-            throw new RuntimeException("Not enough wheat to deduct");
-        }
-
-        double newStone = resources.getStone() - resourcesToDeduct.getOrDefault(TypeOfResource.STONE, 0.0);
-        if (newStone >= 0) {
-            resources.setStone(newStone);
-        } else {
-            throw new RuntimeException("Not enough stone to deduct");
-        }
-
-        double newGold = resources.getGold() - resourcesToDeduct.getOrDefault(TypeOfResource.GOLD, 0.0);
-        if (newGold >= 0) {
-            resources.setGold(newGold);
-        } else {
-            throw new RuntimeException("Not enough gold to deduct");
-        }
-
-        // Save the updated resources
         resourcesRepository.save(resources);
     }
 
-
     private Village getVillageById(Long villageId) {
-        return villageRepository.findById(villageId).orElseThrow(RuntimeException::new);
+        return villageRepository.findById(villageId).orElseThrow(() -> new RuntimeException("Village not found"));
     }
 
+    private double calculateProductionRate(Village village, TypeOfResource type) {
+        return village.getBuildings().stream()
+                .filter(building -> getBuildingTypeForResource(type) == building.getType())
+                .mapToDouble(building -> building.getProductionRate().doubleValue())
+                .sum();
+    }
 
+    private BuildingType getBuildingTypeForResource(TypeOfResource type) {
+        switch (type) {
+            case WOOD:
+                return BuildingType.FOREST;
+            case WHEAT:
+                return BuildingType.FARM;
+            case STONE:
+                return BuildingType.QUARRY;
+            case GOLD:
+                return BuildingType.MINE;
+            default:
+                throw new IllegalArgumentException("Invalid resource type");
+        }
+    }
 }
