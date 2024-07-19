@@ -1,5 +1,6 @@
 package com.superapi.gamerealm.model.buildings;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.superapi.gamerealm.model.Village;
 import com.superapi.gamerealm.model.resources.Upgrade;
@@ -41,10 +42,11 @@ public class Building {
     private int buildingLevel;
     private final int maxLevel = 10;
 
+    public Building() {
+    }
 
 
-
-    // Existing constructors and methods...
+// Existing constructors and methods...
 
     // New constructor for initializing with BuildingType and Village
     public Building(BuildingType type, Village village) {
