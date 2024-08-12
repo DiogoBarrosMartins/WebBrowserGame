@@ -23,6 +23,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+
+
 @Service
 public class BuildingService {
 
@@ -92,31 +94,46 @@ public class BuildingService {
             throw new IllegalStateException("Player doesn't have enough resources to upgrade this building.");
         }
     }
+
     private void deductResourcesAndInitiateConstruction(Building building, Map<TypeOfResource, Double> resourcesNeeded) {
+        // Debugging output for the building and resources
+        System.out.println("Starting deductResourcesAndInitiateConstruction");
+        System.out.println("Building ID: " + building.getId());
+        System.out.println("Village ID: " + building.getVillage().getId());
+        System.out.println("Resources needed: " + resourcesNeeded);
+
         resourceService.deductResources(building.getVillage().getId(), resourcesNeeded);
+        System.out.println("Resources deducted for village ID: " + building.getVillage().getId());
 
-
-        // Create a new Construction instance
+        // Debugging output for construction
         Construction construction = new Construction();
         construction.setBuildingId(building.getId());
         construction.setVillage(building.getVillage());
         LocalDateTime now = LocalDateTime.now();
         construction.setStartedAt(now);
+        System.out.println("Construction started at: " + now);
 
-        // Calculate and set the end time for construction
-        LocalDateTime endsAt = now.plusMinutes(building.getTimeToUpgrade().getMinute()); // Assuming timeToUpgrade is a LocalDateTime
+        LocalDateTime endsAt = building.getTimeToUpgrade();
+        if (endsAt == null) {
+            System.out.println("Warning: building.getTimeToUpgrade() is null.");
+        } else {
+            System.out.println("Building time to upgrade ends at: " + endsAt);
+        }
         construction.setEndsAt(endsAt);
 
-        // Save the construction instance
+        System.out.println("Saving construction for building ID: " + building.getId());
         constructionRepository.save(construction);
 
-        // Set timeToUpgrade in the Building instance
-        building.setTimeToUpgrade(construction.getEndsAt());
-        buildingRepository.save(building); // Save the updated Building instance
+        building.setTimeToUpgrade(endsAt);
+        System.out.println("Updated building's time to upgrade: " + endsAt);
+        buildingRepository.save(building);
 
-        // Schedule construction completion
+        System.out.println("Scheduling construction completion");
         scheduleConstructionCompletion(construction);
+
+        System.out.println("Finished deductResourcesAndInitiateConstruction for building ID: " + building.getId());
     }
+
 
 
     private void scheduleConstructionCompletion(Construction construction) {
