@@ -159,17 +159,15 @@ public class VillageService {
     }
 
     private void initializeDefaultResources(Village village) {
+                
         Resources resources = new Resources();
-        resources.setWood(1000.0);
-        resources.setWheat(1000.0);
-        resources.setStone(500.0);
-        resources.setGold(500.0);
-        resources.setVillage(village);
-
-        List<Resources> resourcesList = new ArrayList<>();
-        resourcesList.add(resources);
-
-        village.setResources(resourcesList);
+        Resources r = new Resources();
+        r.setWood(1000);
+        r.setWheat(1000);
+        r.setStone(500);
+        r.setGold(500);
+        r.setVillage(v);
+        v.setResources(List.of(r));
     }
 
 
